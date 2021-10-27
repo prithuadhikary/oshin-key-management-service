@@ -1,0 +1,385 @@
+openapi: 3.0.0
+info:
+  title: Cryptography Service
+  description: >-
+    Cryptography Service aims to provide features to perform
+    cryptographic operations, generate certificate signing requests and
+    certificates.
+  version: 1.0.0
+servers:
+  - url: 'https://localhost:8080'
+paths:
+  /aes/encrypt:
+    description: >-
+      Will perform AES encryption as per the parameters specified in the
+      request.
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/AesEncryptRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/AesEncryptResponse'
+  /aes/decrypt:
+    description: >-
+      Will perform AES decryption as per the parameters specified in the
+      request.
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/AesDecryptRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/AesDecryptResponse'
+  /certificate/generate-csr:
+    description: >
+      Will generate an asymmetric keypair and generate a Certificate Signing
+      Request for an entity
+
+      designated by the subject distinguished name.
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/GenerateCSRRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/GenerateCSRResponse'
+  /certificate/sign:
+    description: |-
+      Will accept the certificate signing request with additional parameters
+      such as validity and key usages.
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/CertificateSigningRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/CertificateSigningResponse'
+components:
+  schemas:
+    AesEncryptRequest:
+      description: >-
+        AES encrypt request containing the plaintext/message to encrypt along
+        with other parameters such as mode of operation, initialization vector,
+        tag length and additional authentication data.
+      type: object
+      properties:
+        message:
+          description: The message/plaintext data to encrypt using AES.
+          type: string
+          format: base64
+          example: SGVsbG8gV29ybGQ=
+        keyAlias:
+          description: The key alias of the key to use to encrypt the message.
+          type: string
+          example: aes-256-2021-10-24
+        modeOfOperation:
+          description: The cipher mode of operation to use while encrypting the message.
+          enum:
+            - CBC
+            - GCM
+          example: GCM
+        iv:
+          description: >-
+            Optional initialization vector to use while encrypting the message.
+            If not provided and required, one will be generated during
+            encryption.
+          type: string
+          format: base64
+          example: qrvM3e7/ESI=
+        tagLength:
+          description: >-
+            Optional field for AES GCM. Determines the length of tag(in bytes)
+            generated during GCM based encryption.
+          type: number
+          example: 16
+        additionalAuthData:
+          description: >-
+            Optional additional authentication data passed while using GCM mode
+            of operation.
+          type: string
+          format: base64
+          example: SGVsbG8gV29ybGQ=
+    AesEncryptResponse:
+      description: >
+        Response containing the resultant ciphertext after encryption, the
+        initialization vector used during the encryption and an optional tag
+        generated during encryption using GCM.
+      type: object
+      properties:
+        cipher:
+          description: The resultant ciphertext after encryption using AES.
+          type: string
+          format: base64
+          example: WZK+1FvQndtpUILu1YizzXHv5WpV
+        iv:
+          description: The initialization vector used during the encryption process.
+          type: string
+          format: base64
+          example: 84VptPggcdKfmTYR281myA==
+        tag:
+          description: >-
+            Optional tag generated during encryption using GCM mode of
+            operation.
+          type: string
+          format: base64
+          example: sKU9OnA349RZVf/h1qEt9w==
+    AesDecryptRequest:
+      description: >
+        AES decrypt request containing the cipher text to decrypt along with
+        parameters such as iv, tag, cipher mode of operation and additional
+        authentication data.
+      type: object
+      properties:
+        cipher:
+          description: The cipher text to decrypt using AES.
+          type: string
+          format: base64
+          example: WZK+1FvQndtpUILu1YizzXHv5WpV
+        tag:
+          description: >-
+            Optional tag required during the decryption process while using GCM
+            mode of operation.
+          type: string
+          format: base64
+          example: sKU9OnA349RZVf/h1qEt9w==
+        modeOfOperation:
+          description: The cipher mode of operation to use while decrypting the message.
+          enum:
+            - CBC
+            - GCM
+          example: GCM
+        iv:
+          description: |
+            Initialization vector to use while decrypting the cipher text.
+          type: string
+          format: base64
+          example: qrvM3e7/ESI=
+        additionalAuthData:
+          description: >-
+            Optional additional authentication data passed while using GCM mode
+            of operation.
+          type: string
+          format: base64
+          example: SGVsbG8gV29ybGQ=
+    AesDecryptResponse:
+      description: The response containing the decrypted message.
+      type: object
+      properties:
+        message:
+          description: The message obtained after the AES decryption process.
+          type: string
+          format: base64
+          example: UHJpdGh1IGlzIGEgZ29vZCBib3ku
+    GenerateCSRRequest:
+      description: >-
+        The GenerateCSRRequest contains the subject distinguished name to
+        generate the certificate for, the key type, representing the type of key
+        to generate and any associated parameters required for generation of the
+        key.
+      type: object
+      properties:
+        subjectDN:
+          description: >-
+            The subject distinguished name to generate the certificate signing
+            request for.
+          type: string
+          example: 'CN=Prithu,OU=O&T,O=MasterCard'
+        keyType:
+          description: The type of the key to generate.
+          type: string
+          enum:
+            - RSA
+            - ELLIPTIC_CURVE
+        keyGenParams:
+          description: A map containing parameters required for generation of the key.
+          type: object
+          properties:
+            keySize:
+              description: >-
+                The size of the RSA private key to generate. Required when key
+                type is RSA.
+              type: number
+              enum:
+                - 1024
+                - 2048
+                - 3072
+                - 4096
+              example: 4096
+            namedCurve:
+              description: >-
+                The named elliptic curve to generate the private key on.
+                Required when key type is Elliptic Curve.
+              type: string
+              example: secp256r1
+    GenerateCSRResponse:
+      description: >-
+        The GenerateCSRResponse object contains the wrapped private key
+        generated and the certificate signing request in PKCS10 format.
+      type: object
+      properties:
+        wrappedKey:
+          description: The wrapped private key.
+          type: string
+          format: base64
+          example: >-
+            GqcvgIIV1NDCSyxqBt+lSbcTxvfjBI0dDdaxB/JwKT2SkCAQtAGCWn7+eBbStbBDtRPR27BJiG71DVy7XLcVCgl0ThmcQ+dTyvgtsCf7/n8=
+        pkcs10CSR:
+          description: The Certificate Signing Request in PKCS10 format.
+          type: string
+          example: |-
+            -----BEGIN CERTIFICATE REQUEST-----
+            MIHuMIGWAgEAMDQxDzANBgNVBAMMBlByaXRodTEMMAoGA1UECwwDTyZUMRMwEQYD
+            VQQKDApNYXN0ZXJDYXJkMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyEqzOEEA
+            LbTXn2o5Zj/1DX3pb0CojKHLF1cjPqH6zDONJdm+I3qLb7z1jqUTKn2MFP96JfF9
+            BGBnSzm6SyXBfaAAMAoGCCqGSM49BAMCA0cAMEQCIGJi1pgr37ET5GFYv7QC/Qw9
+            lNTlhg54X25TrQl+NyXsAiAuzZTMjspslmcsJSi4wcd7KwnbmFy8GHXHtygPTSJe
+            4w==
+            -----END CERTIFICATE REQUEST-----
+    CertificateSigningRequest:
+      description: >-
+        Used to sign and provision an X509 certificate from a Certificate
+        Signing Request with mentioned validity and
+
+        key usages.
+      type: object
+      properties:
+        pkcs10CSR:
+          description: >-
+            PKCS10 certificate signing request containing subject public key
+            information and subject information etc.
+          type: string
+          example: |
+            -----BEGIN CERTIFICATE REQUEST-----
+            MIHuMIGWAgEAMDQxDzANBgNVBAMMBlByaXRodTEMMAoGA1UECwwDTyZUMRMwEQYD
+            VQQKDApNYXN0ZXJDYXJkMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEyEqzOEEA
+            LbTXn2o5Zj/1DX3pb0CojKHLF1cjPqH6zDONJdm+I3qLb7z1jqUTKn2MFP96JfF9
+            BGBnSzm6SyXBfaAAMAoGCCqGSM49BAMCA0cAMEQCIGJi1pgr37ET5GFYv7QC/Qw9
+            lNTlhg54X25TrQl+NyXsAiAuzZTMjspslmcsJSi4wcd7KwnbmFy8GHXHtygPTSJe
+            4w==
+            -----END CERTIFICATE REQUEST-----
+        validFrom:
+          description: The date onwards of which the signed certificate will be valid.
+          type: string
+          format: date-time
+          example: '2021-10-24T00:00+05:30'
+        validityInYears:
+          description: Validity of the certificate in years.
+          type: number
+          example: 5
+        keyUsages:
+          description: List of key usages the certificate is being provisioned for.
+          type: string
+          enum:
+            - KEY_AGREEMENT
+            - KEY_CERT_SIGN
+            - KEY_ENCIPHERMENT
+            - DATA_ENCIPHERMENT
+            - DECIPHER_ONLY
+            - ENCIPHER_ONLY
+            - DIGITAL_SIGNATURE
+            - NON_REPUDIATIUON
+        selfSigned:
+          description: |-
+            If true, will generate a self signed certificate. If false, an issuer certificate
+            must be passed.
+          type: boolean
+          example: t
+        wrappedIssuerPrivateKey:
+          description: |-
+            The wrapped issuer private key. The private key will be used to sign the certificate.
+          type: string
+          format: base64
+          example: |-
+            GqcvgIIV1NDCSyxqBt+lSbcTxvfjBI0dDdaxB/JwKT2gdVovXtZ+nzM3uR424i6ugOVVY2Y2mS80QmgaJhFgdvmql6F7kGcbn/szV2mGjDA=
+        issuerCertificate:
+          description: |-
+            Issuer Certificate as PEM. Required when the certificate to be generated is not self signed. The issuer
+            certificate is used to retrieve the Issuer Distinguished Name.
+          type: string
+          example: |
+            -----BEGIN CERTIFICATE-----
+            MIIBpjCCAUygAwIBAgIBATAKBggqhkjOPQQDAjA0MQ8wDQYDVQQDDAZQcml0aHUx
+            DDAKBgNVBAsMA08mVDETMBEGA1UECgwKTWFzdGVyQ2FyZDAeFw0yMTEwMjMxODMw
+            MDBaFw0zMTEwMjMxODMwMDBaMDQxDzANBgNVBAMMBlByaXRodTEMMAoGA1UECwwD
+            TyZUMRMwEQYDVQQKDApNYXN0ZXJDYXJkMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD
+            QgAESUL2dky6uyXBltS6U0Nd3UY9/Lakx7lpTc6KW5escCPLbK/NY0U5CWPCnp4f
+            aqLvjnKRMAtqlQ83hWjGEyIgPKNPME0wHQYDVR0OBBYEFKjpTe8ZO0KYngRN2Bvx
+            kXYbcYdRMB8GA1UdIwQYMBaAFKjpTe8ZO0KYngRN2BvxkXYbcYdRMAsGA1UdDwQE
+            AwICBDAKBggqhkjOPQQDAgNIADBFAiEAifFl4bGi9Y79aS746q89nEQDkOQvr4Kq
+            LSqnC1FQ7fYCIB/JsCZD3MjlZD35Yh/hW89QhqseV6sQgChExFi/j/ct
+            -----END CERTIFICATE-----
+        unwrappingKeyAlias:
+          description: |-
+            The key alias identifying the key to use to unwrap the wrapped key.
+          type: string
+          example: aes-256-2021-10-24
+        serial:
+          description: |-
+            The certificate serial number.
+          type: number
+          example: 1
+        signatureAlgorithm:
+          description: |-
+            The certificate signing algorithm. The issuer private key should match the
+            supported types of keys for the signing algorithm. For example, if the
+            signature algorithm is SHA256withECDSA then the issuer private key should be
+            an Elliptic Curve private key.
+          type: string
+          enum:
+            - SHA1withRSA
+            - SHA256withRSA
+            - SHA256withECDSA
+    CertificateSigningResponse:
+      description: Certificate signing response containing the issued X509 certificate.
+      type: object
+      properties:
+        certificate:
+          description: The issued X509 certificate.
+  requestBodies:
+    AesEncryptRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AesEncryptRequest'
+    AesDecryptRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AesDecryptRequest'
+    GenerateCSRRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenerateCSRRequest'
+    CertificateSigningRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CertificateSigningRequest'
+  responses:
+    AesEncryptResponse:
+      description: >-
+        Response containing the resultant ciphertext after encryption, the
+        initialization vector used during the encryption and an optional tag
+        generated during encryption using GCM.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AesEncryptResponse'
+    AesDecryptResponse:
+      description: The plain text message obtained after the AES decryption process.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AesDecryptResponse'
+    GenerateCSRResponse:
+      description: >-
+        The GenerateCSRResponse object contains the wrapped private key
+        generated and the certificate signing request in PKCS10 format.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenerateCSRResponse'
+    CertificateSigningResponse:
+      description: Certificate signing response containing the issued X509 certificate.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CertificateSigningResponse'

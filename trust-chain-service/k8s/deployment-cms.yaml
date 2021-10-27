@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-management-service
+  labels:
+    app: crypto-management-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: crypto-management-service
+  template:
+    metadata:
+      labels:
+        app: crypto-management-service
+    spec:
+      containers:
+        - name: crypto-management-service
+          image: prithuadhikary/crypto-management-service:1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8084
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crypto-management-service
+spec:
+  type: ClusterIP
+  selector:
+    app: crypto-management-service
+  ports:
+    - port: 80
+      targetPort: 8084
+#---
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: crypto-management-service
+#  annotations:
+#    kubernetes.io/ingress.class: haproxy
+#spec:
+#  rules:
+#    - http:
+#        paths:
+#          - backend:
+#              service:
+#                name: crypto-management-service
+#                port:
+#                  number: 80
+#            pathType: Prefix
+#            path: /api

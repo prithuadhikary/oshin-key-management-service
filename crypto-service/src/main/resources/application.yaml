@@ -1,0 +1,10 @@
+mock:
+  config:
+    aesKey: LJHvFxxPqfTy+y2S7Qvx6Q==
+
+spring:
+  application:
+    name: crypto-service
+
+server:
+  port: 8083

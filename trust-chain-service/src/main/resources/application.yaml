@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: trust-chain-service
+  cloud:
+    kubernetes:
+      discovery:
+        enabled: false
+      enabled: false
+
+server:
+  port: 8084
+  servlet:
+    context-path: /api/trust-chain-service
+

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-service
+  labels:
+    app: crypto-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: crypto-service
+  template:
+    metadata:
+      labels:
+        app: crypto-service
+    spec:
+      containers:
+        - name: crypto-service
+          image: prithuadhikary/crypto-service:1.0
+          imagePullPolicy: Always
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: local
+          ports:
+            - containerPort: 8083
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crypto-service
+spec:
+  type: ClusterIP
+  selector:
+    app: crypto-service
+  ports:
+    - port: 80
+      targetPort: 8083
+#---
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: crypto-service-ingress
+#  annotations:
+#    kubernetes.io/ingress.class: haproxy
+#spec:
+#  rules:
+#    - http:
+#        paths:
+#          - backend:
+#              service:
+#                name: crypto-service
+#                port:
+#                  number: 80
+#            pathType: Prefix
+#            path: /api
+#      host: opabs.labs.com
