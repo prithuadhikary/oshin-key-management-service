@@ -1,5 +1,7 @@
 package com.opabs.trustchain.domain;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.opabs.trustchain.views.TrustChainViews;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -11,6 +13,7 @@ import java.util.UUID;
 
 @Data
 @Entity
+@JsonView(TrustChainViews.CertificateWithoutTrustChain.class)
 public class TrustChain {
 
     @Id
@@ -24,5 +27,8 @@ public class TrustChain {
     private String name;
 
     private String description;
+
+    @OneToOne
+    private Certificate rootCertificate;
 
 }

@@ -1,8 +1,11 @@
 package com.opabs.trustchain.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.opabs.trustchain.controller.command.CreateTrustChainCommand;
+import com.opabs.trustchain.controller.command.UpdateTrustChainCommand;
 import com.opabs.trustchain.domain.TrustChain;
 import com.opabs.trustchain.service.TrustChainService;
+import com.opabs.trustchain.views.TrustChainViews;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,7 @@ public class TrustChainController {
 
     private final TrustChainService trustChainService;
 
+    @JsonView(TrustChainViews.CertificateWithoutTrustChain.class)
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TrustChain create(@RequestBody @Validated CreateTrustChainCommand command) {
@@ -38,8 +42,8 @@ public class TrustChainController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<TrustChain> update(@PathVariable("id") UUID id, @RequestBody TrustChain trustChain) {
-        return trustChainService.update(id, trustChain).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<TrustChain> update(@PathVariable("id") UUID id, @RequestBody UpdateTrustChainCommand command) {
+        return trustChainService.update(id, command).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("{id}")

@@ -7,20 +7,21 @@ import lombok.EqualsAndHashCode;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CreateTrustChainCommand extends GenerateCSRBase {
+public class CreateCertificateCommand extends GenerateCSRBase {
 
-    private String name;
+    private UUID parentCertificateId;
 
-    private String description;
+    private String subjectDistinguishedName;
 
-    private OffsetDateTime validFrom;
+    private List<KeyUsages> keyUsages;
 
     private Integer validityInYears;
 
-    private List<KeyUsages> keyUsages;
+    private OffsetDateTime validFrom;
 
     private SigningAlgorithm signatureAlgorithm;
 
