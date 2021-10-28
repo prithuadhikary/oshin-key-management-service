@@ -5,11 +5,14 @@ import com.opabs.common.enums.RSAKeySize;
 import com.opabs.common.model.KeyType;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
+
 @Data
 public class GenerateCSRBase {
 
     private KeyType keyType;
 
+    @NotEmpty
     private String subjectDistinguishedName;
 
     /**

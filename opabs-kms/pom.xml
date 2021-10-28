@@ -14,6 +14,7 @@
         <module>../crypto-service</module>
         <module>../trust-chain-service</module>
         <module>../gateway</module>
+        <module>../tenant-management-service</module>
     </modules>
 
 </project>

@@ -48,8 +48,8 @@ public class TrustChainService {
 
         GenerateCSRRequest request = createCSRRequest(command);
         GenerateCSRResponse csr = cryptoService.generateCSR(request);
-        log.info("CSR Response: {}", csr.getPkcs10CSR());
-        log.info("Wrapped Key: {}", csr.getWrappedKey());
+        log.debug("CSR Response: {}", csr.getPkcs10CSR());
+        log.debug("Wrapped Key: {}", csr.getWrappedKey());
 
         CertificateSigningRequest signingRequest = createSigningRequest(command, csr);
 

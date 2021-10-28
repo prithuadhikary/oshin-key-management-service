@@ -1,0 +1,9 @@
+server:
+  port: 8085
+  servlet:
+    context-path: /api/tenant-management-service
+
+spring:
+  cloud:
+    kubernetes:
+      enabled: false

@@ -1,4 +1,4 @@
-package com.opabs.trustchain.exception;
+package com.opabs.tenent.management.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

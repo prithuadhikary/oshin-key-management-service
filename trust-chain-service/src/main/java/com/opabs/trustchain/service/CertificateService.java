@@ -45,7 +45,7 @@ public class CertificateService {
         GenerateCSRResponse csrResponse = cryptoService.generateCSR(generateCSRRequest);
 
         Certificate parentCertificate = certificateRepository.findById(command.getParentCertificateId())
-                .orElseThrow(NotFoundException::new);
+                .orElseThrow(() -> new NotFoundException("Certificate", command.getParentCertificateId()));
 
         CertificateSigningRequest csrReq = new CertificateSigningRequest();
         csrReq.setKeyUsages(command.getKeyUsages());
