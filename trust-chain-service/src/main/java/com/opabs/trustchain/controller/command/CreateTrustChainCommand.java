@@ -9,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -21,6 +22,9 @@ public class CreateTrustChainCommand extends GenerateCSRBase {
 
     @NotNull
     private OffsetDateTime validFrom;
+
+    @NotNull
+    private UUID tenantExtId;
 
     @NotNull
     private Integer validityInYears;

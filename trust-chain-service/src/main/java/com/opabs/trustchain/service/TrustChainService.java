@@ -1,10 +1,7 @@
 package com.opabs.trustchain.service;
 
 import com.opabs.common.enums.KeyUsages;
-import com.opabs.common.model.CertificateSigningRequest;
-import com.opabs.common.model.CertificateSigningResponse;
-import com.opabs.common.model.GenerateCSRRequest;
-import com.opabs.common.model.GenerateCSRResponse;
+import com.opabs.common.model.*;
 import com.opabs.trustchain.controller.command.CreateTrustChainCommand;
 import com.opabs.trustchain.controller.command.UpdateTrustChainCommand;
 import com.opabs.trustchain.domain.Certificate;
@@ -16,6 +13,7 @@ import com.opabs.trustchain.repository.TrustChainRepository;
 import com.opabs.trustchain.utils.CertificateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -81,7 +79,7 @@ public class TrustChainService {
     }
 
     public Optional<TrustChain> findById(UUID id) {
-        return trustChainRepository.findById(id);
+        return trustChainRepository.findByIdAndDeleted(id, false);
     }
 
     private CertificateSigningRequest createSigningRequest(CreateTrustChainCommand command, GenerateCSRResponse csr) {
@@ -102,12 +100,18 @@ public class TrustChainService {
         return signingRequest;
     }
 
-    public Iterable<TrustChain> findAll(PageRequest pageRequest) {
-        return trustChainRepository.findAll(pageRequest);
+    public ListResponse<TrustChain> findAll(PageRequest pageRequest) {
+        Page<TrustChain> chains = trustChainRepository.findAllByDeleted(false, pageRequest);
+        ListResponse<TrustChain> response = new ListResponse<>();
+        response.setContent(chains.getContent());
+        response.setPage(pageRequest.getPageNumber());
+        response.setPageSize(pageRequest.getPageSize());
+        response.setTotalPages(chains.getTotalPages());
+        return response;
     }
 
     public Optional<TrustChain> update(UUID id, UpdateTrustChainCommand trustChain) {
-        Optional<TrustChain> existing = trustChainRepository.findById(id);
+        Optional<TrustChain> existing = trustChainRepository.findByIdAndDeleted(id, false);
         if (existing.isPresent()) {
             TrustChain existingTrustChain = existing.get();
             existingTrustChain.setDescription(trustChain.getDescription());
@@ -119,9 +123,11 @@ public class TrustChainService {
     }
 
     public Optional<TrustChain> delete(UUID id) {
-        Optional<TrustChain> existing = trustChainRepository.findById(id);
+        Optional<TrustChain> existing = trustChainRepository.findByIdAndDeleted(id, false);
         if (existing.isPresent()) {
-            trustChainRepository.delete(existing.get());
+            TrustChain trustChain = existing.get();
+            trustChain.setDeleted(true);
+            trustChainRepository.save(trustChain);
             return existing;
         } else {
             return Optional.empty();

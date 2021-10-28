@@ -1,5 +1,6 @@
 package com.opabs.tenent.management.controller;
 
+import com.opabs.common.model.ListResponse;
 import com.opabs.tenent.management.controller.command.CreateTenantCommand;
 import com.opabs.tenent.management.controller.command.UpdateTenantCommand;
 import com.opabs.tenent.management.controller.response.CreateTenantResponse;
@@ -29,7 +30,7 @@ public class TenantController {
     }
 
     @GetMapping
-    public Iterable<Tenant> list(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "20") Integer size) {
+    public ListResponse<Tenant> list(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "20") Integer size) {
         return tenantService.findAll(PageRequest.of(page, size));
     }
 

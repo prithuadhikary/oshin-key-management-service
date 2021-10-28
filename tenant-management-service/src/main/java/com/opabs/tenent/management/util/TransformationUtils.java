@@ -21,6 +21,7 @@ public class TransformationUtils {
             contactInfoDTO.getAddresses().forEach(addressDTO -> {
                 Address address = new Address();
                 copyProperties(addressDTO, address);
+                address.setContactInfo(contactInfo);
                 addresses.add(address);
             });
             contactInfo.setAddresses(addresses);

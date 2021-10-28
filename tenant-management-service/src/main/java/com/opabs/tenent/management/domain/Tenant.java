@@ -23,7 +23,9 @@ public class Tenant {
 
     private String name;
 
-    @OneToOne
+    private boolean deleted;
+
+    @OneToOne(mappedBy = "tenant")
     private ContactInfo contactInfo;
 
 }

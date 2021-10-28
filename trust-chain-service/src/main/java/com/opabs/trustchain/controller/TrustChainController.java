@@ -1,6 +1,7 @@
 package com.opabs.trustchain.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.opabs.common.model.ListResponse;
 import com.opabs.trustchain.controller.command.CreateTrustChainCommand;
 import com.opabs.trustchain.controller.command.UpdateTrustChainCommand;
 import com.opabs.trustchain.domain.TrustChain;
@@ -37,7 +38,7 @@ public class TrustChainController {
     }
 
     @GetMapping
-    public Iterable<TrustChain> list(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "20") Integer size) {
+    public ListResponse<TrustChain> list(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "20") Integer size) {
         return trustChainService.findAll(PageRequest.of(page, size));
     }
 

@@ -2,6 +2,7 @@ package com.opabs.tenent.management.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
+@EqualsAndHashCode(exclude = "tenant")
 @Entity
 public class ContactInfo {
 
@@ -24,11 +26,11 @@ public class ContactInfo {
 
     private String emailAddress;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "contactInfo")
     private List<Address> addresses;
 
     @JsonIgnore
-    @ManyToOne
+    @OneToOne
     private Tenant tenant;
 
 }
