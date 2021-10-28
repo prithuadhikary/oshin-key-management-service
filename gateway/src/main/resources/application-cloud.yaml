@@ -8,11 +8,12 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: false
+          enabled: true
+    kubernetes:
+      enabled: true
 
-routeLocator:
-  uriPrefix: http://
-
-eureka:
-  client:
-    enabled: false
+endpoint:
+  configuration:
+    cryptoService: http://crypto-service/
+    trustChainService: http://trust-chain-service/
+    tenantManagementService: http://tenant-management-service

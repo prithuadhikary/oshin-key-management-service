@@ -9,9 +9,9 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 @Component
-public class ExampleWebFilter implements WebFilter {
+public class RequestTracerFilter implements WebFilter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExampleWebFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestTracerFilter.class);
 
     @Override
     public Mono<Void> filter(ServerWebExchange serverWebExchange,

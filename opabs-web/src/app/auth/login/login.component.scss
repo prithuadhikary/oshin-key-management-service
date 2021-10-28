@@ -1,0 +1,31 @@
+@import '~@angular/material/theming';
+
+.login-form-outer {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    min-height: 100vh;
+
+    .login-form-inner {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .login-form-card {
+        height: 250px;
+        @include mat-elevation-transition;
+        @include mat-elevation(2);
+
+        &:hover {
+            @include mat-elevation(8);
+        }
+        button {
+            margin: 15px 0;
+        }
+    }
+
+    .form-field {
+        width: 400px;
+    }
+}

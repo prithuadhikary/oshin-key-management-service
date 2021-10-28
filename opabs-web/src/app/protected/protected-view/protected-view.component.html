@@ -1,0 +1,14 @@
+<mat-toolbar>
+    <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
+      <span>OPABS KMS</span>
+      <div>
+        <button mat-button [routerLink]="['/protected', 'dashboard']">Dashboard</button>
+        <button mat-button [routerLink]="['/protected', 'tenants']">Tenants</button>
+        <button mat-button (click)="logout()">Logout</button>
+      </div>
+    </mat-toolbar-row>
+</mat-toolbar>
+<div class="display-area" fxFlexFill>
+    <router-outlet></router-outlet>
+</div>
+

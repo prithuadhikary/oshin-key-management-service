@@ -7,11 +7,16 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: true
+          enabled: false
           lower-case-service-id: true
+    kubernetes:
+      enabled: false
 
-route-locator:
-  uri-prefix: lb://
+endpoint:
+  configuration:
+    cryptoService: http://localhost:8083
+    trustChainService: http://localhost:8084
+    tenantManagementService: http://localhost:8085
 
 management:
   endpoints:

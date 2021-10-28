@@ -1,0 +1,17 @@
+<div class="page-header">
+  <h1>Tenants</h1>
+  <hr>
+</div>
+<div class="wrapper" fxLayout="row" fxLayoutAlign="start start">
+  <div fxFlex="30%" fxLayout="column" fxFlexFill>
+     <div [ngClass]="{ item: true, selected: isSelected(tenant) }" *ngFor="let tenant of (tenantsResponse | async)?.content" (click)="setSelectedTenant(tenant)">
+        <h3><fa-icon [icon]="faBuilding"></fa-icon> {{tenant.name}}</h3>
+     </div>
+  </div>
+  <div class="item-details" fxFlex="70%" *ngIf="selectedTenant">
+    <h2><fa-icon class="fa-1x" [icon]="faBuilding"></fa-icon> {{selectedTenant.name}}</h2>
+  </div>
+  <div fxFlex="70%" *ngIf="!selectedTenant" fxLayout="row" fxLayoutAlign="center center">
+    <h3>Please select a tenant to view.</h3>
+  </div>
+</div>
