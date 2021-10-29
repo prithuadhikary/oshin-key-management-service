@@ -6,7 +6,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {FlexModule} from '@angular/flex-layout';
 import {MatCardModule} from '@angular/material/card';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-
+import {NgxChartsModule} from '@swimlane/ngx-charts';
 const routes: Routes = [
   { path: '', component: TenantsListComponent, pathMatch: 'full' }
 ];
@@ -18,7 +18,8 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     FlexModule,
     MatCardModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    NgxChartsModule
   ]
 })
 export class TenantsModule { }

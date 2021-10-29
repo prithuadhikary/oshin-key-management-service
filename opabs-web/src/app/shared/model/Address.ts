@@ -6,7 +6,7 @@ export interface Address {
 
     city: string;
 
-    state: string;
+    stateOrProvince: string;
 
     zip: string;
 

@@ -3,13 +3,48 @@
   <hr>
 </div>
 <div class="wrapper" fxLayout="row" fxLayoutAlign="start start">
-  <div fxFlex="30%" fxLayout="column" fxFlexFill>
+  <div class="item-list" fxFlex="30%" fxLayout="column" fxFlexFill>
      <div [ngClass]="{ item: true, selected: isSelected(tenant) }" *ngFor="let tenant of (tenantsResponse | async)?.content" (click)="setSelectedTenant(tenant)">
         <h3><fa-icon [icon]="faBuilding"></fa-icon> {{tenant.name}}</h3>
      </div>
   </div>
-  <div class="item-details" fxFlex="70%" *ngIf="selectedTenant">
-    <h2><fa-icon class="fa-1x" [icon]="faBuilding"></fa-icon> {{selectedTenant.name}}</h2>
+  <div class="item-details" fxLayout="column" fxFlex="70%" *ngIf="selectedTenant">
+    <h1><fa-icon class="fa-1x" [icon]="faBuilding"></fa-icon> {{selectedTenant.name}}</h1>
+    <h2>Contact Info</h2>
+    <blockquote>
+      <span *ngIf="selectedTenant.contactInfo.phone" >Phone: {{selectedTenant.contactInfo.phone}}</span><br>
+      <span *ngIf="selectedTenant.contactInfo.emailAddress">Email: {{selectedTenant.contactInfo.emailAddress}}</span>
+    </blockquote>
+    <h2>Certificates And Keys</h2>
+    <div fxLayout="row" *ngIf="chartData && chartData.length > 0; else elseBlock">
+      <ngx-charts-pie-chart
+        [view]="view"
+        [scheme]="colorScheme"
+        [results]="chartData"
+        [gradient]="gradient"
+        [legend]="showLegend"
+        [labels]="showLabels"
+        [doughnut]="isDoughnut"
+      >
+      </ngx-charts-pie-chart>
+    </div>
+    <ng-template #elseBlock>
+      <div fxLayout="row">
+        <blockquote>
+          <h3>No certificates found for this tenant.</h3>
+        </blockquote>
+      </div>
+    </ng-template>
+    <h2>Addresses</h2>
+    <div fxLayout="row">
+      <blockquote *ngFor="let address of selectedTenant.contactInfo.addresses">
+        {{address.addressLine1}}<br>
+        {{address.addressLine2}}<br>
+        {{address.city}}<br>
+        {{address.stateOrProvince}}<br>
+        {{address.country}}
+      </blockquote>
+    </div>
   </div>
   <div fxFlex="70%" *ngIf="!selectedTenant" fxLayout="row" fxLayoutAlign="center center">
     <h3>Please select a tenant to view.</h3>

@@ -4,6 +4,7 @@ import com.opabs.common.model.ListResponse;
 import com.opabs.tenent.management.controller.command.CreateTenantCommand;
 import com.opabs.tenent.management.controller.command.UpdateTenantCommand;
 import com.opabs.tenent.management.controller.response.CreateTenantResponse;
+import com.opabs.tenent.management.controller.response.TenantListResponse;
 import com.opabs.tenent.management.domain.ContactInfo;
 import com.opabs.tenent.management.domain.Tenant;
 import com.opabs.tenent.management.repository.AddressRepository;
@@ -55,11 +56,13 @@ public class TenantService {
 
     public ListResponse<Tenant> findAll(PageRequest pageRequest) {
         Page<Tenant> tenants = tenantRepository.findAllByDeleted(false, pageRequest);
+        //TODO: Get certificate info data from the trust chain service and populate tenantlistreposne.
         ListResponse<Tenant> response = new ListResponse<>();
         response.setContent(tenants.getContent());
         response.setPage(pageRequest.getPageNumber());
         response.setPageSize(pageRequest.getPageSize());
         response.setTotalPages(tenants.getTotalPages());
+
         return response;
     }
 

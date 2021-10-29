@@ -27,7 +27,7 @@ export class AuthEffects {
                         addressLine1: 'F701, Surobhi Township',
                         addressLine2: 'Tingare Nagar',
                         city: 'Pune',
-                        state: 'Maharashtra',
+                        stateOrProvince: 'Maharashtra',
                         country: 'India',
                         zip: '411015'
                     }]
@@ -35,6 +35,6 @@ export class AuthEffects {
             }));
             this._router.navigate(['protected', 'dashboard']);
         }
-        )), { dispatch: false })
+        )), { dispatch: false });
 
 }

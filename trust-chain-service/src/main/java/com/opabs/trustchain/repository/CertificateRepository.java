@@ -1,11 +1,17 @@
 package com.opabs.trustchain.repository;
 
 import com.opabs.trustchain.domain.Certificate;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
 public interface CertificateRepository extends PagingAndSortingRepository<Certificate, UUID> {
+
+    @Query("SELECT c.keyType as keyType, count(c) as count from Certificate c WHERE c.trustChain.tenantExtId = ?1 group by c.keyType")
+    List<CountByKeyType> countByTenantExtId(UUID tenantId);
+
 }

@@ -6,8 +6,11 @@ import com.opabs.trustchain.controller.command.CreateTrustChainCommand;
 import com.opabs.trustchain.controller.command.UpdateTrustChainCommand;
 import com.opabs.trustchain.domain.Certificate;
 import com.opabs.trustchain.domain.TrustChain;
+import com.opabs.trustchain.exception.NotFoundException;
 import com.opabs.trustchain.feign.CryptoService;
+import com.opabs.trustchain.feign.TenantManagementService;
 import com.opabs.trustchain.model.CertificateInfo;
+import com.opabs.trustchain.model.TenantInfo;
 import com.opabs.trustchain.repository.CertificateRepository;
 import com.opabs.trustchain.repository.TrustChainRepository;
 import com.opabs.trustchain.utils.CertificateUtils;
@@ -33,16 +36,20 @@ public class TrustChainService {
 
     private final CryptoService cryptoService;
 
+    private final TenantManagementService tenantManagementService;
+
     private final TrustChainRepository trustChainRepository;
 
     private final CertificateRepository certificateRepository;
 
     public TrustChain create(CreateTrustChainCommand command) {
 
-        //1. Create a root certificate using crypto service with key usage
-        //2. Create TrustChain entity.
-        //3. Save certificate and wrappedPrivateKey.
-        //4. Return fully populated TrustChainEntity back to the client.
+        //1. Validate tenantExtId with tenant management service.
+        //2. Create a root certificate using crypto service with key usage
+        //3. Create TrustChain entity.
+        //4. Save certificate and wrappedPrivateKey.
+        //5. Return fully populated TrustChain entity back to the client.
+        validateTenantExtId(command);
 
         GenerateCSRRequest request = createCSRRequest(command);
         GenerateCSRResponse csr = cryptoService.generateCSR(request);
@@ -54,6 +61,7 @@ public class TrustChainService {
         CertificateSigningResponse signingResponse = cryptoService.signCSR(signingRequest);
 
         TrustChain trustChain = new TrustChain();
+        trustChain.setTenantExtId(command.getTenantExtId());
         trustChain.setName(command.getName());
         trustChain.setDescription(command.getDescription());
 
@@ -66,6 +74,7 @@ public class TrustChainService {
         byte[] wrappedKey = Base64.getDecoder().decode(csr.getWrappedKey());
         certificate.setWrappedPrivateKey(compress(wrappedKey));
         certificate.setTrustChain(trustChain);
+        certificate.setKeyType(command.getKeyType());
 
         CertificateInfo certInfo = CertificateUtils.getCertificateInfo(signingResponse.getCertificate());
         certificate.setPublicKeyFingerprint(certInfo.getPublicKeyFingerprint());
@@ -78,6 +87,18 @@ public class TrustChainService {
         return trustChain;
     }
 
+    private void validateTenantExtId(CreateTrustChainCommand command) {
+        try {
+            TenantInfo tenantInfo = tenantManagementService.getTenantInfo(command.getTenantExtId());
+            if (!tenantInfo.getId().equals(command.getTenantExtId())) {
+                throw new NotFoundException("tenant", command.getTenantExtId());
+            }
+        } catch (Exception ex) {
+            log.error("Error occurred while fetching tenant information.", ex);
+            throw new NotFoundException("tenant", command.getTenantExtId());
+        }
+    }
+
     public Optional<TrustChain> findById(UUID id) {
         return trustChainRepository.findByIdAndDeleted(id, false);
     }
@@ -85,11 +106,10 @@ public class TrustChainService {
     private CertificateSigningRequest createSigningRequest(CreateTrustChainCommand command, GenerateCSRResponse csr) {
         CertificateSigningRequest signingRequest = new CertificateSigningRequest();
         signingRequest.setSelfSigned(true);
-        if (command.getKeyUsages() != null && !command.getKeyUsages().isEmpty()) {
-            signingRequest.setKeyUsages(command.getKeyUsages());
-        } else {
-            signingRequest.setKeyUsages(Collections.singletonList(KeyUsages.KEY_CERT_SIGN));
-        }
+
+        //Default for a self signed root certificate.
+        signingRequest.setKeyUsages(Collections.singletonList(KeyUsages.KEY_CERT_SIGN));
+
         signingRequest.setPkcs10CSR(csr.getPkcs10CSR());
         signingRequest.setSignatureAlgorithm(command.getSignatureAlgorithm());
         //TODO: Change this to use a valid key alias after implementation of key alias based keys.

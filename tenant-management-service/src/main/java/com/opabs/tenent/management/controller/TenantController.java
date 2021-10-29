@@ -4,6 +4,7 @@ import com.opabs.common.model.ListResponse;
 import com.opabs.tenent.management.controller.command.CreateTenantCommand;
 import com.opabs.tenent.management.controller.command.UpdateTenantCommand;
 import com.opabs.tenent.management.controller.response.CreateTenantResponse;
+import com.opabs.tenent.management.controller.response.TenantListResponse;
 import com.opabs.tenent.management.domain.Tenant;
 import com.opabs.tenent.management.service.TenantService;
 import lombok.RequiredArgsConstructor;

@@ -12,3 +12,5 @@ server:
   servlet:
     context-path: /api/trust-chain-service
 
+
+

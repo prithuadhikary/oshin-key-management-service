@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.opabs.trustchain.utils.CertificateUtils.*;
+import static com.opabs.trustchain.utils.CompressionUtils.compress;
 import static com.opabs.trustchain.utils.CompressionUtils.uncompress;
 
 @Service
@@ -63,8 +64,11 @@ public class CertificateService {
 
         Certificate newCertificate = new Certificate();
         newCertificate.setAnchor(false);
+        newCertificate.setKeyType(command.getKeyType());
         newCertificate.setParentCertificate(parentCertificate);
         newCertificate.setContent(fromPemCertificate(certificateResponse.getCertificate()));
+        newCertificate.setTrustChain(parentCertificate.getTrustChain());
+        newCertificate.setWrappedPrivateKey(compress(Base64.getDecoder().decode(csrResponse.getWrappedKey())));
 
         CertificateInfo certificateInfo = CertificateUtils.getCertificateInfo(certificateResponse.getCertificate());
         newCertificate.setCertificateFingerprint(certificateInfo.getCertificateFingerprint());

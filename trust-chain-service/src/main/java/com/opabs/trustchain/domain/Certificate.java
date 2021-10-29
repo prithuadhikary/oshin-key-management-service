@@ -2,6 +2,7 @@ package com.opabs.trustchain.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.opabs.common.model.KeyType;
 import com.opabs.trustchain.views.TrustChainViews;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
@@ -41,5 +42,8 @@ public class Certificate {
 
     @OneToOne
     private TrustChain trustChain;
+
+    @Enumerated(EnumType.STRING)
+    private KeyType keyType;
 
 }

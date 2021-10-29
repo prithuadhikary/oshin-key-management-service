@@ -24,15 +24,14 @@ public class CreateTrustChainCommand extends GenerateCSRBase {
     private OffsetDateTime validFrom;
 
     @NotNull
-    private UUID tenantExtId;
-
-    @NotNull
     private Integer validityInYears;
 
-    @NotEmpty
     private List<KeyUsages> keyUsages;
 
     @NotNull
     private SigningAlgorithm signatureAlgorithm;
+
+    @NotNull
+    private UUID tenantExtId;
 
 }

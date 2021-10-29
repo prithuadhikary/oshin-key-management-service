@@ -11,7 +11,7 @@ public class NotFoundException extends BadRequestException {
 
     public NotFoundException(String entity, UUID id) {
         super(
-                MessageFormat.format("Entity {} with id {} Not found", entity, id),
+                MessageFormat.format("Entity {0} with id {1} not found.", entity, id),
                 ErrorCode.NOT_FOUND
         );
     }
