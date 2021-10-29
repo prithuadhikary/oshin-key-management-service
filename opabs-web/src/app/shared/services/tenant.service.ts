@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {LoadTenantsRequest} from '../model/LoadTenantsRequest';
 import {CreateTenantRequest} from '../model/CreateTenantRequest';
+import {UpdateTenantRequest} from '../model/UpdateTenantRequest';
 
 @Injectable({
   providedIn: 'root'
@@ -19,12 +20,23 @@ export class TenantService {
     );
   }
 
-  create(createTenantRequest: any): Observable<any> {
-    console.log(createTenantRequest);
+  create(createTenantRequest: CreateTenantRequest): Observable<any> {
     return this.http.post(
       '/api/tenant-management-service/tenant',
       createTenantRequest
     );
+  }
+
+  update(updateTenantReqeust: UpdateTenantRequest): Observable<any> {
+    return this.http.put(
+      '/api/tenant-management-service/tenant/' + updateTenantReqeust.id,
+      updateTenantReqeust
+    );
+  }
+
+  show(id: string): Observable<any> {
+    return this.http.get(
+      '/api/tenant-management-service/tenant/' + id);
   }
 
 }

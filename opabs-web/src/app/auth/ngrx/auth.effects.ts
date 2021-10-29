@@ -29,7 +29,7 @@ export class AuthEffects {
                         city: 'Pune',
                         stateOrProvince: 'Maharashtra',
                         country: 'India',
-                        zip: '411015'
+                        zipCode: '411015'
                     }]
                 }
             }));

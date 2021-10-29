@@ -7,26 +7,27 @@
      <div fxLayout="row" fxLayoutAlign="start center" [ngClass]="{ item: true, selected: isSelected(tenant) }" *ngFor="let tenant of (tenantsResponse | async)?.content" (click)="setSelectedTenant(tenant)">
         <h3><fa-icon [icon]="faBuilding"></fa-icon> {{tenant.name}}</h3>
      </div>
+    <mat-paginator [length]="paginatorLength"
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="pageSizeOptions"
+                   (page)="changePage($event)"
+                   aria-label="Select page">
+    </mat-paginator>
   </div>
   <div class="item-details" fxLayout="column" fxFlex="70%" *ngIf="selectedTenant">
-    <h1><fa-icon class="fa-1x" [icon]="faBuilding"></fa-icon> {{selectedTenant.name}}</h1>
+    <h1>
+      <fa-icon class="fa-1x" [icon]="faBuilding"></fa-icon>
+      {{selectedTenant.name}}
+      <fa-icon class="edit-btn" [icon]="faEdit" (click)="openEditDialog()"></fa-icon>
+    </h1>
     <h2>Contact Info</h2>
     <blockquote>
       <span *ngIf="selectedTenant.contactInfo.phone" >Phone: {{selectedTenant.contactInfo.phone}}</span><br>
       <span *ngIf="selectedTenant.contactInfo.emailAddress">Email: {{selectedTenant.contactInfo.emailAddress}}</span>
     </blockquote>
     <h2>Certificates And Keys</h2>
-    <div fxLayout="row" *ngIf="chartData && chartData.length > 0; else elseBlock">
-      <ngx-charts-pie-chart
-        [view]="view"
-        [scheme]="colorScheme"
-        [results]="chartData"
-        [gradient]="gradient"
-        [legend]="showLegend"
-        [labels]="showLabels"
-        [doughnut]="isDoughnut"
-      >
-      </ngx-charts-pie-chart>
+    <div fxLayout="row" *ngIf="showChart; else elseBlock">
+      <div id="chart"></div>
     </div>
     <ng-template #elseBlock>
       <div fxLayout="row">

@@ -1,0 +1,18 @@
+.header {
+  margin-bottom: 10px;
+  h2 {
+    margin: 0;
+  }
+}
+.add-address-icon {
+  margin: 4px;
+}
+.address-container {
+  position: relative;
+
+  fa-icon.remove-address-icon {
+    position: absolute;
+    top: -2px;
+    right: 0;
+  }
+}

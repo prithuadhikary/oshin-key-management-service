@@ -13,12 +13,15 @@ import {MatDialogModule} from '@angular/material/dialog';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AddTenantComponent } from './add-tenant/add-tenant.component';
 import {MatInputModule} from '@angular/material/input';
+import { EditTenantComponent } from './edit-tenant/edit-tenant.component';
+import {MatPaginatorModule} from '@angular/material/paginator';
+
 const routes: Routes = [
   { path: '', component: TenantsListComponent, pathMatch: 'full' }
 ];
 
 @NgModule({
-  declarations: [TenantsListComponent, AddTenantComponent],
+  declarations: [TenantsListComponent, AddTenantComponent, EditTenantComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -30,7 +33,8 @@ const routes: Routes = [
     MatButtonModule,
     MatDialogModule,
     ReactiveFormsModule,
-    MatInputModule
+    MatInputModule,
+    MatPaginatorModule
   ]
 })
 export class TenantsModule { }

@@ -8,7 +8,7 @@ export interface Address {
 
     stateOrProvince: string;
 
-    zip: string;
+    zipCode: string;
 
     country: string;
 

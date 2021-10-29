@@ -5,4 +5,5 @@ export interface LoadTenantsResponse {
   page: number;
   pageSize: number;
   totalPages: number;
+  totalElements: number;
 }

@@ -51,6 +51,7 @@
 }
 
 .item-details {
+  position: relative;
   padding: 20px;
   h2 {
     margin: 0;
@@ -59,10 +60,21 @@
     font-size: 15px;
   }
 
+  .edit-btn {
+    color: #707070;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+
   blockquote {
     margin-left: 0;
     border-left: 10px solid #707070;
     padding-left: 10px;
     min-height: 10px;
   }
+}
+
+#chart {
+  height: 300px;
+  width: 300px;
 }

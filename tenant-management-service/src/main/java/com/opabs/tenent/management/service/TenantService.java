@@ -61,6 +61,7 @@ public class TenantService {
         response.setPage(pageRequest.getPageNumber());
         response.setPageSize(pageRequest.getPageSize());
         response.setTotalPages(tenants.getTotalPages());
+        response.setTotalElements(tenants.getTotalElements());
 
         return response;
     }

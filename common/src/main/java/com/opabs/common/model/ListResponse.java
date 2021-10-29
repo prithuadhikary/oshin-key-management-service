@@ -13,4 +13,6 @@ public class ListResponse<T> {
 
     private Integer totalPages;
 
+    private long totalElements;
+
 }
