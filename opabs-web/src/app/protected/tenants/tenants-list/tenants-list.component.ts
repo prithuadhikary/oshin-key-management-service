@@ -2,10 +2,12 @@ import {Component, OnInit} from '@angular/core';
 import {TenantService} from '../../../shared/services/tenant.service';
 import {Observable} from 'rxjs';
 import {LoadTenantsResponse} from '../../../shared/model/LoadTenantsResponse';
-import {faBuilding} from '@fortawesome/free-solid-svg-icons';
+import {faBuilding, faPlus} from '@fortawesome/free-solid-svg-icons';
 import {Tenant} from '../../../shared/model/Tenant';
 import {Color, ScaleType} from '@swimlane/ngx-charts';
 import {CertificateService} from '../../../shared/services/certificate.service';
+import {MatDialog} from '@angular/material/dialog';
+import {AddTenantComponent} from '../add-tenant/add-tenant.component';
 
 @Component({
   selector: 'app-tenants-list',
@@ -31,17 +33,23 @@ export class TenantsListComponent implements OnInit {
   };
 
   faBuilding = faBuilding;
+  faPlus = faPlus;
 
   selectedTenant: Tenant;
 
   constructor(
     private tenantService: TenantService,
-    private certificateService: CertificateService
+    private certificateService: CertificateService,
+    public dialog: MatDialog
   ) { }
 
   tenantsResponse: Observable<LoadTenantsResponse>;
 
   ngOnInit(): void {
+    this.loadList();
+  }
+
+  loadList(): void {
     this.tenantsResponse = this.tenantService.list({
       page: 0,
       size: 20
@@ -55,7 +63,7 @@ export class TenantsListComponent implements OnInit {
         const chartData: any = [];
         for (const certCountInfo of data.certificateCountInfos) {
           chartData.push({
-            name: certCountInfo.keyType,
+            name: certCountInfo.keyType.replace('_', ' ') + ' Certificate(s)',
             value: certCountInfo.certificateCount
           });
         }
@@ -65,5 +73,17 @@ export class TenantsListComponent implements OnInit {
 
   isSelected(tenant): boolean {
     return tenant.id === this.selectedTenant?.id;
+  }
+
+  openAddDialog() {
+    this.dialog.open(AddTenantComponent, {
+      disableClose: true
+    })
+      .afterClosed().subscribe(result => {
+        console.log(result);
+        this.tenantService.create(result).subscribe(data => {
+            this.loadList();
+        });
+    });
   }
 }

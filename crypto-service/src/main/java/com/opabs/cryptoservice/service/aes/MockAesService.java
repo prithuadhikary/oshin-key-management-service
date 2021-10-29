@@ -1,11 +1,11 @@
 package com.opabs.cryptoservice.service.aes;
 
+import com.opabs.common.enums.ModeOfOperation;
 import com.opabs.common.model.AesDecryptRequest;
 import com.opabs.common.model.AesDecryptResponse;
 import com.opabs.common.model.AesEncryptRequest;
 import com.opabs.common.model.AesEncryptResponse;
 import com.opabs.cryptoservice.config.MockConfig;
-import com.opabs.common.enums.ModeOfOperation;
 import com.opabs.cryptoservice.exception.BadTagException;
 import com.opabs.cryptoservice.service.model.AesCommandBase;
 import com.opabs.cryptoservice.service.model.AesDecryptCommand;

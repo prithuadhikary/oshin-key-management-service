@@ -5,9 +5,12 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.opabs.common.model.KeyType;
 import com.opabs.trustchain.views.TrustChainViews;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -45,5 +48,11 @@ public class Certificate {
 
     @Enumerated(EnumType.STRING)
     private KeyType keyType;
+
+    @CreationTimestamp
+    private OffsetDateTime dateCreated;
+
+    @UpdateTimestamp
+    private OffsetDateTime dateUpdated;
 
 }

@@ -4,11 +4,11 @@ import com.opabs.common.model.ListResponse;
 import com.opabs.tenent.management.controller.command.CreateTenantCommand;
 import com.opabs.tenent.management.controller.command.UpdateTenantCommand;
 import com.opabs.tenent.management.controller.response.CreateTenantResponse;
-import com.opabs.tenent.management.controller.response.TenantListResponse;
 import com.opabs.tenent.management.domain.Tenant;
 import com.opabs.tenent.management.service.TenantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +32,7 @@ public class TenantController {
 
     @GetMapping
     public ListResponse<Tenant> list(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "20") Integer size) {
-        return tenantService.findAll(PageRequest.of(page, size));
+        return tenantService.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateUpdated")));
     }
 
     @GetMapping("{id}")

@@ -10,12 +10,16 @@
 
 .item-list {
   border-right: 1px solid #CCC;
-  margin-top: -8px;
+  margin-top: -6px;
+
+  h3 {
+    margin:0;
+    padding: 20px;
+  }
 }
 
 .item {
   background: white;
-  padding: 20px;
   box-shadow: inset 0 0 3px #707070;
   fa-icon {
     color: #707070;
@@ -34,6 +38,7 @@
 .item:hover:not(.selected) {
   animation: pulse 0.5s;
   background: #9aaef2;
+  cursor: pointer;
 }
 
 @keyframes pulse {

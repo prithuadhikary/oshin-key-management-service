@@ -1,8 +1,8 @@
 package com.opabs.cryptoservice.service.certificate;
 
+import com.opabs.common.enums.KeyUsages;
 import com.opabs.common.model.*;
 import com.opabs.cryptoservice.config.MockConfig;
-import com.opabs.common.enums.KeyUsages;
 import com.opabs.cryptoservice.exception.CSRSignatureInvalidException;
 import com.opabs.cryptoservice.exception.InternalServerErrorException;
 import com.opabs.cryptoservice.exception.KeyPairGenerationFailureException;

@@ -3,7 +3,9 @@ package com.opabs.trustchain.utils;
 import com.opabs.common.model.GenerateCSRRequest;
 import com.opabs.common.model.KeyType;
 import com.opabs.trustchain.controller.command.GenerateCSRBase;
+import com.opabs.trustchain.exception.CurveNameMissingException;
 import com.opabs.trustchain.exception.InternalServerErrorException;
+import com.opabs.trustchain.exception.KeySizeMissingException;
 import com.opabs.trustchain.model.CertificateInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
@@ -88,10 +90,16 @@ public class CertificateUtils {
         request.setWrappingKeyAlias("aes-key-alias");
         request.setSubjectDN(command.getSubjectDistinguishedName());
         if (command.getKeyType() == KeyType.RSA) {
+            if (command.getKeySize() == null) {
+                throw new KeySizeMissingException();
+            }
             request.setKeyGenParams(
                     Map.of("keySize", command.getKeySize().getLength())
             );
         } else {
+            if (command.getNamedCurve() == null) {
+                throw new CurveNameMissingException();
+            }
             request.setKeyGenParams(
                     Map.of("namedCurve", command.getNamedCurve().name())
             );

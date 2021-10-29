@@ -2,7 +2,6 @@ package com.opabs.trustchain.controller;
 
 import com.opabs.trustchain.controller.command.CreateCertificateCommand;
 import com.opabs.trustchain.controller.responses.CreateCertificateResponse;
-import com.opabs.trustchain.domain.Certificate;
 import com.opabs.trustchain.service.CertificateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

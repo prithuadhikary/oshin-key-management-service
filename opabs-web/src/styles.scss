@@ -76,6 +76,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background:
 .page-header {
   color: #6e8bed;
   margin: 20px 3.5% 0px;
+
+  &.border-bottom {
+    border-bottom: 1px solid #a9a9a9;
+  }
 }
 
 .wrapper, html, body {
