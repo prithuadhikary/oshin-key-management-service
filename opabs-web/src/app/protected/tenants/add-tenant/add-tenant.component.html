@@ -52,7 +52,7 @@
               <mat-error *ngIf="addresses.controls[i].get('stateOrProvince').hasError('required')">State Or Province is required.</mat-error>
             </mat-form-field>
           </div>
-          <div fxLayout="row">
+          <div fxLayout="row" fxLayoutGap="5px">
             <mat-form-field fxFlex.gt-md="50%" appearance="fill">
               <mat-label>Country</mat-label>
               <input required matInput formControlName="country">
