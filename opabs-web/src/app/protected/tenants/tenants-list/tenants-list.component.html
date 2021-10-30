@@ -4,7 +4,7 @@
 </div>
 <div class="wrapper" fxLayout="row" fxLayoutAlign="start start">
   <div class="item-list" fxFlex="30%" fxLayout="column" fxFlexFill>
-     <div fxLayout="row" fxLayoutAlign="start center" [ngClass]="{ item: true, selected: isSelected(tenant) }" *ngFor="let tenant of (tenantsResponse | async)?.content" (click)="setSelectedTenant(tenant)">
+     <div fxLayout="row" fxLayoutAlign="start center" [ngClass]="{ item: true, selected: isSelected(tenant) }" *ngFor="let tenant of (tenantsResponse$ | async)?.content" (click)="setSelectedTenant(tenant)">
         <h3><fa-icon [icon]="faBuilding"></fa-icon> {{tenant.name}}</h3>
      </div>
     <mat-paginator [length]="paginatorLength"

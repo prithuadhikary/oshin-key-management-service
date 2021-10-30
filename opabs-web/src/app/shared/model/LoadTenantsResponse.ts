@@ -1,9 +1,5 @@
 import {Tenant} from './Tenant';
+import {LoadEntityResponse} from './LoadEntityResponse';
 
-export interface LoadTenantsResponse {
-  content: Array<Tenant>;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-  totalElements: number;
+export interface LoadTenantsResponse extends LoadEntityResponse<Tenant>{
 }

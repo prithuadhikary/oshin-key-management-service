@@ -1,0 +1,54 @@
+<div class="page-header border-bottom" fxLayout="row" fxLayoutAlign="space-between start">
+  <h1>Trust Chains</h1>
+  <button mat-flat-button color="primary" (click)="openAddDialog()">Add Trust Chain</button>
+</div>
+<div class="wrapper" fxLayout="row" fxLayoutAlign="start start">
+  <div class="item-list" fxFlex="30%" fxLayout="column" fxFlexFill>
+    <div fxLayout="row" fxLayoutAlign="start center" [ngClass]="{ item: true, selected: isSelected(trustChain) }" *ngFor="let trustChain of (trustChainResponse$ | async)?.content" (click)="setSelectedTenant(trustChain)">
+      <h3><fa-icon [icon]="faCertificate"></fa-icon> {{trustChain.name}}</h3>
+    </div>
+    <mat-paginator [length]="paginatorLength"
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="pageSizeOptions"
+                   (page)="changePage($event)"
+                   aria-label="Select page">
+    </mat-paginator>
+  </div>
+  <div class="item-details" fxLayout="column" fxFlex="70%" *ngIf="selectedTrustChain">
+    <h1>
+      <fa-icon class="fa-1x" [icon]="faCertificate"></fa-icon>
+      {{selectedTrustChain.name}}
+      <fa-icon class="action-btn" [icon]="faEdit" (click)="openEditDialog()"></fa-icon>
+      <fa-icon class="action-btn" [icon]="faTrash" (click)="openDeleteDialog()"></fa-icon>
+    </h1>
+    <span>{{selectedTrustChain.description}}</span>
+    <h2>Root Certificate Info</h2>
+    <blockquote fxLayout="row">
+      <div fxLayout="column" fxFlex="50%">
+        <h3>Subject Distinguished Name</h3>
+        <span>{{selectedTrustChain.rootCertificate.subjectDistinguishedName}}</span>
+        <h3>Key Type</h3>
+        <span>{{selectedTrustChain.rootCertificate.keyType | keyTypeDisplay }}</span>
+        <h3>Issuer Distinguished Name</h3>
+        <span>{{selectedTrustChain.rootCertificate.issuerDistinguishedName}}</span>
+        <h3>Valid From</h3>
+        <span>{{selectedTrustChain.rootCertificate.validFrom | date: 'medium'}}</span>
+        <h3>Valid Upto</h3>
+        <span>{{selectedTrustChain.rootCertificate.validUpto | date: 'medium'}}</span>
+      </div>
+      <div fxLayout="column" fxFlex="50%">
+        <h3>Has Expired?</h3>
+        <span>{{selectedTrustChain.rootCertificate.expired ? 'Yes' : 'No'}}</span>
+        <h3>Not Valid Yet</h3>
+        <span>{{selectedTrustChain.rootCertificate.notYetValid ? 'Yes' : 'No'}}</span>
+        <h3>Certificate Fingerprint (SHA-256 Digest)</h3>
+        <span>{{selectedTrustChain.rootCertificate.certificateFingerprint}}</span>
+        <h3>Public Key Fingerprint (SHA-256 Digest)</h3>
+        <span>{{selectedTrustChain.rootCertificate.publicKeyFingerprint}}</span>
+      </div>
+    </blockquote>
+  </div>
+  <div fxFlex="70%" *ngIf="!selectedTrustChain" fxLayout="row" fxLayoutAlign="center center">
+    <h3>Please select a trust chain to view.</h3>
+  </div>
+</div>

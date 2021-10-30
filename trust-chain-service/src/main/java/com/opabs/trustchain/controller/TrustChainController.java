@@ -1,12 +1,11 @@
 package com.opabs.trustchain.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.opabs.common.model.ListResponse;
 import com.opabs.trustchain.controller.command.CreateTrustChainCommand;
 import com.opabs.trustchain.controller.command.UpdateTrustChainCommand;
+import com.opabs.trustchain.controller.model.TrustChainModel;
 import com.opabs.trustchain.domain.TrustChain;
 import com.opabs.trustchain.service.TrustChainService;
-import com.opabs.trustchain.views.TrustChainViews;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -24,10 +23,9 @@ public class TrustChainController {
 
     private final TrustChainService trustChainService;
 
-    @JsonView(TrustChainViews.CertificateWithoutTrustChain.class)
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TrustChain create(@RequestBody @Validated CreateTrustChainCommand command) {
+    public TrustChainModel create(@RequestBody @Validated CreateTrustChainCommand command) {
         return trustChainService.create(command);
     }
 
@@ -38,7 +36,7 @@ public class TrustChainController {
     }
 
     @GetMapping
-    public ListResponse<TrustChain> list(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "20") Integer size) {
+    public ListResponse<TrustChainModel> list(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "20") Integer size) {
         return trustChainService.findAll(PageRequest.of(page, size));
     }
 

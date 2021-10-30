@@ -4,6 +4,7 @@ import com.opabs.common.enums.KeyUsages;
 import com.opabs.common.model.*;
 import com.opabs.trustchain.controller.command.CreateTrustChainCommand;
 import com.opabs.trustchain.controller.command.UpdateTrustChainCommand;
+import com.opabs.trustchain.controller.model.TrustChainModel;
 import com.opabs.trustchain.domain.Certificate;
 import com.opabs.trustchain.domain.TrustChain;
 import com.opabs.trustchain.exception.NotFoundException;
@@ -14,20 +15,20 @@ import com.opabs.trustchain.model.TenantInfo;
 import com.opabs.trustchain.repository.CertificateRepository;
 import com.opabs.trustchain.repository.TrustChainRepository;
 import com.opabs.trustchain.utils.CertificateUtils;
+import com.opabs.trustchain.utils.TransformationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.opabs.trustchain.utils.CertificateUtils.createCSRRequest;
 import static com.opabs.trustchain.utils.CertificateUtils.fromPemCertificate;
 import static com.opabs.trustchain.utils.CompressionUtils.compress;
+import static com.opabs.trustchain.utils.TransformationUtils.fromTrustChain;
 
 @Slf4j
 @Service
@@ -42,7 +43,7 @@ public class TrustChainService {
 
     private final CertificateRepository certificateRepository;
 
-    public TrustChain create(CreateTrustChainCommand command) {
+    public TrustChainModel create(CreateTrustChainCommand command) {
 
         //1. Validate tenantExtId with tenant management service.
         //2. Create a root certificate using crypto service with key usage
@@ -84,7 +85,7 @@ public class TrustChainService {
         trustChain.setRootCertificate(certificate);
         trustChainRepository.save(trustChain);
 
-        return trustChain;
+        return fromTrustChain(trustChain);
     }
 
     private void validateTenantExtId(CreateTrustChainCommand command) {
@@ -120,13 +121,15 @@ public class TrustChainService {
         return signingRequest;
     }
 
-    public ListResponse<TrustChain> findAll(PageRequest pageRequest) {
+    public ListResponse<TrustChainModel> findAll(PageRequest pageRequest) {
         Page<TrustChain> chains = trustChainRepository.findAllByDeleted(false, pageRequest);
-        ListResponse<TrustChain> response = new ListResponse<>();
-        response.setContent(chains.getContent());
+        ListResponse<TrustChainModel> response = new ListResponse<>();
+        List<TrustChainModel> transformedModel = chains.getContent().stream().map(TransformationUtils::fromTrustChain).collect(Collectors.toList());
+        response.setContent(transformedModel);
         response.setPage(pageRequest.getPageNumber());
         response.setPageSize(pageRequest.getPageSize());
         response.setTotalPages(chains.getTotalPages());
+        response.setTotalElements(chains.getTotalElements());
         return response;
     }
 

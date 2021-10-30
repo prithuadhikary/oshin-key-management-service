@@ -4,7 +4,6 @@ import com.opabs.common.model.KeyType;
 import com.opabs.cryptoservice.exception.KeyPairGenerationFailureException;
 import com.opabs.cryptoservice.exception.KeySizeMissingException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.security.KeyFactory;
@@ -15,7 +14,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Map;
 
 @Slf4j
-@Profile("local")
 @Component
 public class RSAKeyPairStrategy implements KeyPairStrategy {
 

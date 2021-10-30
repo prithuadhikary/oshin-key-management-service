@@ -33,7 +33,7 @@ export class TenantsListComponent implements OnInit {
 
   selectedTenant: Tenant;
 
-  tenantsResponse: Observable<LoadTenantsResponse>;
+  tenantsResponse$: Observable<LoadTenantsResponse>;
 
   showChart = false;
 
@@ -48,7 +48,7 @@ export class TenantsListComponent implements OnInit {
   }
 
   loadList(page: number, pageSize: number): void {
-    this.tenantsResponse = this.tenantService.list({
+    this.tenantsResponse$ = this.tenantService.list({
       page,
       size: pageSize
     }).pipe(
@@ -136,7 +136,7 @@ export class TenantsListComponent implements OnInit {
   changePage(event: { pageIndex: number, pageSize: number }): void {
     this.currentPageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
-    this.tenantsResponse = this.tenantService.list({ page: event.pageIndex, size: event.pageSize});
+    this.tenantsResponse$ = this.tenantService.list({ page: event.pageIndex, size: event.pageSize});
   }
 
   openEditDialog(): void {

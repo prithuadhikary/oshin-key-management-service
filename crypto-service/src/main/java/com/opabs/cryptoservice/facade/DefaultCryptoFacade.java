@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Slf4j
-@Profile("local")
 @Component
 @RequiredArgsConstructor
 public class DefaultCryptoFacade implements CryptoFacade {

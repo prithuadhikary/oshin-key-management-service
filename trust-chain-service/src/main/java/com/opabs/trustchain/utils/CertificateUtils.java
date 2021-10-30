@@ -18,9 +18,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
+import java.security.cert.*;
+import java.util.Date;
 import java.util.Map;
 
 @Slf4j
@@ -54,17 +53,37 @@ public class CertificateUtils {
     public static CertificateInfo getCertificateInfo(String pemCertificate) {
         try {
             byte[] certDer = fromPemCertificate(pemCertificate);
-            Certificate certificateObject = getCertificateObject(certDer);
-            String publicKeyFingerprint = getFingerprint(certificateObject.getPublicKey().getEncoded());
-            String certificateFingerprint = getFingerprint(certificateObject.getEncoded());
-
-            CertificateInfo certificateInfo = new CertificateInfo();
-            certificateInfo.setCertificateFingerprint(certificateFingerprint);
-            certificateInfo.setPublicKeyFingerprint(publicKeyFingerprint);
-            return certificateInfo;
+            return getCertificateInfo(certDer);
         } catch (Exception ex) {
             log.error("Error occurred while reading certificate info.", ex);
             throw new InternalServerErrorException();
+        }
+    }
+
+    public static CertificateInfo getCertificateInfo(byte[] certDer) throws CertificateException {
+        X509Certificate certificateObject = getCertificateObject(certDer);
+        String publicKeyFingerprint = getFingerprint(certificateObject.getPublicKey().getEncoded());
+        String certificateFingerprint = getFingerprint(certificateObject.getEncoded());
+
+        CertificateInfo certificateInfo = new CertificateInfo();
+        certificateInfo.setCertificateFingerprint(certificateFingerprint);
+        certificateInfo.setPublicKeyFingerprint(publicKeyFingerprint);
+        certificateInfo.setIssuerDistinguishedName(certificateObject.getIssuerDN().getName());
+        certificateInfo.setSubjectDistinguishedName(certificateObject.getSubjectDN().getName());
+        certificateInfo.setValidFrom(certificateObject.getNotBefore());
+        certificateInfo.setValidUpto(certificateObject.getNotAfter());
+        populateValidity(certificateObject, certificateInfo);
+        return certificateInfo;
+    }
+
+    private static void populateValidity(X509Certificate certificateObject, CertificateInfo certificateInfo) {
+        try {
+            certificateObject.checkValidity(new Date());
+            certificateInfo.setExpired(false);
+        } catch (CertificateExpiredException exception) {
+            certificateInfo.setExpired(true);
+        } catch (CertificateNotYetValidException exception) {
+            certificateInfo.setNotYetValid(true);
         }
     }
 
@@ -78,9 +97,9 @@ public class CertificateUtils {
         }
     }
 
-    private static Certificate getCertificateObject(byte[] certificateDer) throws CertificateException {
+    private static X509Certificate getCertificateObject(byte[] certificateDer) throws CertificateException {
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-        return certificateFactory.generateCertificate(new ByteArrayInputStream(certificateDer));
+        return (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(certificateDer));
     }
 
     public static <T extends GenerateCSRBase> GenerateCSRRequest createCSRRequest(T command) {
