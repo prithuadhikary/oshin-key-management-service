@@ -15,13 +15,14 @@ import { AddTenantComponent } from './add-tenant/add-tenant.component';
 import {MatInputModule} from '@angular/material/input';
 import { EditTenantComponent } from './edit-tenant/edit-tenant.component';
 import {MatPaginatorModule} from '@angular/material/paginator';
+import { DeleteTenantComponent } from './delete-tenant/delete-tenant.component';
 
 const routes: Routes = [
   { path: '', component: TenantsListComponent, pathMatch: 'full' }
 ];
 
 @NgModule({
-  declarations: [TenantsListComponent, AddTenantComponent, EditTenantComponent],
+  declarations: [TenantsListComponent, AddTenantComponent, EditTenantComponent, DeleteTenantComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),

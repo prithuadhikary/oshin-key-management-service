@@ -39,4 +39,9 @@ export class TenantService {
       '/api/tenant-management-service/tenant/' + id);
   }
 
+  delete(id: string): Observable<any> {
+    return this.http.delete(
+      '/api/tenant-management-service/tenant/' + id
+    );
+  }
 }

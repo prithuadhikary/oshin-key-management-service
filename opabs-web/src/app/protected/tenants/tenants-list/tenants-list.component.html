@@ -18,7 +18,8 @@
     <h1>
       <fa-icon class="fa-1x" [icon]="faBuilding"></fa-icon>
       {{selectedTenant.name}}
-      <fa-icon class="edit-btn" [icon]="faEdit" (click)="openEditDialog()"></fa-icon>
+      <fa-icon class="action-btn" [icon]="faEdit" (click)="openEditDialog()"></fa-icon>
+      <fa-icon class="action-btn" [icon]="faTrash" (click)="openDeleteDialog()"></fa-icon>
     </h1>
     <h2>Contact Info</h2>
     <blockquote>

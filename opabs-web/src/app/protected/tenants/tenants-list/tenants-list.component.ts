@@ -2,7 +2,7 @@ import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {TenantService} from '../../../shared/services/tenant.service';
 import {Observable} from 'rxjs';
 import {LoadTenantsResponse} from '../../../shared/model/LoadTenantsResponse';
-import {faBuilding, faPlus, faEdit} from '@fortawesome/free-solid-svg-icons';
+import {faBuilding, faPlus, faEdit, faTrash} from '@fortawesome/free-solid-svg-icons';
 import {Tenant} from '../../../shared/model/Tenant';
 import {CertificateService} from '../../../shared/services/certificate.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -11,13 +11,14 @@ import * as c3 from 'c3';
 import {CertificateReportResponse} from '../../../shared/model/CertificateReportResponse';
 import {EditTenantComponent} from '../edit-tenant/edit-tenant.component';
 import {tap} from 'rxjs/operators';
+import {DeleteTenantComponent} from '../delete-tenant/delete-tenant.component';
 
 @Component({
   selector: 'app-tenants-list',
   templateUrl: './tenants-list.component.html',
   styleUrls: ['./tenants-list.component.scss']
 })
-export class TenantsListComponent implements OnInit, AfterViewInit {
+export class TenantsListComponent implements OnInit {
 
   constructor(
     private tenantService: TenantService,
@@ -28,6 +29,7 @@ export class TenantsListComponent implements OnInit, AfterViewInit {
   faBuilding = faBuilding;
   faPlus = faPlus;
   faEdit = faEdit;
+  faTrash = faTrash;
 
   selectedTenant: Tenant;
 
@@ -38,10 +40,8 @@ export class TenantsListComponent implements OnInit, AfterViewInit {
   // Page params
   paginatorLength;
   pageSize = 10;
+  currentPageIndex = 0;
   pageSizeOptions: number[] = [5, 10, 25, 100];
-
-  ngAfterViewInit(): void {
-  }
 
   ngOnInit(): void {
     this.loadList(0, this.pageSize);
@@ -123,7 +123,19 @@ export class TenantsListComponent implements OnInit, AfterViewInit {
     });
   }
 
+  openDeleteDialog(): void {
+    this.dialog.open(DeleteTenantComponent, { data: { tenantName: this.selectedTenant.name }})
+      .afterClosed().subscribe(result => {
+        if (result) {
+          this.tenantService.delete(this.selectedTenant.id)
+            .subscribe(() => this.loadList(this.currentPageIndex, this.pageSize));
+        }
+    });
+  }
+
   changePage(event: { pageIndex: number, pageSize: number }): void {
+    this.currentPageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
     this.tenantsResponse = this.tenantService.list({ page: event.pageIndex, size: event.pageSize});
   }
 
