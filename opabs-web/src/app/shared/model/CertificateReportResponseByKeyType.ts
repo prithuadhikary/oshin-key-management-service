@@ -1,4 +1,4 @@
-export interface CertificateReportResponse {
+export interface CertificateReportResponseByKeyType {
 
   tenantId: string;
   totalCertificateCount: number;

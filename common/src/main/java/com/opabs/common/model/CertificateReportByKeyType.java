@@ -3,12 +3,9 @@ package com.opabs.common.model;
 import lombok.Data;
 
 import java.util.List;
-import java.util.UUID;
 
 @Data
-public class CertificateReportInfo {
-
-    private UUID tenantId;
+public class CertificateReportByKeyType {
 
     private int totalCertificateCount;
 

@@ -1,6 +1,7 @@
 package com.opabs.trustchain.repository;
 
 import com.opabs.trustchain.domain.Certificate;
+import com.opabs.trustchain.domain.TrustChain;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
@@ -13,5 +14,11 @@ public interface CertificateRepository extends PagingAndSortingRepository<Certif
 
     @Query("SELECT c.keyType as keyType, count(c) as count from Certificate c WHERE c.trustChain.tenantExtId = ?1 group by c.keyType")
     List<CountByKeyType> countByTenantExtId(UUID tenantId);
+
+    @Query("SELECT c.keyType as keyType, count(c) as count from Certificate c WHERE c.trustChain = ?1 group by c.keyType")
+    List<CountByKeyType> countByTrustChain(TrustChain trustChain);
+
+    @Query("SELECT c.isAnchor as isAnchor, count(c) as count from Certificate c WHERE c.trustChain = ?1 group by c.isAnchor")
+    List<CountByHierarchy> countByHierarchy(TrustChain trustChain);
 
 }

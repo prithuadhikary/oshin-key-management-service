@@ -47,6 +47,11 @@
         <span>{{selectedTrustChain.rootCertificate.publicKeyFingerprint}}</span>
       </div>
     </blockquote>
+    <h2>Issued Certificates - Summary</h2>
+    <div fxLayout="row">
+      <div fxFlex="50%" id="chart-by-trust-chain"></div>
+      <div fxFlex="50%" id="chart-by-hierarchy"></div>
+    </div>
   </div>
   <div fxFlex="70%" *ngIf="!selectedTrustChain" fxLayout="row" fxLayoutAlign="center center">
     <h3>Please select a trust chain to view.</h3>

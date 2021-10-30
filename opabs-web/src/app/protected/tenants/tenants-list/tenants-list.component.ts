@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import {TenantService} from '../../../shared/services/tenant.service';
 import {Observable} from 'rxjs';
 import {LoadTenantsResponse} from '../../../shared/model/LoadTenantsResponse';
@@ -8,10 +8,11 @@ import {CertificateService} from '../../../shared/services/certificate.service';
 import {MatDialog} from '@angular/material/dialog';
 import {AddTenantComponent} from '../add-tenant/add-tenant.component';
 import * as c3 from 'c3';
-import {CertificateReportResponse} from '../../../shared/model/CertificateReportResponse';
+import {CertificateReportResponseByKeyType} from '../../../shared/model/CertificateReportResponseByKeyType';
 import {EditTenantComponent} from '../edit-tenant/edit-tenant.component';
 import {tap} from 'rxjs/operators';
 import {DeleteTenantComponent} from '../delete-tenant/delete-tenant.component';
+import {CertificateReportResponseByHierarchy} from '../../../shared/model/CertificateReportResponseByHierarchy';
 
 @Component({
   selector: 'app-tenants-list',
@@ -61,16 +62,16 @@ export class TenantsListComponent implements OnInit {
 
   setSelectedTenant(tenant: Tenant): void {
     this.selectedTenant = tenant;
-    this.certificateService.fetchCertificateCount(tenant.id)
+    this.certificateService.fetchCertificateCountByTenantId(tenant.id)
       .subscribe((data) => {
-        const {chartDataPerKeyType, colorPalette} = this.processData(data);
+        const {chartDataPerKeyType, colorPalette} = this.processDataForKeyType(data);
         this.generateC3Chart(chartDataPerKeyType, data.totalCertificateCount, colorPalette);
       }, (error => {
         console.log(error);
       }));
   }
 
-  private processData(data: CertificateReportResponse): { chartDataPerKeyType: Array<string>, colorPalette: object } {
+  private processDataForKeyType(data: CertificateReportResponseByKeyType): { chartDataPerKeyType: Array<string>, colorPalette: object } {
     const chartData: any = [];
     let index = 0;
     const colors = ['#516ee5', '#FFAB40', '#795548'];

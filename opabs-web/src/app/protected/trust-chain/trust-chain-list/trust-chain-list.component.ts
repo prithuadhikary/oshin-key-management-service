@@ -6,6 +6,10 @@ import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {TrustChain} from '../../../shared/model/TrustChain';
 import {LoadTrustChainsResponse} from '../../../shared/model/LoadTrustChainsResponse';
+import {CertificateService} from '../../../shared/services/certificate.service';
+import {CertificateReportResponseByKeyType} from '../../../shared/model/CertificateReportResponseByKeyType';
+import * as c3 from 'c3';
+import {CertificateReportResponseByHierarchy} from '../../../shared/model/CertificateReportResponseByHierarchy';
 
 @Component({
   selector: 'app-trust-chain-list',
@@ -16,6 +20,7 @@ export class TrustChainListComponent implements OnInit {
 
   constructor(
     private trustChainService: TrustChainService,
+    private certificateService: CertificateService,
     public dialog: MatDialog
   ) { }
 
@@ -35,6 +40,8 @@ export class TrustChainListComponent implements OnInit {
   currentPageIndex = 0;
   pageSizeOptions: number[] = [5, 10, 25, 100];
 
+  showChart = false;
+
   ngOnInit(): void {
     this.loadList(0, this.pageSize);
   }
@@ -53,6 +60,78 @@ export class TrustChainListComponent implements OnInit {
 
   setSelectedTenant(trustChain: TrustChain): void {
     this.selectedTrustChain = trustChain;
+    this.certificateService.fetchCertificateCountByTrustChainId(trustChain.id)
+      .subscribe((data) => {
+        const {chartDataPerKeyType, colorPalette} = this.processData(data);
+        this.generateC3Chart(chartDataPerKeyType, data.totalCertificateCount, colorPalette, '#chart-by-trust-chain');
+      }, (error => {
+        console.log(error);
+      }));
+    this.certificateService.fetchCertificateCountByHierarchy(trustChain.id)
+      .subscribe(data => {
+        const {chartDataPerKeyType, colorPalette} = this.processDataForHierarchy(data);
+        this.generateC3Chart(chartDataPerKeyType, data.totalCertificateCount, colorPalette, '#chart-by-hierarchy');
+      });
+  }
+
+
+  private processDataForHierarchy(data: CertificateReportResponseByHierarchy): { chartDataPerKeyType: Array<string>, colorPalette: object } {
+    const chartData: any = [];
+    let index = 0;
+    const colors = ['#516ee5', '#FFAB40', '#795548'];
+    const colorPalette = {};
+    let key = 'Root Certificates';
+    chartData.push([
+      key,
+      data.anchorCertificateCount
+    ]);
+    colorPalette[key] = colors[index++];
+    key = 'Non-Root Certificates';
+    chartData.push([
+      key,
+      data.nonAnchorCertificateCount
+    ]);
+    colorPalette[key] = colors[index++];
+    return {chartDataPerKeyType: chartData, colorPalette};
+  }
+
+
+  private processData(data: CertificateReportResponseByKeyType): { chartDataPerKeyType: Array<string>, colorPalette: object } {
+    const chartData: any = [];
+    let index = 0;
+    const colors = ['#516ee5', '#FFAB40', '#795548'];
+    const colorPalette = {};
+    for (const certCountInfo of data.certificateCountInfos) {
+      const key = certCountInfo.keyType.replace('_', ' ') + ' Certificate(s)';
+      chartData.push([
+        key,
+        certCountInfo.certificateCount
+      ]);
+      colorPalette[key] = colors[index++];
+    }
+    return {chartDataPerKeyType: chartData, colorPalette};
+  }
+
+  private generateC3Chart(chartData: any, totalCount, colorPalette, chartDivSelector: string): void {
+    this.showChart = chartData && chartData.length > 0;
+    setTimeout(() => {
+      c3.generate({
+        bindto: chartDivSelector,
+        data: {
+          columns: chartData,
+          type: 'donut',
+          colors: colorPalette
+        },
+        donut: {
+          title: 'Total \n' + totalCount + ' Certificate(s)',
+          label: {
+            format: (value: number): number => {
+              return value;
+            }
+          }
+        }
+      });
+    }, 200);
   }
 
   isSelected(trustChain: TrustChain): boolean {
