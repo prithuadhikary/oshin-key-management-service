@@ -1,0 +1,80 @@
+<form class="add-tenant" fxFlex.gt-md="600px" fxFlex="100%" fxLayout="column" [formGroup]="formGroup" (ngSubmit)="createTrustChain()">
+  <div class="header" fxLayout="row" fxLayoutAlign="space-between center">
+    <h2>Add Trust Chain</h2>
+    <fa-icon class="close-icon" [icon]="faTimesCircle" [mat-dialog-close]="true"></fa-icon>
+  </div>
+
+  <div fxLayout="column">
+    <mat-form-field fxFlex.gt-md="100%" appearance="fill">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name">
+      <mat-error *ngIf="name.hasError('required')">Name is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field fxFlex.gt-md="100%" appearance="fill">
+      <mat-label>Subject Distinguished Name</mat-label>
+      <input matInput formControlName="subjectDistinguishedName">
+      <mat-error *ngIf="subjectDistinguishedName.hasError('required')">Subject distinguished name is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Valid From</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="validFrom">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="validFrom.hasError('required')">Valid from is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field fxFlex.gt-md="100%" appearance="fill">
+      <mat-label>Validity In Years</mat-label>
+      <input type="number" matInput formControlName="validityInYears">
+      <mat-error *ngIf="validityInYears.hasError('required')">Validity in years is required.</mat-error>
+      <mat-error *ngIf="validityInYears.hasError('min')">The minimum value is 1.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Root Certificate Key Type</mat-label>
+      <mat-select formControlName="keyType" (selectionChange)="keyTypeChanged()">
+        <mat-option *ngFor="let keyType of keyTypes" [value]="keyType.type">
+          {{keyType.displayName}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="keyType.hasError('required')">Key type is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field *ngIf="showKeyLengthInput" appearance="fill">
+      <mat-label>Key Length</mat-label>
+      <mat-select formControlName="keySize">
+        <mat-option *ngFor="let keyLength of keyLengths" [value]="keyLength.keySize">
+          {{keyLength.displayName}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="keySize.hasError('required')">Key length is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field *ngIf="showNamedCurveInput" appearance="fill">
+      <mat-label>Named Curve</mat-label>
+      <mat-select formControlName="namedCurve">
+        <mat-option *ngFor="let namedCurve of namedCurves" [value]="namedCurve">
+          {{namedCurve}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="namedCurve.hasError('required')">Named curve is required.</mat-error>
+    </mat-form-field>
+    <mat-form-field *ngIf="showSignatureAlgorithms" appearance="fill">
+      <mat-label>Signature Algorithm</mat-label>
+      <mat-select formControlName="signatureAlgorithm">
+        <mat-option *ngFor="let signatureAlgorithm of signatureAlgorithms" [value]="signatureAlgorithm">
+          {{signatureAlgorithm}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="signatureAlgorithm.hasError('required')">Signature algorithm is required.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Tenant</mat-label>
+      <mat-select formControlName="tenantExtId">
+        <mat-option *ngFor="let tenant of tenants" [value]="tenant.id">
+          {{tenant.name}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="tenantExtId.hasError('required')">Tenant is required.</mat-error>
+    </mat-form-field>
+  </div>
+
+  <button mat-flat-button color="primary" [disabled]="formGroup.invalid">Create</button>
+</form>

@@ -21,20 +21,20 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [TrustChainListComponent, AddTrustChainComponent],
-    imports: [
-        CommonModule,
-        RouterModule.forChild(routes),
-        FlexModule,
-        MatButtonModule,
-        FontAwesomeModule,
-        MatPaginatorModule,
-        SharedModule,
-        MatDialogModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatDatepickerModule,
-        MatSelectModule
-    ]
+  imports: [
+    CommonModule,
+    RouterModule.forChild(routes),
+    FlexModule,
+    MatButtonModule,
+    FontAwesomeModule,
+    MatPaginatorModule,
+    SharedModule,
+    MatDialogModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatSelectModule
+  ]
 })
 export class TrustChainModule { }
