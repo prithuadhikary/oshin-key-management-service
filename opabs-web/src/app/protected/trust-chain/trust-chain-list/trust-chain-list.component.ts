@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {TrustChainService} from '../../../shared/services/trust-chain.service';
-import {faBuilding, faPlus, faEdit, faTrash, faCertificate} from '@fortawesome/free-solid-svg-icons';
+import {faBuilding, faCertificate, faEdit, faPlus, faTrash} from '@fortawesome/free-solid-svg-icons';
 import {MatDialog} from '@angular/material/dialog';
 import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
@@ -23,7 +23,8 @@ export class TrustChainListComponent implements OnInit {
     private trustChainService: TrustChainService,
     private certificateService: CertificateService,
     public dialog: MatDialog
-  ) { }
+  ) {
+  }
 
   faBuilding = faBuilding;
   faPlus = faPlus;
@@ -76,6 +77,7 @@ export class TrustChainListComponent implements OnInit {
   }
 
 
+  // tslint:disable-next-line:max-line-length
   private processDataForHierarchy(data: CertificateReportResponseByHierarchy): { chartDataPerKeyType: Array<string>, colorPalette: object } {
     const chartData: any = [];
     let index = 0;
@@ -145,30 +147,9 @@ export class TrustChainListComponent implements OnInit {
     });
   }
 
-  openDeleteDialog(): void {
-    /*this.dialog.open(DeleteTenantComponent, { data: { tenantName: this.selectedTrustChain.name }})
-      .afterClosed().subscribe(result => {
-      if (result) {
-        this.trustChainService.delete(this.selectedTrustChain.id)
-          .subscribe(() => this.loadList(this.currentPageIndex, this.pageSize));
-      }
-    });*/
-  }
-
   changePage(event: { pageIndex: number, pageSize: number }): void {
     this.currentPageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
-    this.trustChainResponse$ = this.trustChainService.list({ page: event.pageIndex, size: event.pageSize});
-  }
-
-  openEditDialog(): void {
-    /*this.dialog.open(EditTenantComponent, {
-      disableClose: true,
-      data: this.selectedTrustChain
-    }).afterClosed().subscribe(result => {
-      this.trustChainService.update(result).subscribe((data) => {
-        Object.assign(this.selectedTrustChain, data);
-      });
-    });*/
+    this.trustChainResponse$ = this.trustChainService.list({page: event.pageIndex, size: event.pageSize});
   }
 }
