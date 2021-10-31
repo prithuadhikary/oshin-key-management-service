@@ -14,7 +14,6 @@ import { KeyTypeDisplayPipe } from './pipes/key-type-display.pipe';
     TenantService
   ],
   exports: [
-    KeyTypeDisplayPipe,
     KeyTypeDisplayPipe
   ]
 })

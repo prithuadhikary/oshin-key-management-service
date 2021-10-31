@@ -4,10 +4,10 @@ import com.opabs.trustchain.controller.command.CreateCertificateCommand;
 import com.opabs.trustchain.controller.responses.CreateCertificateResponse;
 import com.opabs.trustchain.service.CertificateService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +19,11 @@ public class CertificateController {
     @PostMapping
     public CreateCertificateResponse createCertificate(@RequestBody CreateCertificateCommand command) {
         return certificateService.createCertificate(command);
+    }
+
+    @GetMapping("download/{id}")
+    public ResponseEntity<byte[]> download(@PathVariable("id") UUID id) {
+        return ResponseEntity.ok(certificateService.getCertificateContent(id));
     }
 
 }

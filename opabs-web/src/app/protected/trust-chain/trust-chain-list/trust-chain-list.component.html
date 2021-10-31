@@ -15,12 +15,16 @@
     </mat-paginator>
   </div>
   <div class="item-details" fxLayout="column" fxFlex="70%" *ngIf="selectedTrustChain">
-    <h1>
-      <fa-icon class="fa-1x" [icon]="faCertificate"></fa-icon>
-      {{selectedTrustChain.name}}
+    <h1 fxLayout="row" fxLayoutAlign="space-between center">
+      <span><fa-icon class="fa-1x" [icon]="faCertificate"></fa-icon>
+        {{selectedTrustChain.name}}</span>
+      <button mat-stroked-button color="primary">View Certificates</button>
     </h1>
     <span>{{selectedTrustChain.description}}</span>
-    <h2>Root Certificate Info</h2>
+    <h2 fxLayout="row" fxLayoutAlign="space-between center">
+      Root Certificate Info
+      <fa-icon class="certificate-download-icon" [icon]="faDownload" (click)="downloadRootCert()"></fa-icon>
+    </h2>
     <blockquote fxLayout="row">
       <div fxLayout="column" fxFlex="50%">
         <h3>Subject Distinguished Name</h3>
@@ -50,6 +54,7 @@
       <div fxFlex="50%" id="chart-by-trust-chain"></div>
       <div fxFlex="50%" id="chart-by-hierarchy"></div>
     </div>
+    <h2>Certificate Tree</h2>
   </div>
   <div fxFlex="70%" *ngIf="!selectedTrustChain" fxLayout="row" fxLayoutAlign="center center">
     <h3>Please select a trust chain to view.</h3>

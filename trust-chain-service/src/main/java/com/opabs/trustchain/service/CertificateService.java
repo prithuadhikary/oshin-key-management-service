@@ -14,11 +14,14 @@ import com.opabs.trustchain.feign.CryptoService;
 import com.opabs.trustchain.model.CertificateInfo;
 import com.opabs.trustchain.repository.CertificateRepository;
 import com.opabs.trustchain.utils.CertificateUtils;
+import com.opabs.trustchain.utils.CompressionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.opabs.trustchain.utils.CertificateUtils.*;
@@ -86,6 +89,14 @@ public class CertificateService {
 
         return response;
     }
+
+    public byte[] getCertificateContent(UUID id) {
+        Optional<Certificate> certificate = certificateRepository.findById(id);
+        return certificate.map(Certificate::getContent)
+                .map(CompressionUtils::uncompress)
+                .orElseThrow(() -> new NotFoundException("certificate", id));
+    }
+
 
     private void validateKeyUsage(CreateCertificateCommand command) {
         List<KeyUsages> unsupported = null;

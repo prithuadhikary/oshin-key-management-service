@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {TrustChainService} from '../../../shared/services/trust-chain.service';
-import {faBuilding, faCertificate, faEdit, faPlus, faTrash} from '@fortawesome/free-solid-svg-icons';
+import {faCertificate, faDownload} from '@fortawesome/free-solid-svg-icons';
 import {MatDialog} from '@angular/material/dialog';
 import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
@@ -11,6 +11,7 @@ import {CertificateReportResponseByKeyType} from '../../../shared/model/Certific
 import * as c3 from 'c3';
 import {CertificateReportResponseByHierarchy} from '../../../shared/model/CertificateReportResponseByHierarchy';
 import {AddTrustChainComponent} from '../add-trust-chain/add-trust-chain.component';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-trust-chain-list',
@@ -26,11 +27,8 @@ export class TrustChainListComponent implements OnInit {
   ) {
   }
 
-  faBuilding = faBuilding;
-  faPlus = faPlus;
-  faEdit = faEdit;
-  faTrash = faTrash;
   faCertificate = faCertificate;
+  faDownload = faDownload;
 
   selectedTrustChain: TrustChain;
 
@@ -44,8 +42,11 @@ export class TrustChainListComponent implements OnInit {
 
   showChart = false;
 
+  isLeftVisible = true;
+
   ngOnInit(): void {
     this.loadList(0, this.pageSize);
+    setTimeout(() => this.isLeftVisible = true, 3000);
   }
 
   loadList(page: number, pageSize: number): void {
@@ -130,6 +131,13 @@ export class TrustChainListComponent implements OnInit {
         }
       });
     }, 200);
+  }
+
+  downloadRootCert(): void {
+    this.certificateService.downloadCertificate(this.selectedTrustChain.rootCertificate.id)
+      .subscribe(data => {
+        saveAs(data, 'root_certificate_' + this.selectedTrustChain.name + '.crt');
+      });
   }
 
   isSelected(trustChain: TrustChain): boolean {

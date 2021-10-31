@@ -24,5 +24,8 @@ export class CertificateService {
     return this.http.get<CertificateReportResponseByHierarchy>('/api/trust-chain-service/certificate-report/by-hierarchy/' + trustChainId);
   }
 
+  downloadCertificate(id: string): Observable<Blob> {
+      return this.http.get('/api/trust-chain-service/certificate/download/' + id, { responseType: 'blob'});
+  }
 
 }
