@@ -10,6 +10,7 @@ import {CertificateService} from '../../../shared/services/certificate.service';
 import {CertificateReportResponseByKeyType} from '../../../shared/model/CertificateReportResponseByKeyType';
 import * as c3 from 'c3';
 import {CertificateReportResponseByHierarchy} from '../../../shared/model/CertificateReportResponseByHierarchy';
+import {AddTrustChainComponent} from '../add-trust-chain/add-trust-chain.component';
 
 @Component({
   selector: 'app-trust-chain-list',
@@ -139,14 +140,14 @@ export class TrustChainListComponent implements OnInit {
   }
 
   openAddDialog(): void {
-    /*this.dialog.open(AddTenantComponent, {
+    this.dialog.open(AddTrustChainComponent, {
       disableClose: true
     }).afterClosed().subscribe(result => {
       console.log(result);
       this.trustChainService.create(result).subscribe(data => {
         this.loadList(0, 20);
       });
-    });*/
+    });
   }
 
   openDeleteDialog(): void {

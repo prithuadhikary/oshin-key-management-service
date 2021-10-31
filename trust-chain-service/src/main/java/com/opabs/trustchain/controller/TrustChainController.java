@@ -8,6 +8,7 @@ import com.opabs.trustchain.domain.TrustChain;
 import com.opabs.trustchain.service.TrustChainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -37,7 +38,7 @@ public class TrustChainController {
 
     @GetMapping
     public ListResponse<TrustChainModel> list(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "20") Integer size) {
-        return trustChainService.findAll(PageRequest.of(page, size));
+        return trustChainService.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));
     }
 
     @PutMapping("{id}")

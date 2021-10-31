@@ -7,21 +7,34 @@ import {MatButtonModule} from '@angular/material/button';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {SharedModule} from '../../shared/shared.module';
+import { AddTrustChainComponent } from './add-trust-chain/add-trust-chain.component';
+import {MatDialogModule} from '@angular/material/dialog';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatSelectModule} from '@angular/material/select';
 
 const routes: Routes = [
   { path: '', component: TrustChainListComponent }
 ];
 
 @NgModule({
-  declarations: [TrustChainListComponent],
-  imports: [
-    CommonModule,
-    RouterModule.forChild(routes),
-    FlexModule,
-    MatButtonModule,
-    FontAwesomeModule,
-    MatPaginatorModule,
-    SharedModule
-  ]
+  declarations: [TrustChainListComponent, AddTrustChainComponent],
+    imports: [
+        CommonModule,
+        RouterModule.forChild(routes),
+        FlexModule,
+        MatButtonModule,
+        FontAwesomeModule,
+        MatPaginatorModule,
+        SharedModule,
+        MatDialogModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatDatepickerModule,
+        MatSelectModule
+    ]
 })
 export class TrustChainModule { }

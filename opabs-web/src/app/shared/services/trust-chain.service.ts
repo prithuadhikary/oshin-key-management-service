@@ -3,6 +3,8 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {LoadTrustChainsRequest} from '../model/LoadTrustChainsRequest';
 import {LoadTrustChainsResponse} from '../model/LoadTrustChainsResponse';
+import {CreateTrustChainRequest} from '../model/CreateTrustChainRequest';
+import {CreateTrustChainResponse} from '../model/CreateTrustChainResponse';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +18,13 @@ export class TrustChainService {
     return this.http.get<LoadTrustChainsResponse>(
       '/api/trust-chain-service/trust-chain',
       { params }
+    );
+  }
+
+  create(request: CreateTrustChainRequest): Observable<CreateTrustChainResponse> {
+    return this.http.post<CreateTrustChainResponse>(
+      '/api/trust-chain-service/trust-chain',
+      request
     );
   }
 
