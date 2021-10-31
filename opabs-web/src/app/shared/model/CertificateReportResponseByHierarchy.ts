@@ -1,5 +1,4 @@
 export interface CertificateReportResponseByHierarchy {
-  totalCertificateCount: number;
-  anchorCertificateCount: number;
-  nonAnchorCertificateCount: number;
+  countsByLevel: Array<{ level: string, count: number }>;
+  totalCount: number;
 }

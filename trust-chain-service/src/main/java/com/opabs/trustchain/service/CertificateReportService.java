@@ -1,18 +1,21 @@
 package com.opabs.trustchain.service;
 
 import com.opabs.common.model.CertificateCountInfo;
-import com.opabs.common.model.CertificateReportByHierarchy;
-import com.opabs.common.model.CertificateReportByKeyType;
+import com.opabs.trustchain.controller.model.CertificateCountByHierarchy;
+import com.opabs.trustchain.controller.model.CertificateCountByLevel;
+import com.opabs.trustchain.controller.model.CertificateReportByKeyType;
+import com.opabs.trustchain.domain.Certificate;
 import com.opabs.trustchain.domain.TrustChain;
 import com.opabs.trustchain.exception.NotFoundException;
 import com.opabs.trustchain.feign.TenantManagementService;
 import com.opabs.trustchain.repository.CertificateRepository;
-import com.opabs.trustchain.repository.CountByHierarchy;
+import com.opabs.trustchain.repository.CountByCertificateForLevel;
 import com.opabs.trustchain.repository.CountByKeyType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,25 +55,44 @@ public class CertificateReportService {
         return getCertificateReportInfo(countByKeyTypes);
     }
 
-    public CertificateReportByHierarchy certificateReportByHierarchy(UUID trustChainId) {
-        // 1. Validate trust chain id
-        // 2. Calculate certificate count by root/non root for trust chain id.
+    public CertificateCountByHierarchy certificateReportByHierarchy(UUID trustChainId) {
         Optional<TrustChain> existing = trustChainService.findById(trustChainId);
         TrustChain trustChain = existing.orElseThrow(() -> new NotFoundException("trust chain", trustChainId));
 
-        List<CountByHierarchy> countByHierarchies = certificateRepository.countByHierarchy(trustChain);
+        List<CountByCertificateForLevel> certificateCountsByParentCert = certificateRepository.findCountByCertForLevel(trustChain.getId());
 
-        CertificateReportByHierarchy reportByHierarchy = new CertificateReportByHierarchy();
-        countByHierarchies.forEach(countByHierarchy -> {
-            reportByHierarchy.setTotalCertificateCount(reportByHierarchy.getTotalCertificateCount() + countByHierarchy.getCount());
-            if (countByHierarchy.getIsAnchor()) {
-                reportByHierarchy.setAnchorCertificateCount(countByHierarchy.getCount());
-            } else {
-                reportByHierarchy.setNonAnchorCertificateCount(countByHierarchy.getCount());
+        List<CertificateCountByLevel> countByLevels = new ArrayList<>();
+        CertificateCountByHierarchy countByHierarchy = new CertificateCountByHierarchy();
+        countByHierarchy.setCountsByLevel(countByLevels);
+        certificateCountsByParentCert.forEach(countByParentCert -> {
+            Optional<Certificate> parentCertificateOpt = Optional.empty();
+            if (countByParentCert.getParentCertificateId() != null) {
+                parentCertificateOpt = certificateRepository.findById(getUUIDFromBytes(countByParentCert.getParentCertificateId()));
             }
+            CertificateCountByLevel countByLevel = new CertificateCountByLevel();
+            countByLevel.setCount(countByParentCert.getCount());
+            if (parentCertificateOpt.isEmpty()) {
+                countByLevel.setLevel("Level 0");
+            } else {
+                countByLevel.setLevel("Level " + findLevel(parentCertificateOpt.get()));
+            }
+            countByLevels.add(countByLevel);
+            countByHierarchy.setTotalCount(countByHierarchy.getTotalCount() + countByParentCert.getCount());
         });
 
-        return reportByHierarchy;
+        return countByHierarchy;
+    }
+
+    private int findLevel(Certificate certificate) {
+        return levelOf(certificate, 1);
+    }
+
+    private int levelOf(Certificate certificate, int level) {
+        if (certificate.isAnchor() || certificate.getParentCertificate() == null)
+            return level;
+        else {
+            return levelOf(certificate.getParentCertificate(), level + 1);
+        }
     }
 
     private CertificateReportByKeyType getCertificateReportInfo(List<CountByKeyType> certCountsByKeyType) {
@@ -81,6 +103,14 @@ public class CertificateReportService {
             info.setTotalCertificateCount(info.getTotalCertificateCount() + countByKeyType.getCount());
         });
         return info;
+    }
+
+    public UUID getUUIDFromBytes(byte[] bytes) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        long high = byteBuffer.getLong();
+        long low = byteBuffer.getLong();
+
+        return new UUID(high, low);
     }
 
     private void validateTenantId(UUID tenantId) {

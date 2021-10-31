@@ -66,7 +66,7 @@ public class CertificateService {
         newCertificate.setAnchor(false);
         newCertificate.setKeyType(command.getKeyType());
         newCertificate.setParentCertificate(parentCertificate);
-        newCertificate.setContent(fromPemCertificate(certificateResponse.getCertificate()));
+        newCertificate.setContent(compress(fromPemCertificate(certificateResponse.getCertificate())));
         newCertificate.setTrustChain(parentCertificate.getTrustChain());
         newCertificate.setWrappedPrivateKey(compress(Base64.getDecoder().decode(csrResponse.getWrappedKey())));
 
@@ -77,6 +77,7 @@ public class CertificateService {
         certificateRepository.save(newCertificate);
 
         CreateCertificateResponse response = new CreateCertificateResponse();
+        response.setId(newCertificate.getId());
         response.setCertificate(certificateResponse.getCertificate());
         response.setTrustChainId(parentCertificate.getTrustChain().getId());
         response.setParentCertificateId(parentCertificate.getId());

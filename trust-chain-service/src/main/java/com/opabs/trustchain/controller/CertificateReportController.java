@@ -1,7 +1,8 @@
 package com.opabs.trustchain.controller;
 
-import com.opabs.common.model.CertificateReportByHierarchy;
-import com.opabs.common.model.CertificateReportByKeyType;
+import com.opabs.trustchain.controller.model.CertificateCountByHierarchy;
+import com.opabs.trustchain.controller.model.CertificateCountByLevel;
+import com.opabs.trustchain.controller.model.CertificateReportByKeyType;
 import com.opabs.trustchain.service.CertificateReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class CertificateReportController {
     }
 
     @RequestMapping("by-hierarchy/{trustChainId}")
-    public ResponseEntity<CertificateReportByHierarchy> certificateReportByHierarchy(@PathVariable("trustChainId") UUID trustChainId) {
+    public ResponseEntity<CertificateCountByHierarchy> certificateReportByHierarchy(@PathVariable("trustChainId") UUID trustChainId) {
         return ResponseEntity.ok(certificateReportService.certificateReportByHierarchy(trustChainId));
     }
 

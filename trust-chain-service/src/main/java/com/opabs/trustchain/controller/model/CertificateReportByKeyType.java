@@ -1,5 +1,6 @@
-package com.opabs.common.model;
+package com.opabs.trustchain.controller.model;
 
+import com.opabs.common.model.CertificateCountInfo;
 import lombok.Data;
 
 import java.util.List;

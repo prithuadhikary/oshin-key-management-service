@@ -7,6 +7,8 @@ import java.util.UUID;
 @Data
 public class CreateCertificateResponse {
 
+    private UUID id;
+
     private String certificate;
 
     private UUID trustChainId;

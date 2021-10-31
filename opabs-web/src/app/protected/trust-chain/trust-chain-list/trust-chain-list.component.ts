@@ -71,7 +71,7 @@ export class TrustChainListComponent implements OnInit {
     this.certificateService.fetchCertificateCountByHierarchy(trustChain.id)
       .subscribe(data => {
         const {chartDataPerKeyType, colorPalette} = this.processDataForHierarchy(data);
-        this.generateC3Chart(chartDataPerKeyType, data.totalCertificateCount, colorPalette, '#chart-by-hierarchy');
+        this.generateC3Chart(chartDataPerKeyType, data.totalCount, colorPalette, '#chart-by-hierarchy');
       });
   }
 
@@ -81,18 +81,13 @@ export class TrustChainListComponent implements OnInit {
     let index = 0;
     const colors = ['#516ee5', '#FFAB40', '#795548'];
     const colorPalette = {};
-    let key = 'Root Certificates';
-    chartData.push([
-      key,
-      data.anchorCertificateCount
-    ]);
-    colorPalette[key] = colors[index++];
-    key = 'Non-Root Certificates';
-    chartData.push([
-      key,
-      data.nonAnchorCertificateCount
-    ]);
-    colorPalette[key] = colors[index++];
+    data.countsByLevel.forEach(({level, count}) => {
+      chartData.push([
+        level,
+        count
+      ]);
+      colorPalette[level] = colors[index++];
+    });
     return {chartDataPerKeyType: chartData, colorPalette};
   }
 

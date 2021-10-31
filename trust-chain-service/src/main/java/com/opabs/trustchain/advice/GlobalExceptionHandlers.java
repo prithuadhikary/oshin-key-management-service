@@ -4,6 +4,7 @@ import com.opabs.trustchain.exception.BadRequestException;
 import com.opabs.trustchain.exception.ErrorCode;
 import com.opabs.trustchain.exception.model.BadRequest;
 import com.opabs.trustchain.exception.model.InternalServerError;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -42,6 +43,12 @@ public class GlobalExceptionHandlers {
                         .message(exception.getMostSpecificCause().getMessage())
                         .build()
         );
+    }
+
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<BadRequest> handleFeignException(FeignException exception) {
+        return ResponseEntity.badRequest().body(BadRequest.builder().errorCode(ErrorCode.BAD_REQUEST.name())
+                .message(exception.getMessage()).build());
     }
 
 }

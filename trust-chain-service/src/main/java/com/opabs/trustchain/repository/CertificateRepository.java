@@ -21,4 +21,7 @@ public interface CertificateRepository extends PagingAndSortingRepository<Certif
     @Query("SELECT c.isAnchor as isAnchor, count(c) as count from Certificate c WHERE c.trustChain = ?1 group by c.isAnchor")
     List<CountByHierarchy> countByHierarchy(TrustChain trustChain);
 
+    @Query(value = "SELECT count(c.id) as count, c.parent_certificate_id as parentCertificateId from Certificate c WHERE c.trust_chain_id = ?1 group by c.parent_certificate_id", nativeQuery = true)
+    List<CountByCertificateForLevel> findCountByCertForLevel(UUID trustChainId);
+
 }
