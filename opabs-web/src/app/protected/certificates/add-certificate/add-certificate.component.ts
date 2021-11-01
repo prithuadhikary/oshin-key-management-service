@@ -7,6 +7,7 @@ import {KeyLength} from '../../../shared/model/KeyLength';
 import {NamedCurves} from '../../../shared/model/NamedCurves';
 import {KeyUsage} from '../../../shared/model/KeyUsage';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {DN_REGEX} from '../../../shared/model/Constants';
 
 @Component({
   selector: 'app-add-certificate',
@@ -68,7 +69,7 @@ export class AddCertificateComponent implements OnInit {
 
   ngOnInit(): void {
     this.formGroup = this.fb.group({
-      subjectDistinguishedName: [null, [Validators.required]],
+      subjectDistinguishedName: [null, [Validators.required, Validators.pattern(DN_REGEX)]],
       keyUsages: [null, [Validators.required]],
       keyType: [null, [Validators.required]],
       namedCurve: [null],

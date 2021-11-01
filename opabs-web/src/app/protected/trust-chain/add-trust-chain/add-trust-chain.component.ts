@@ -7,6 +7,7 @@ import {NamedCurves} from '../../../shared/model/NamedCurves';
 import {SignatureAlgorithms} from '../../../shared/model/SignatureAlgorithms';
 import {TenantService} from '../../../shared/services/tenant.service';
 import {MatDialogRef} from '@angular/material/dialog';
+import {DN_REGEX} from '../../../shared/model/Constants';
 
 @Component({
   selector: 'app-add-trust-chain',
@@ -58,7 +59,7 @@ export class AddTrustChainComponent implements OnInit {
     this.formGroup = this.fb.group({
       name: ['', [Validators.required]],
       description: [''],
-      subjectDistinguishedName: ['', Validators.required],
+      subjectDistinguishedName: ['', [Validators.required, Validators.pattern(DN_REGEX)]],
       validFrom: ['', Validators.required],
       keyType: [null, Validators.required],
       keySize: [null],

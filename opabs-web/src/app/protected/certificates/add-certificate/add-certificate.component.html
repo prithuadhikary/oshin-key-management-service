@@ -8,6 +8,7 @@
       <mat-label>Subject Distinguished Name</mat-label>
       <input matInput formControlName="subjectDistinguishedName">
       <mat-error *ngIf="subjectDistinguishedName.hasError('required')">Subject distinguished name is required.</mat-error>
+      <mat-error *ngIf="subjectDistinguishedName.hasError('pattern')">Subject distinguished is invalid.</mat-error>
     </mat-form-field>
     <mat-form-field appearance="fill">
       <mat-label>Valid From</mat-label>

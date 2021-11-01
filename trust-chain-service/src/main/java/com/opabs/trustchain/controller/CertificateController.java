@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -21,7 +22,7 @@ public class CertificateController {
     private final CertificateService certificateService;
 
     @PostMapping
-    public CreateCertificateResponse createCertificate(@RequestBody CreateCertificateCommand command) {
+    public CreateCertificateResponse createCertificate(@RequestBody @Validated CreateCertificateCommand command) {
         return certificateService.createCertificate(command);
     }
 
