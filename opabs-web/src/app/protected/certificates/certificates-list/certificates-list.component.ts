@@ -71,7 +71,9 @@ export class CertificatesListComponent implements OnInit {
   }
 
   openAddCertificate(): void {
-    this.dialog.open(AddCertificateComponent)
+    this.dialog.open(AddCertificateComponent, {
+      data: { parentKeyType: this.selectedCertificate.keyType }
+    })
       .afterClosed().subscribe(result => {
         result.parentCertificateId = this.selectedCertificate.id;
         this.certificateService.create(result).subscribe(() => {

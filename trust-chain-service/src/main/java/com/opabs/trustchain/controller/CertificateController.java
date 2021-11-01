@@ -35,7 +35,7 @@ public class CertificateController {
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size
     ) {
-        return certificateService.list(PageRequest.of(page, size, Sort.by("dateCreated")));
+        return certificateService.list(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));
     }
 
 }

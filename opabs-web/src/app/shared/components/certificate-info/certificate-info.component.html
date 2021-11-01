@@ -1,0 +1,28 @@
+<blockquote fxLayout="row">
+  <div fxLayout="column" fxFlex="50%">
+    <h3>Subject Distinguished Name</h3>
+    <span>{{certificate.subjectDistinguishedName}}</span>
+    <h3>Key Type</h3>
+    <span>{{certificate.keyType | keyTypeDisplay }}</span>
+    <h3>Issuer Distinguished Name</h3>
+    <span>{{certificate.issuerDistinguishedName}}</span>
+    <h3>Valid From</h3>
+    <span>{{certificate.validFrom | date: 'medium'}}</span>
+    <h3>Valid Upto</h3>
+    <span>{{certificate.validUpto | date: 'medium'}}</span>
+    <h3>Key Usages</h3>
+    <span>{{getKeyUsages()}}</span>
+  </div>
+  <div fxLayout="column" fxFlex="50%">
+    <h3>Has Expired?</h3>
+    <span>{{certificate.expired ? 'Yes' : 'No'}}</span>
+    <h3>Not Valid Yet</h3>
+    <span>{{certificate.notYetValid ? 'Yes' : 'No'}}</span>
+    <h3>Certificate Fingerprint (SHA-256 Digest)</h3>
+    <span>{{certificate.certificateFingerprint}}</span>
+    <h3>Public Key Fingerprint (SHA-256 Digest)</h3>
+    <span>{{certificate.publicKeyFingerprint}}</span>
+    <h3>Is A Root Certificate</h3>
+    <span>{{certificate.anchor ? 'Yes': 'No'}}</span>
+  </div>
+</blockquote>

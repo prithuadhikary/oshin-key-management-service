@@ -8,6 +8,7 @@ import com.opabs.trustchain.controller.responses.CreateCertificateResponse;
 import com.opabs.trustchain.domain.Certificate;
 import com.opabs.trustchain.exception.KeyTypeAndUsageMismatch;
 import com.opabs.trustchain.exception.NotFoundException;
+import com.opabs.trustchain.exception.ParentKeyUsageInvalidException;
 import com.opabs.trustchain.feign.CryptoService;
 import com.opabs.trustchain.model.CertificateInfo;
 import com.opabs.trustchain.repository.CertificateRepository;
@@ -16,7 +17,6 @@ import com.opabs.trustchain.utils.CompressionUtils;
 import com.opabs.trustchain.utils.TransformationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -47,11 +47,19 @@ public class CertificateService {
 
         validateKeyUsage(command);
 
+        Certificate parentCertificate = certificateRepository.findById(command.getParentCertificateId())
+                .orElseThrow(() -> new NotFoundException("parent certificate", command.getParentCertificateId()));
+
+        // The parent certificate must have the key usage 'KEY_CERT_SIGN' otherwise its private key
+        // can't be used to sign the CSR.
+
+        List<KeyUsages> parentKeyUsages = getKeyUsages(uncompress(parentCertificate.getContent()));
+        if (!parentKeyUsages.contains(KeyUsages.KEY_CERT_SIGN)) {
+            throw new ParentKeyUsageInvalidException();
+        }
+
         GenerateCSRRequest generateCSRRequest = createCSRRequest(command);
         GenerateCSRResponse csrResponse = cryptoService.generateCSR(generateCSRRequest);
-
-        Certificate parentCertificate = certificateRepository.findById(command.getParentCertificateId())
-                .orElseThrow(() -> new NotFoundException("Certificate", command.getParentCertificateId()));
 
         CertificateSigningRequest csrReq = new CertificateSigningRequest();
         csrReq.setKeyUsages(command.getKeyUsages());

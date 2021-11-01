@@ -76,12 +76,12 @@ public class CertificateUtils {
         certificateInfo.setValidFrom(certificateObject.getNotBefore());
         certificateInfo.setValidUpto(certificateObject.getNotAfter());
 
-        certificateInfo.setKeyUsages(populateKeyUsages(certificateObject));
+        certificateInfo.setKeyUsages(getKeyUsages(certificateObject));
         populateValidity(certificateObject, certificateInfo);
         return certificateInfo;
     }
 
-    private static List<KeyUsages> populateKeyUsages(X509Certificate certificateObject) {
+    public static List<KeyUsages> getKeyUsages(X509Certificate certificateObject) {
         List<KeyUsages> certKeyUsagesList = new ArrayList<>();
         boolean[] keyUsages = certificateObject.getKeyUsage();
         for (KeyUsages keyUsage : KeyUsages.values()) {
@@ -90,6 +90,16 @@ public class CertificateUtils {
             }
         }
         return certKeyUsagesList;
+    }
+
+    public static List<KeyUsages> getKeyUsages(byte[] certDer) {
+        try {
+            X509Certificate certificate = getCertificateObject(certDer);
+            return getKeyUsages(certificate);
+        } catch (CertificateException ex) {
+            log.error("Error occurred while parsing certificate.", ex);
+            throw new InternalServerErrorException();
+        }
     }
 
     private static void populateValidity(X509Certificate certificateObject, CertificateInfo certificateInfo) {
@@ -113,7 +123,7 @@ public class CertificateUtils {
         }
     }
 
-    private static X509Certificate getCertificateObject(byte[] certificateDer) throws CertificateException {
+    public static X509Certificate getCertificateObject(byte[] certificateDer) throws CertificateException {
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
         return (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(certificateDer));
     }
