@@ -1,5 +1,6 @@
 package com.opabs.trustchain.utils;
 
+import com.opabs.common.enums.KeyUsages;
 import com.opabs.common.model.GenerateCSRRequest;
 import com.opabs.common.model.KeyType;
 import com.opabs.trustchain.controller.command.GenerateCSRBase;
@@ -19,7 +20,9 @@ import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -72,8 +75,21 @@ public class CertificateUtils {
         certificateInfo.setSubjectDistinguishedName(certificateObject.getSubjectDN().getName());
         certificateInfo.setValidFrom(certificateObject.getNotBefore());
         certificateInfo.setValidUpto(certificateObject.getNotAfter());
+
+        certificateInfo.setKeyUsages(populateKeyUsages(certificateObject));
         populateValidity(certificateObject, certificateInfo);
         return certificateInfo;
+    }
+
+    private static List<KeyUsages> populateKeyUsages(X509Certificate certificateObject) {
+        List<KeyUsages> certKeyUsagesList = new ArrayList<>();
+        boolean[] keyUsages = certificateObject.getKeyUsage();
+        for (KeyUsages keyUsage : KeyUsages.values()) {
+            if (keyUsages[keyUsage.getKeyUsageByteIndex()]) {
+                certKeyUsagesList.add(keyUsage);
+            }
+        }
+        return certKeyUsagesList;
     }
 
     private static void populateValidity(X509Certificate certificateObject, CertificateInfo certificateInfo) {

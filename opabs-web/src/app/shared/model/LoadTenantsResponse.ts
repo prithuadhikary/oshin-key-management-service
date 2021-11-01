@@ -1,5 +1,5 @@
 import {Tenant} from './Tenant';
-import {LoadEntityResponse} from './LoadEntityResponse';
+import {ListResponse} from './ListResponse';
 
-export interface LoadTenantsResponse extends LoadEntityResponse<Tenant>{
+export interface LoadTenantsResponse extends ListResponse<Tenant>{
 }

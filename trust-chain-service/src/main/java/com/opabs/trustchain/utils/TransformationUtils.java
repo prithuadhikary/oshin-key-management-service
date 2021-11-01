@@ -51,6 +51,7 @@ public class TransformationUtils {
             certificateModel.setValidUpto(certificateInfo.getValidUpto().toInstant().atOffset(ZoneOffset.UTC));
             certificateModel.setExpired(certificateInfo.isExpired());
             certificateModel.setNotYetValid(certificateInfo.isNotYetValid());
+            certificateModel.setKeyUsages(certificateInfo.getKeyUsages());
         } catch (Exception ex) {
             log.error("Error occurred while parsing certificate.", ex);
             throw new InternalServerErrorException();

@@ -4,7 +4,7 @@
 </div>
 <div class="wrapper" fxLayout="row" fxLayoutAlign="start start">
   <div class="item-list" fxFlex="30%" fxLayout="column" fxFlexFill>
-    <div fxLayout="row" fxLayoutAlign="start center" [ngClass]="{ item: true, selected: isSelected(trustChain) }" *ngFor="let trustChain of (trustChainResponse$ | async)?.content" (click)="setSelectedTenant(trustChain)">
+    <div fxLayout="row" fxLayoutAlign="start center" [ngClass]="{ item: true, selected: isSelected(trustChain) }" *ngFor="let trustChain of (trustChainResponse$ | async)?.content" (click)="setSelected(trustChain)">
       <h3><fa-icon [icon]="faCertificate"></fa-icon> {{trustChain.name}}</h3>
     </div>
     <mat-paginator [length]="paginatorLength"
@@ -25,36 +25,12 @@
       Root Certificate Info
       <fa-icon class="certificate-download-icon" [icon]="faDownload" (click)="downloadRootCert()"></fa-icon>
     </h2>
-    <blockquote fxLayout="row">
-      <div fxLayout="column" fxFlex="50%">
-        <h3>Subject Distinguished Name</h3>
-        <span>{{selectedTrustChain.rootCertificate.subjectDistinguishedName}}</span>
-        <h3>Key Type</h3>
-        <span>{{selectedTrustChain.rootCertificate.keyType | keyTypeDisplay }}</span>
-        <h3>Issuer Distinguished Name</h3>
-        <span>{{selectedTrustChain.rootCertificate.issuerDistinguishedName}}</span>
-        <h3>Valid From</h3>
-        <span>{{selectedTrustChain.rootCertificate.validFrom | date: 'medium'}}</span>
-        <h3>Valid Upto</h3>
-        <span>{{selectedTrustChain.rootCertificate.validUpto | date: 'medium'}}</span>
-      </div>
-      <div fxLayout="column" fxFlex="50%">
-        <h3>Has Expired?</h3>
-        <span>{{selectedTrustChain.rootCertificate.expired ? 'Yes' : 'No'}}</span>
-        <h3>Not Valid Yet</h3>
-        <span>{{selectedTrustChain.rootCertificate.notYetValid ? 'Yes' : 'No'}}</span>
-        <h3>Certificate Fingerprint (SHA-256 Digest)</h3>
-        <span>{{selectedTrustChain.rootCertificate.certificateFingerprint}}</span>
-        <h3>Public Key Fingerprint (SHA-256 Digest)</h3>
-        <span>{{selectedTrustChain.rootCertificate.publicKeyFingerprint}}</span>
-      </div>
-    </blockquote>
+    <app-certificate-info [certificate]="selectedTrustChain.rootCertificate"></app-certificate-info>
     <h2>Issued Certificates - Summary</h2>
     <div fxLayout="row">
       <div fxFlex="50%" id="chart-by-trust-chain"></div>
       <div fxFlex="50%" id="chart-by-hierarchy"></div>
     </div>
-    <h2>Certificate Tree</h2>
   </div>
   <div fxFlex="70%" *ngIf="!selectedTrustChain" fxLayout="row" fxLayoutAlign="center center">
     <h3>Please select a trust chain to view.</h3>

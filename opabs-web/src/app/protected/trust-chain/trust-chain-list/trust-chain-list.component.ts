@@ -12,6 +12,7 @@ import * as c3 from 'c3';
 import {CertificateReportResponseByHierarchy} from '../../../shared/model/CertificateReportResponseByHierarchy';
 import {AddTrustChainComponent} from '../add-trust-chain/add-trust-chain.component';
 import { saveAs } from 'file-saver';
+import {KeyUsage} from '../../../shared/model/KeyUsage';
 
 @Component({
   selector: 'app-trust-chain-list',
@@ -42,11 +43,8 @@ export class TrustChainListComponent implements OnInit {
 
   showChart = false;
 
-  isLeftVisible = true;
-
   ngOnInit(): void {
     this.loadList(0, this.pageSize);
-    setTimeout(() => this.isLeftVisible = true, 3000);
   }
 
   loadList(page: number, pageSize: number): void {
@@ -61,7 +59,7 @@ export class TrustChainListComponent implements OnInit {
     );
   }
 
-  setSelectedTenant(trustChain: TrustChain): void {
+  setSelected(trustChain: TrustChain): void {
     this.selectedTrustChain = trustChain;
     this.certificateService.fetchCertificateCountByTrustChainId(trustChain.id)
       .subscribe((data) => {
@@ -148,10 +146,15 @@ export class TrustChainListComponent implements OnInit {
     this.dialog.open(AddTrustChainComponent, {
       disableClose: true
     }).afterClosed().subscribe(result => {
-      console.log(result);
       this.trustChainService.create(result).subscribe(data => {
         this.loadList(0, 20);
       });
+    });
+  }
+
+  getKeyUsages(): Array<string> {
+    return this.selectedTrustChain.rootCertificate.keyUsages.map(value => {
+      return KeyUsage[value];
     });
   }
 

@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import {Observable} from 'rxjs';
 import {CertificateReportResponseByKeyType} from '../model/CertificateReportResponseByKeyType';
 import {CertificateReportResponseByHierarchy} from '../model/CertificateReportResponseByHierarchy';
+import {ListResponse} from '../model/ListResponse';
+import {Certificate} from '../model/Certificate';
 
 @Injectable({
   providedIn: 'root'
@@ -28,4 +30,12 @@ export class CertificateService {
       return this.http.get('/api/trust-chain-service/certificate/download/' + id, { responseType: 'blob'});
   }
 
+  list(param: { size: number; page: number }): Observable<ListResponse<Certificate>> {
+    const params = new HttpParams().set('page', param.page.toString()).set('size', param.size.toString());
+    return this.http.get<ListResponse<Certificate>>('/api/trust-chain-service/certificate', { params });
+  }
+
+  create(request: any): Observable<Certificate> {
+    return this.http.post<Certificate>('/api/trust-chain-service/certificate', request);
+  }
 }

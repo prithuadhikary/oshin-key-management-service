@@ -2,7 +2,7 @@ import {KeyType} from './KeyType';
 
 export interface Certificate {
   id: string;
-  isAnchor: boolean;
+  anchor: boolean;
   publicKeyFingerprint: string;
   certificateFingerprint: string;
   parentCertificateId: string;
@@ -16,4 +16,5 @@ export interface Certificate {
   validUpto: string;
   expired: boolean;
   notYetValid: boolean;
+  keyUsages: Array<string>;
 }

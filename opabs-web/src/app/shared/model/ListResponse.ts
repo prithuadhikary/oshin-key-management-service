@@ -1,4 +1,4 @@
-export interface LoadEntityResponse<T> {
+export interface ListResponse<T> {
 
   content: Array<T>;
   page: number;

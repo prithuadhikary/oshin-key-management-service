@@ -1,3 +1,33 @@
 <div class="page-header border-bottom" fxLayout="row" fxLayoutAlign="space-between start">
   <h1>Certificates</h1>
 </div>
+<div class="wrapper" fxLayout="row" fxLayoutAlign="start start">
+  <div class="item-list" fxFlex="30%" fxLayout="column" fxFlexFill>
+    <div fxLayout="row" fxLayoutAlign="start center" [ngClass]="{ item: true, selected: isSelected(certificate) }" *ngFor="let certificate of (certificateListResponse$ | async)?.content" (click)="setSelected(certificate)">
+      <h3 fxLayout="row" fxLayoutAlign="start center">
+        <i class="certificate-icon"></i>
+        {{certificate.subjectDistinguishedName}}
+      </h3>
+    </div>
+    <mat-paginator [length]="paginatorLength"
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="pageSizeOptions"
+                   (page)="changePage($event)"
+                   aria-label="Select page">
+    </mat-paginator>
+  </div>
+  <div class="item-details" fxLayout="column" fxFlex="70%" *ngIf="selectedCertificate">
+    <h1 fxLayout="row" fxLayoutAlign="space-between center">
+      <span fxLayout="row" fxLayoutAlign="start center">
+        <i class="certificate-icon"></i>
+        {{selectedCertificate.subjectDistinguishedName}}
+      </span>
+      <button mat-stroked-button color="primary" (click)="openAddCertificate()">Add Child Certificate</button>
+    </h1>
+    <h2 fxLayout="row" fxLayoutAlign="space-between center">
+      Certificate Info
+      <fa-icon class="certificate-download-icon" [icon]="faDownload" (click)="downloadCert()"></fa-icon>
+    </h2>
+    <app-certificate-info [certificate]="selectedCertificate"></app-certificate-info>
+  </div>
+</div>

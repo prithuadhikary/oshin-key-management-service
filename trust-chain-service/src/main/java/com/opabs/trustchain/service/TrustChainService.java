@@ -109,7 +109,7 @@ public class TrustChainService {
         signingRequest.setSelfSigned(true);
 
         //Default for a self signed root certificate.
-        signingRequest.setKeyUsages(Collections.singletonList(KeyUsages.KEY_CERT_SIGN));
+        signingRequest.setKeyUsages(Arrays.asList(KeyUsages.KEY_CERT_SIGN, KeyUsages.CRL_SIGN));
 
         signingRequest.setPkcs10CSR(csr.getPkcs10CSR());
         signingRequest.setSignatureAlgorithm(command.getSignatureAlgorithm());

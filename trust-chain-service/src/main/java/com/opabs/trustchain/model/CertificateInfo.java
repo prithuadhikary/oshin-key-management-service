@@ -1,8 +1,10 @@
 package com.opabs.trustchain.model;
 
+import com.opabs.common.enums.KeyUsages;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class CertificateInfo {
@@ -22,5 +24,7 @@ public class CertificateInfo {
     private boolean isExpired;
 
     private boolean notYetValid;
+
+    private List<KeyUsages> keyUsages;
 
 }

@@ -1,11 +1,9 @@
 package com.opabs.trustchain.service;
 
 import com.opabs.common.enums.KeyUsages;
-import com.opabs.common.model.CertificateSigningRequest;
-import com.opabs.common.model.CertificateSigningResponse;
-import com.opabs.common.model.GenerateCSRRequest;
-import com.opabs.common.model.GenerateCSRResponse;
+import com.opabs.common.model.*;
 import com.opabs.trustchain.controller.command.CreateCertificateCommand;
+import com.opabs.trustchain.controller.model.CertificateModel;
 import com.opabs.trustchain.controller.responses.CreateCertificateResponse;
 import com.opabs.trustchain.domain.Certificate;
 import com.opabs.trustchain.exception.KeyTypeAndUsageMismatch;
@@ -15,7 +13,11 @@ import com.opabs.trustchain.model.CertificateInfo;
 import com.opabs.trustchain.repository.CertificateRepository;
 import com.opabs.trustchain.utils.CertificateUtils;
 import com.opabs.trustchain.utils.CompressionUtils;
+import com.opabs.trustchain.utils.TransformationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
@@ -109,4 +111,15 @@ public class CertificateService {
         }
     }
 
+    public ListResponse<CertificateModel> list(Pageable pageRequest) {
+        Page<Certificate> certificates = certificateRepository.findAll(pageRequest);
+        ListResponse<CertificateModel> listResponse = new ListResponse<>();
+        listResponse.setContent(certificates.getContent().stream().map(TransformationUtils::fromCertificate).collect(Collectors.toList()));
+        listResponse.setTotalElements(certificates.getTotalElements());
+        listResponse.setTotalPages(certificates.getTotalPages());
+        listResponse.setPageSize(pageRequest.getPageSize());
+        listResponse.setPage(pageRequest.getPageNumber());
+
+        return listResponse;
+    }
 }
