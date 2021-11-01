@@ -9,12 +9,18 @@ import com.opabs.trustchain.exception.InternalServerErrorException;
 import com.opabs.trustchain.exception.KeySizeMissingException;
 import com.opabs.trustchain.model.CertificateInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.cert.jcajce.JcaCertStore;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.MessageDigest;
@@ -126,6 +132,19 @@ public class CertificateUtils {
     public static X509Certificate getCertificateObject(byte[] certificateDer) throws CertificateException {
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
         return (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(certificateDer));
+    }
+
+    public static byte[] getP7b(List<byte[]> certificateDerList) throws CertificateException, CMSException, IOException {
+        List<X509Certificate> certificateChain = new ArrayList<>();
+        for (byte[] certificateContent : certificateDerList) {
+            certificateChain.add(getCertificateObject(certificateContent));
+        }
+        CMSProcessableByteArray msg = new CMSProcessableByteArray("".getBytes());
+        CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
+        JcaCertStore store = new JcaCertStore(certificateChain);
+        gen.addCertificates(store);
+        CMSSignedData signedData = gen.generate(msg);
+        return signedData.getEncoded();
     }
 
     public static <T extends GenerateCSRBase> GenerateCSRRequest createCSRRequest(T command) {

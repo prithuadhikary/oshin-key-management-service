@@ -6,6 +6,7 @@ import com.opabs.trustchain.controller.command.CreateCertificateCommand;
 import com.opabs.trustchain.controller.model.CertificateModel;
 import com.opabs.trustchain.controller.responses.CreateCertificateResponse;
 import com.opabs.trustchain.domain.Certificate;
+import com.opabs.trustchain.exception.InternalServerErrorException;
 import com.opabs.trustchain.exception.KeyTypeAndUsageMismatch;
 import com.opabs.trustchain.exception.NotFoundException;
 import com.opabs.trustchain.exception.ParentKeyUsageInvalidException;
@@ -16,20 +17,22 @@ import com.opabs.trustchain.utils.CertificateUtils;
 import com.opabs.trustchain.utils.CompressionUtils;
 import com.opabs.trustchain.utils.TransformationUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.cms.CMSException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.io.IOException;
+import java.security.cert.CertificateException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.opabs.trustchain.utils.CertificateUtils.*;
 import static com.opabs.trustchain.utils.CompressionUtils.compress;
 import static com.opabs.trustchain.utils.CompressionUtils.uncompress;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CertificateService {
@@ -105,6 +108,28 @@ public class CertificateService {
         return certificate.map(Certificate::getContent)
                 .map(CompressionUtils::uncompress)
                 .orElseThrow(() -> new NotFoundException("certificate", id));
+    }
+
+    public byte[] getCertificateChainContent(UUID id) {
+        Optional<Certificate> certificateOpt = certificateRepository.findById(id);
+        Certificate certificate = certificateOpt
+                .orElseThrow(() -> new NotFoundException("certificate", id));
+        try {
+            List<byte[]> chainContents = new ArrayList<>();
+            addParentBytes(certificate, chainContents);
+            return getP7b(chainContents);
+        } catch (CertificateException | CMSException | IOException exception) {
+            log.error("Error occurred while generating p7b bundle.", exception);
+            throw new InternalServerErrorException();
+        }
+    }
+
+    private void addParentBytes(Certificate certificate, List<byte[]> chainContents) {
+        chainContents.add(uncompress(certificate.getContent()));
+        Certificate parentCert = certificate.getParentCertificate();
+        if (parentCert != null) {
+            addParentBytes(parentCert, chainContents);
+        }
     }
 
 

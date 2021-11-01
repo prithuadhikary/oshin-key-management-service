@@ -4,19 +4,23 @@ import { MaterialModule } from '../material.module';
 import { TenantService } from './services/tenant.service';
 import { KeyTypeDisplayPipe } from './pipes/key-type-display.pipe';
 import { CertificateInfoComponent } from './components/certificate-info/certificate-info.component';
+import { LoaderComponent } from './components/loader/loader.component';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 @NgModule({
-  declarations: [KeyTypeDisplayPipe, CertificateInfoComponent],
+  declarations: [KeyTypeDisplayPipe, CertificateInfoComponent, LoaderComponent],
   imports: [
     CommonModule,
-    MaterialModule
+    MaterialModule,
+    MatProgressBarModule
   ],
   providers: [
     TenantService
   ],
   exports: [
     KeyTypeDisplayPipe,
-    CertificateInfoComponent
+    CertificateInfoComponent,
+    LoaderComponent
   ]
 })
 export class SharedModule { }

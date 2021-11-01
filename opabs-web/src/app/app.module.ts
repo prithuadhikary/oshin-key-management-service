@@ -10,9 +10,10 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { HttpClientModule } from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import {MatCardModule} from '@angular/material/card';
+import {LoaderInterceptorService} from './shared/interceptors/loader-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,9 @@ import {MatCardModule} from '@angular/material/card';
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     FontAwesomeModule
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptorService, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

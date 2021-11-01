@@ -4,13 +4,14 @@ import { AuthModule } from './auth/auth.module';
 import { MaterialModule } from './material.module';
 import { ProtectedViewComponent } from './protected/protected-view/protected-view.component';
 import { ProtectedModule } from './protected/protected.module';
+import {SharedModule} from './shared/shared.module';
 
 const routes: Routes = [
-  { 
-    path: '', 
+  {
+    path: '',
     loadChildren: () => AuthModule
   },
-  { 
+  {
     path: 'protected',
     component: ProtectedViewComponent,
     loadChildren: () => ProtectedModule
@@ -18,10 +19,11 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forRoot(routes),
-    MaterialModule
-  ],
+    imports: [
+        RouterModule.forRoot(routes),
+        MaterialModule,
+        SharedModule
+    ],
   declarations: [ ProtectedViewComponent ],
   exports: [RouterModule]
 })

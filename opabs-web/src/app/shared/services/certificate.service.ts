@@ -27,7 +27,11 @@ export class CertificateService {
   }
 
   downloadCertificate(id: string): Observable<Blob> {
-      return this.http.get('/api/trust-chain-service/certificate/download/' + id, { responseType: 'blob'});
+      return this.http.get('/api/trust-chain-service/certificate/download/der/' + id, { responseType: 'blob'});
+  }
+
+  downloadCertificateChain(id: string): Observable<Blob> {
+      return this.http.get('/api/trust-chain-service/certificate/download/p7b/' + id, { responseType: 'blob'});
   }
 
   list(param: { size: number; page: number }): Observable<ListResponse<Certificate>> {

@@ -25,9 +25,14 @@ public class CertificateController {
         return certificateService.createCertificate(command);
     }
 
-    @GetMapping("download/{id}")
+    @GetMapping("download/der/{id}")
     public ResponseEntity<byte[]> download(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(certificateService.getCertificateContent(id));
+    }
+
+    @GetMapping("download/p7b/{id}")
+    public ResponseEntity<byte[]> downloadCertChain(@PathVariable("id") UUID id) {
+        return ResponseEntity.ok(certificateService.getCertificateChainContent(id));
     }
 
     @GetMapping

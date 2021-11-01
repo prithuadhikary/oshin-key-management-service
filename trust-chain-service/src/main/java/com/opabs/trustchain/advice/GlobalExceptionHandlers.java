@@ -25,7 +25,7 @@ public class GlobalExceptionHandlers {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<BadRequest> handleBadRequest(BadRequestException ex) {
         log.error("Error occurred:", ex);
-        return ResponseEntity.internalServerError().body(
+        return ResponseEntity.badRequest().body(
                 BadRequest
                         .builder()
                         .message(ex.getMessage())

@@ -8,6 +8,7 @@ import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { saveAs } from 'file-saver';
 import {MatDialog} from '@angular/material/dialog';
 import {AddCertificateComponent} from '../add-certificate/add-certificate.component';
+import {KeyUsage} from '../../../shared/model/KeyUsage';
 
 @Component({
   selector: 'app-certificates-list',
@@ -56,6 +57,13 @@ export class CertificatesListComponent implements OnInit {
       });
   }
 
+  downloadCertChain(): void {
+    this.certificateService.downloadCertificateChain(this.selectedCertificate.id)
+      .subscribe(data => {
+        saveAs(data, 'certificate.p7b');
+      });
+  }
+
   changePage(event: { pageIndex: number, pageSize: number }): void {
     this.currentPageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
@@ -70,15 +78,20 @@ export class CertificatesListComponent implements OnInit {
     return certificate.id === this.selectedCertificate?.id;
   }
 
+  canCreateChildCertificates(): boolean {
+    return this.selectedCertificate.keyUsages.includes('KEY_CERT_SIGN');
+  }
+
   openAddCertificate(): void {
     this.dialog.open(AddCertificateComponent, {
       data: { parentKeyType: this.selectedCertificate.keyType }
-    })
-      .afterClosed().subscribe(result => {
-        result.parentCertificateId = this.selectedCertificate.id;
-        this.certificateService.create(result).subscribe(() => {
-         this.loadList(0, this.pageSize);
-       });
+    }).afterClosed().subscribe(result => {
+        if (typeof result === 'object') {
+          result.parentCertificateId = this.selectedCertificate.id;
+          this.certificateService.create(result).subscribe(() => {
+            this.loadList(0, this.pageSize);
+          });
+        }
     });
   }
 }

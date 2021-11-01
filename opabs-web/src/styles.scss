@@ -154,6 +154,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background:
 .item-details {
   position: relative;
   padding: 20px;
+
+  h1 {
+    min-height: 40px;
+  }
+
   h2 {
     margin: 10px 0 0;
     padding: 10px;
@@ -187,5 +192,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background:
       }
     }
   }
+}
+.loader {
+  position: absolute;
+  width: 100%;
+  z-index: 100;
 }
 

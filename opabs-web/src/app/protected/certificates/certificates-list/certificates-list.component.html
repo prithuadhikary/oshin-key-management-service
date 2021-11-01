@@ -22,11 +22,14 @@
         <i class="certificate-icon"></i>
         {{selectedCertificate.subjectDistinguishedName}}
       </span>
-      <button mat-stroked-button color="primary" (click)="openAddCertificate()">Add Child Certificate</button>
+      <button mat-stroked-button color="primary" *ngIf="canCreateChildCertificates()" (click)="openAddCertificate()">Add Child Certificate</button>
     </h1>
     <h2 fxLayout="row" fxLayoutAlign="space-between center">
       Certificate Info
-      <fa-icon class="certificate-download-icon" [icon]="faDownload" (click)="downloadCert()"></fa-icon>
+      <span>
+        <fa-icon class="certificate-download-icon" [icon]="faDownload" (click)="downloadCert()"></fa-icon>(DER)
+        <fa-icon class="certificate-download-icon" [icon]="faDownload" (click)="downloadCertChain()"></fa-icon>(P7B Bundle)
+      </span>
     </h2>
     <app-certificate-info [certificate]="selectedCertificate"></app-certificate-info>
   </div>
