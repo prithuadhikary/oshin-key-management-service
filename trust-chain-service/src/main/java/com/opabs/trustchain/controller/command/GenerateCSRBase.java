@@ -3,7 +3,7 @@ package com.opabs.trustchain.controller.command;
 import com.opabs.common.enums.NamedCurve;
 import com.opabs.common.enums.RSAKeySize;
 import com.opabs.common.model.KeyType;
-import com.opabs.trustchain.validator.DistinguishedName;
+import com.opabs.common.validator.DistinguishedName;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;

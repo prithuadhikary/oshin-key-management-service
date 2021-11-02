@@ -1,4 +1,4 @@
-package com.opabs.trustchain.validator;
+package com.opabs.common.validator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

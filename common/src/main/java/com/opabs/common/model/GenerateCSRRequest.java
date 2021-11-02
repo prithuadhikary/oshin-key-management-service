@@ -1,5 +1,6 @@
 package com.opabs.common.model;
 
+import com.opabs.common.validator.DistinguishedName;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -18,6 +19,7 @@ public class GenerateCSRRequest {
      * The subject distinguished name to generate the certificate signing request for.
      */
     @NotEmpty
+    @DistinguishedName
     private String subjectDN;
 
     /**

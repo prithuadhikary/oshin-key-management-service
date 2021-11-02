@@ -1,13 +1,18 @@
 .mat-toolbar {
     background: #fff;
-    min-height: 50px !important; 
+    min-height: 50px !important;
     height: 50px !important;
     -webkit-box-shadow: 0 10px 6px -6px rgb(223, 223, 223);
     -moz-box-shadow: 0 10px 6px -6px rgb(223, 223, 223);
          box-shadow: 0 10px 6px -6px rgb(223, 223, 223);
 }
-  
+
 .mat-toolbar-row {
-    min-height: 50px !important; 
+    min-height: 50px !important;
     height: 50px !important;
+
+  .active {
+    background: #6e8bed;
+    color: white;
+  }
 }

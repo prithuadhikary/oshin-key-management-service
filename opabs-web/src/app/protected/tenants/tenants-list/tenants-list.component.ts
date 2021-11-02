@@ -12,7 +12,6 @@ import {CertificateReportResponseByKeyType} from '../../../shared/model/Certific
 import {EditTenantComponent} from '../edit-tenant/edit-tenant.component';
 import {tap} from 'rxjs/operators';
 import {DeleteTenantComponent} from '../delete-tenant/delete-tenant.component';
-import {CertificateReportResponseByHierarchy} from '../../../shared/model/CertificateReportResponseByHierarchy';
 
 @Component({
   selector: 'app-tenants-list',
@@ -130,7 +129,10 @@ export class TenantsListComponent implements OnInit {
       .afterClosed().subscribe(result => {
         if (result) {
           this.tenantService.delete(this.selectedTenant.id)
-            .subscribe(() => this.loadList(this.currentPageIndex, this.pageSize));
+            .subscribe(() => {
+              this.selectedTenant = null;
+              this.loadList(this.currentPageIndex, this.pageSize);
+            });
         }
     });
   }

@@ -1,4 +1,4 @@
-package com.opabs.trustchain.validator;
+package com.opabs.common.validator;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x500.X500Name;

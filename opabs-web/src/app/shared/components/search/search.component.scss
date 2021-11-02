@@ -10,10 +10,10 @@
   background-size: 15px 15px;
   background-repeat: no-repeat;
 
-  -webkit-transition: all 0.7s ease 0s;
-  -moz-transition: all 0.7s ease 0s;
-  -o-transition: all 0.7s ease 0s;
-  transition: all 0.7s ease 0s;
+  -webkit-transition: width 0.7s ease 0s;
+  -moz-transition: width 0.7s ease 0s;
+  -o-transition: width 0.7s ease 0s;
+  transition: width 0.7s ease 0s;
 
   &:hover, &:focus, &.expanded {
     width: 200px;

@@ -2,7 +2,6 @@ package com.opabs.trustchain.controller.command;
 
 import com.opabs.common.enums.KeyUsages;
 import com.opabs.common.model.SigningAlgorithm;
-import com.opabs.trustchain.validator.DistinguishedName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

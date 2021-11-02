@@ -2,16 +2,16 @@
     <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
       <span>OPABS KMS</span>
       <div>
-        <button mat-button [routerLink]="['/protected', 'dashboard']">Dashboard</button>
-        <button mat-button [routerLink]="['/protected', 'tenants']">Tenants</button>
-        <button mat-button [routerLink]="['/protected', 'trust-chain']">Trust Chains</button>
-        <button mat-button [routerLink]="['/protected', 'certificates']">Certificates</button>
+        <button mat-button [routerLink]="['/protected', 'dashboard']" routerLinkActive="active">Dashboard</button>
+        <button mat-button [routerLink]="['/protected', 'tenants']" routerLinkActive="active">Tenants</button>
+        <button mat-button [routerLink]="['/protected', 'trust-chain']" routerLinkActive="active">Trust Chains</button>
+        <button mat-button [routerLink]="['/protected', 'certificates']" routerLinkActive="active">Certificates</button>
         <button mat-button (click)="logout()">Logout</button>
       </div>
     </mat-toolbar-row>
-    <app-loader></app-loader>
 </mat-toolbar>
 <div class="display-area" fxFlexFill>
+    <app-loader></app-loader>
     <router-outlet></router-outlet>
 </div>
 

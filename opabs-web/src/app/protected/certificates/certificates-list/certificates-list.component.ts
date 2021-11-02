@@ -8,7 +8,6 @@ import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { saveAs } from 'file-saver';
 import {MatDialog} from '@angular/material/dialog';
 import {AddCertificateComponent} from '../add-certificate/add-certificate.component';
-import {KeyUsage} from '../../../shared/model/KeyUsage';
 import {TrustChainService} from '../../../shared/services/trust-chain.service';
 import {TrustChain} from '../../../shared/model/TrustChain';
 
@@ -102,6 +101,7 @@ export class CertificatesListComponent implements OnInit {
         if (typeof result === 'object') {
           result.parentCertificateId = this.selectedCertificate.id;
           this.certificateService.create(result).subscribe(() => {
+            this.currentPageIndex = 0;
             this.loadList(0, this.pageSize);
           });
         }

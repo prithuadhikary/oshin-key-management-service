@@ -73,7 +73,6 @@ $opabs-theme: mat-light-theme((
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background: #fbfbfb; }
 
-
 .page-header {
   color: #6e8bed;
   margin: 20px 3.5% 0px;
@@ -107,6 +106,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background:
   margin: 5px 3.5% 0;
 }
 
+//List display variables
+$hoverColor: #ffc578;
+
 .item-list {
   border-right: 1px solid #CCC;
   margin-top: -6px;
@@ -126,7 +128,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background:
   }
 
   &.selected {
-    background-color: #ffaf4b;
+    background-color: $hoverColor;
     box-shadow: inset 0 0 8px #707070;
     fa-icon {
       margin-right: 10px;
@@ -135,7 +137,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background:
 }
 .item:hover:not(.selected) {
   animation: pulse 0.5s;
-  background-color: #ffaf4b;
+  background-color: $hoverColor;
   box-shadow: inset 0 0 8px #ffffff;
   cursor: pointer;
 }
@@ -146,7 +148,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background:
     box-shadow: inset 0 0 3px #ffffff;
   }
   100% {
-    background-color: #ffaf4b;
+    background-color: $hoverColor;
     box-shadow: inset 0 0 8px #ffffff;
   }
 }
@@ -192,10 +194,5 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background:
       }
     }
   }
-}
-.loader {
-  position: absolute;
-  width: 100%;
-  z-index: 100;
 }
 
