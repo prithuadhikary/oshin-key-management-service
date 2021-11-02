@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.*;
@@ -34,6 +35,7 @@ import static com.opabs.trustchain.utils.CompressionUtils.uncompress;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CertificateService {
 

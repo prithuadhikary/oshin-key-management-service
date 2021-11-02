@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ import static com.opabs.trustchain.utils.TransformationUtils.fromTrustChain;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class TrustChainService {
 
@@ -47,10 +49,10 @@ public class TrustChainService {
     public TrustChainModel create(CreateTrustChainCommand command) {
 
         //1. Validate tenantExtId with tenant management service.
-        //2. Create a root certificate using crypto service with key usage
+        //2. Create a root certificate using crypto service with key usages keyCertSign and crlSign.
         //3. Create TrustChain entity.
         //4. Save certificate and wrappedPrivateKey.
-        //5. Return fully populated TrustChain entity back to the client.
+        //5. Return fully populated TrustChainModel back to the client.
         validateTenantExtId(command);
 
         GenerateCSRRequest request = createCSRRequest(command);
@@ -134,6 +136,9 @@ public class TrustChainService {
         signingRequest.setValidFrom(command.getValidFrom());
         signingRequest.setValidityInYears(command.getValidityInYears());
         signingRequest.setWrappedIssuerPrivateKey(csr.getWrappedKey());
+
+        signingRequest.setPathLengthConstraint(command.getPathLengthConstraint());
+
         return signingRequest;
     }
 

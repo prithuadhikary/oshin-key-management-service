@@ -11,10 +11,8 @@ import com.opabs.cryptoservice.kpg.KeyPairStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -190,6 +188,14 @@ public class MockCertificateService implements CertificateService {
     private void populateExtensions(CertificateSigningRequest request, PKCS10CertificationRequest pkcs10req, X509Certificate issuerCertificate, X509v3CertificateBuilder certificateGenerator) throws NoSuchAlgorithmException, CertIOException, CertificateEncodingException {
         JcaX509ExtensionUtils extensionUtils = new JcaX509ExtensionUtils();
 
+        List<KeyUsages> keyUsages = request.getKeyUsages();
+
+        Optional<KeyUsage> keyUsage = getKeyUsages(keyUsages);
+
+        if (keyUsage.isPresent()) {
+            certificateGenerator.addExtension(Extension.keyUsage, false, keyUsage.get());
+        }
+
         if (request.isSelfSigned()) {
             //Possibly for the generation of root CA certificate.
             //In case of self signed certificate, the subject and the authority key identifier will be same.
@@ -198,21 +204,32 @@ public class MockCertificateService implements CertificateService {
 
             certificateGenerator.addExtension(Extension.authorityKeyIdentifier, false,
                     extensionUtils.createAuthorityKeyIdentifier(pkcs10req.getSubjectPublicKeyInfo()));
-
         } else {
             certificateGenerator.addExtension(Extension.subjectKeyIdentifier, false,
                     extensionUtils.createSubjectKeyIdentifier(pkcs10req.getSubjectPublicKeyInfo()));
 
             certificateGenerator.addExtension(Extension.authorityKeyIdentifier, false,
                     extensionUtils.createAuthorityKeyIdentifier(issuerCertificate));
-
-        }
-        Optional<KeyUsage> keyUsage = getKeyUsages(request.getKeyUsages());
-
-        if (keyUsage.isPresent()) {
-            certificateGenerator.addExtension(Extension.keyUsage, false, keyUsage.get());
         }
 
+        // If the keyusages contain keyCertSign and CRL sign, then it is a CA certificate for a trust chain.
+        // And should include the BasicConstraints for cA and the path length constraint.
+        if (keyUsage.isPresent() && keyUsages.contains(KeyUsages.KEY_CERT_SIGN) && keyUsages.contains(KeyUsages.CRL_SIGN)) {
+            setCABasicConstraints(request, certificateGenerator);
+        } else {
+            // Adding extension specifying cA flag to be false.
+            certificateGenerator.addExtension(Extension.basicConstraints, true,
+                    new BasicConstraints(false));
+        }
+    }
+
+    private void setCABasicConstraints(CertificateSigningRequest request, X509v3CertificateBuilder certificateGenerator) throws CertIOException {
+        if (request.getPathLengthConstraint() != null) {
+            certificateGenerator.addExtension(Extension.basicConstraints, true,
+                    new BasicConstraints(request.getPathLengthConstraint()));
+        } else {
+            certificateGenerator.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+        }
     }
 
     private Optional<KeyUsage> getKeyUsages(List<KeyUsages> keyUsages) {

@@ -73,4 +73,10 @@ public class CertificateSigningRequest {
     @NotNull
     private SigningAlgorithm signatureAlgorithm;
 
+    /**
+     * The path length constraint gets added as an extension to the certificate being generated in
+     * case the key usage contains keyCertSign and cRLSign bit on.
+     */
+    private Integer pathLengthConstraint;
+
 }

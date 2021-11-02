@@ -1,5 +1,6 @@
-<div class="page-header border-bottom" fxLayout="row" fxLayoutAlign="space-between start">
+<div class="page-header border-bottom" fxLayout="row" fxLayoutAlign="space-between center">
   <h1>Certificates</h1>
+  <app-search (searchTextChange)="searchTextChanged($event)"></app-search>
 </div>
 <div class="wrapper" fxLayout="row" fxLayoutAlign="start start">
   <div class="item-list" fxFlex="30%" fxLayout="column" fxFlexFill>
@@ -36,9 +37,9 @@
     <blockquote>
       <h3>Trust Chain Name</h3>
       <span>{{trustChain.name}}</span>
-      <h3>Creation Date</h3>
+      <h3 *ngIf="trustChain.dateCreated">Creation Date</h3>
       <span>{{trustChain.dateCreated | date: 'short'}}</span>
-      <h3>Last Updated</h3>
+      <h3 *ngIf="trustChain.dateUpdated">Last Updated</h3>
       <span>{{trustChain.dateUpdated | date: 'short'}}</span>
     </blockquote>
   </div>

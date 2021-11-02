@@ -46,9 +46,9 @@ public class CertificateUtils {
             PemObject certificate = pemReader.readPemObject();
             return certificate.getContent();
         } catch (Exception ex) {
-            //TODO: Move exceptions to common.
+            log.error("Error occurred while parsing pem encoded certificate.", ex);
+            throw new InternalServerErrorException();
         }
-        return null;
     }
 
     public static String toPemCertificate(byte[] certificateDer) {
@@ -141,12 +141,7 @@ public class CertificateUtils {
             final ECPublicKey ecpriv = (ECPublicKey) pk;
             final java.security.spec.ECParameterSpec spec = ecpriv.getParams();
             namedCurve = spec.toString();
-            if (spec != null) {
-                len = spec.getOrder().bitLength(); // does this really return something we expect?
-            } else {
-                // We support the key, but we don't know the key length
-                len = 0;
-            }
+            len = spec.getOrder().bitLength(); // does this really return something we expect?
         } else if (pk instanceof DSAPublicKey) {
             final DSAPublicKey dsapub = (DSAPublicKey) pk;
             if (dsapub.getParams() != null) {

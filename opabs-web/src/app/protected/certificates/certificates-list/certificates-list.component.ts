@@ -62,6 +62,10 @@ export class CertificatesListComponent implements OnInit {
       });
   }
 
+  searchTextChanged(value: string): void {
+    console.log(value);
+  }
+
   downloadCertChain(): void {
     this.certificateService.downloadCertificateChain(this.selectedCertificate.id)
       .subscribe(data => {

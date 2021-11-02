@@ -156,4 +156,5 @@ export class AddTrustChainComponent implements OnInit {
   get tenantExtId(): AbstractControl {
     return this.formGroup.get('tenantExtId');
   }
+
 }
