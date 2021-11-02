@@ -32,5 +32,14 @@
       </span>
     </h2>
     <app-certificate-info [certificate]="selectedCertificate"></app-certificate-info>
+    <h2>Owning Trust Chain</h2>
+    <blockquote>
+      <h3>Trust Chain Name</h3>
+      <span>{{trustChain.name}}</span>
+      <h3>Creation Date</h3>
+      <span>{{trustChain.dateCreated | date: 'short'}}</span>
+      <h3>Last Updated</h3>
+      <span>{{trustChain.dateUpdated | date: 'short'}}</span>
+    </blockquote>
   </div>
 </div>

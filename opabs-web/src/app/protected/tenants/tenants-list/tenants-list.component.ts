@@ -117,10 +117,11 @@ export class TenantsListComponent implements OnInit {
     this.dialog.open(AddTenantComponent, {
       disableClose: true
     }).afterClosed().subscribe(result => {
-        console.log(result);
-        this.tenantService.create(result).subscribe(data => {
+        if (typeof result === 'object') {
+          this.tenantService.create(result).subscribe(data => {
             this.loadList(0, 20);
-        });
+          });
+        }
     });
   }
 
@@ -145,9 +146,11 @@ export class TenantsListComponent implements OnInit {
       disableClose: true,
       data: this.selectedTenant
     }).afterClosed().subscribe(result => {
+      if (typeof result === 'object') {
         this.tenantService.update(result).subscribe((data) => {
           Object.assign(this.selectedTenant, data);
         });
+      }
     });
   }
 }

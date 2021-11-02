@@ -146,15 +146,11 @@ export class TrustChainListComponent implements OnInit {
     this.dialog.open(AddTrustChainComponent, {
       disableClose: true
     }).afterClosed().subscribe(result => {
-      this.trustChainService.create(result).subscribe(data => {
-        this.loadList(0, 20);
-      });
-    });
-  }
-
-  getKeyUsages(): Array<string> {
-    return this.selectedTrustChain.rootCertificate.keyUsages.map(value => {
-      return KeyUsage[value];
+      if (typeof result === 'object') {
+        this.trustChainService.create(result).subscribe(data => {
+          this.loadList(0, 20);
+        });
+      }
     });
   }
 

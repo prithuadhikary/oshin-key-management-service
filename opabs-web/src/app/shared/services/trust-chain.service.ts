@@ -5,6 +5,7 @@ import {LoadTrustChainsRequest} from '../model/LoadTrustChainsRequest';
 import {LoadTrustChainsResponse} from '../model/LoadTrustChainsResponse';
 import {CreateTrustChainRequest} from '../model/CreateTrustChainRequest';
 import {CreateTrustChainResponse} from '../model/CreateTrustChainResponse';
+import {TrustChain} from '../model/TrustChain';
 
 @Injectable({
   providedIn: 'root'
@@ -28,4 +29,7 @@ export class TrustChainService {
     );
   }
 
+  show(trustChainId: string): Observable<TrustChain> {
+    return this.http.get<TrustChain>('/api/trust-chain-service/trust-chain/' + trustChainId);
+  }
 }

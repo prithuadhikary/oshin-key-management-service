@@ -8,12 +8,14 @@ import com.opabs.trustchain.exception.CurveNameMissingException;
 import com.opabs.trustchain.exception.InternalServerErrorException;
 import com.opabs.trustchain.exception.KeySizeMissingException;
 import com.opabs.trustchain.model.CertificateInfo;
+import com.opabs.trustchain.model.PublicKeyInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.jce.provider.JCEECPublicKey;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
@@ -25,7 +27,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.cert.*;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -81,7 +87,9 @@ public class CertificateUtils {
         certificateInfo.setSubjectDistinguishedName(certificateObject.getSubjectDN().getName());
         certificateInfo.setValidFrom(certificateObject.getNotBefore());
         certificateInfo.setValidUpto(certificateObject.getNotAfter());
-
+        PublicKeyInfo keyInfo = getKeyLength(certificateObject.getPublicKey());
+        certificateInfo.setKeyLength(keyInfo.getKeyLength());
+        certificateInfo.setNamedCurve(keyInfo.getNamedCurve());
         certificateInfo.setKeyUsages(getKeyUsages(certificateObject));
         populateValidity(certificateObject, certificateInfo);
         return certificateInfo;
@@ -106,6 +114,48 @@ public class CertificateUtils {
             log.error("Error occurred while parsing certificate.", ex);
             throw new InternalServerErrorException();
         }
+    }
+
+    /**
+     * This calculates the public key length given the public key.
+     *
+     * @param pk the public key to find the key length of.
+     * @return the length of the public key.
+     */
+    public static PublicKeyInfo getKeyLength(final PublicKey pk) {
+        int len = -1;
+        String namedCurve = null;
+        if (pk instanceof RSAPublicKey) {
+            final RSAPublicKey rsapub = (RSAPublicKey) pk;
+            len = rsapub.getModulus().bitLength();
+        } else if (pk instanceof JCEECPublicKey) {
+            final JCEECPublicKey ecpriv = (JCEECPublicKey) pk;
+            final org.bouncycastle.jce.spec.ECParameterSpec spec = ecpriv.getParameters();
+            if (spec != null) {
+                len = spec.getN().bitLength();
+            } else {
+                // We support the key, but we don't know the key length
+                len = 0;
+            }
+        } else if (pk instanceof ECPublicKey) {
+            final ECPublicKey ecpriv = (ECPublicKey) pk;
+            final java.security.spec.ECParameterSpec spec = ecpriv.getParams();
+            namedCurve = spec.toString();
+            if (spec != null) {
+                len = spec.getOrder().bitLength(); // does this really return something we expect?
+            } else {
+                // We support the key, but we don't know the key length
+                len = 0;
+            }
+        } else if (pk instanceof DSAPublicKey) {
+            final DSAPublicKey dsapub = (DSAPublicKey) pk;
+            if (dsapub.getParams() != null) {
+                len = dsapub.getParams().getP().bitLength();
+            } else {
+                len = dsapub.getY().bitLength();
+            }
+        }
+        return PublicKeyInfo.builder().keyLength(len).namedCurve(namedCurve).build();
     }
 
     private static void populateValidity(X509Certificate certificateObject, CertificateInfo certificateInfo) {

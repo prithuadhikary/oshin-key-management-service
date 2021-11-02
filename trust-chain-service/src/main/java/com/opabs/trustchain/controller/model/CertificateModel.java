@@ -31,6 +31,8 @@ public class CertificateModel {
 
     private KeyType keyType;
 
+    private Integer keyLength;
+
     private OffsetDateTime dateCreated;
 
     private OffsetDateTime dateUpdated;
@@ -42,5 +44,7 @@ public class CertificateModel {
     private boolean isExpired;
 
     private boolean notYetValid;
+
+    private String namedCurve;
 
 }

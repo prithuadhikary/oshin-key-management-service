@@ -27,4 +27,7 @@ public class CertificateInfo {
 
     private List<KeyUsages> keyUsages;
 
+    private Integer keyLength;
+
+    private String namedCurve;
 }

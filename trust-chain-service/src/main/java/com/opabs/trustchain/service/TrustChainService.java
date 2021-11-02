@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import static com.opabs.trustchain.utils.CertificateUtils.createCSRRequest;
 import static com.opabs.trustchain.utils.CertificateUtils.fromPemCertificate;
 import static com.opabs.trustchain.utils.CompressionUtils.compress;
+import static com.opabs.trustchain.utils.TransformationUtils.fromCertificate;
 import static com.opabs.trustchain.utils.TransformationUtils.fromTrustChain;
 
 @Slf4j
@@ -98,6 +99,21 @@ public class TrustChainService {
             log.error("Error occurred while fetching tenant information.", ex);
             throw new NotFoundException("tenant", command.getTenantExtId());
         }
+    }
+
+    public TrustChainModel show(UUID id) {
+        TrustChainModel responseModel = new TrustChainModel();
+        TrustChain trustChain = trustChainRepository.findByIdAndDeleted(id, false)
+                .orElseThrow(() -> new NotFoundException("trust chain", id));
+        responseModel.setTenantExtId(trustChain.getTenantExtId());
+        responseModel.setId(trustChain.getId());
+        responseModel.setName(trustChain.getName());
+        responseModel.setDescription(trustChain.getDescription());
+        responseModel.setRootCertificate(fromCertificate(trustChain.getRootCertificate()));
+        responseModel.setDeleted(trustChain.isDeleted());
+        responseModel.setDateCreated(trustChain.getDateCreated());
+        responseModel.setDateUpdated(trustChain.getDateUpdated());
+        return responseModel;
     }
 
     public Optional<TrustChain> findById(UUID id) {

@@ -52,6 +52,8 @@ public class TransformationUtils {
             certificateModel.setExpired(certificateInfo.isExpired());
             certificateModel.setNotYetValid(certificateInfo.isNotYetValid());
             certificateModel.setKeyUsages(certificateInfo.getKeyUsages());
+            certificateModel.setKeyLength(certificateInfo.getKeyLength());
+            certificateModel.setNamedCurve(certificateInfo.getNamedCurve());
         } catch (Exception ex) {
             log.error("Error occurred while parsing certificate.", ex);
             throw new InternalServerErrorException();

@@ -17,4 +17,6 @@ export interface Certificate {
   expired: boolean;
   notYetValid: boolean;
   keyUsages: Array<string>;
+  keyLength: number;
+  namedCurve: string;
 }

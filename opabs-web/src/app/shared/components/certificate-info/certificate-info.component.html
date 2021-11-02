@@ -1,5 +1,7 @@
 <blockquote fxLayout="row">
   <div fxLayout="column" fxFlex="50%">
+    <h3>Certificate ID</h3>
+    <span>{{certificate.id}}</span>
     <h3>Subject Distinguished Name</h3>
     <span>{{certificate.subjectDistinguishedName}}</span>
     <h3>Key Type</h3>
@@ -14,6 +16,8 @@
     <span>{{getKeyUsages()}}</span>
   </div>
   <div fxLayout="column" fxFlex="50%">
+    <h3>Key Length</h3>
+    <span>{{certificate.keyLength}} bits <span *ngIf="certificate.namedCurve">[{{certificate.namedCurve}}]</span></span>
     <h3>Has Expired?</h3>
     <span>{{certificate.expired ? 'Yes' : 'No'}}</span>
     <h3>Not Valid Yet</h3>

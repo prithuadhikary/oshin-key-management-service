@@ -31,9 +31,8 @@ public class TrustChainController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<TrustChain> show(@PathVariable("id") UUID id) {
-        Optional<TrustChain> trustChain = trustChainService.findById(id);
-        return trustChain.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<TrustChainModel> show(@PathVariable("id") UUID id) {
+        return ResponseEntity.ok(trustChainService.show(id));
     }
 
     @GetMapping

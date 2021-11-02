@@ -9,6 +9,8 @@ import { saveAs } from 'file-saver';
 import {MatDialog} from '@angular/material/dialog';
 import {AddCertificateComponent} from '../add-certificate/add-certificate.component';
 import {KeyUsage} from '../../../shared/model/KeyUsage';
+import {TrustChainService} from '../../../shared/services/trust-chain.service';
+import {TrustChain} from '../../../shared/model/TrustChain';
 
 @Component({
   selector: 'app-certificates-list',
@@ -21,6 +23,8 @@ export class CertificatesListComponent implements OnInit {
 
   selectedCertificate: Certificate;
 
+  trustChain: TrustChain;
+
   // Page params
   paginatorLength;
   pageSize = 10;
@@ -31,6 +35,7 @@ export class CertificatesListComponent implements OnInit {
 
   constructor(
     private certificateService: CertificateService,
+    private trustChainService: TrustChainService,
     private dialog: MatDialog
   ) { }
 
@@ -60,7 +65,7 @@ export class CertificatesListComponent implements OnInit {
   downloadCertChain(): void {
     this.certificateService.downloadCertificateChain(this.selectedCertificate.id)
       .subscribe(data => {
-        saveAs(data, 'certificate.p7b');
+        saveAs(data, 'certificate-chain.p7b');
       });
   }
 
@@ -72,6 +77,10 @@ export class CertificatesListComponent implements OnInit {
 
   setSelected(certificate: Certificate): void {
     this.selectedCertificate = certificate;
+    this.trustChainService.show(this.selectedCertificate.trustChainId)
+      .subscribe(data => {
+        this.trustChain = data;
+      });
   }
 
   isSelected(certificate: Certificate): boolean {
