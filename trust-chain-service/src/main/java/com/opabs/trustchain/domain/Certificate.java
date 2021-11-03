@@ -32,6 +32,8 @@ public class Certificate {
 
     private boolean isAnchor;
 
+    private String subjectDistinguishedName;
+
     private String publicKeyFingerprint;
 
     private String certificateFingerprint;

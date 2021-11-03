@@ -39,9 +39,10 @@ public class CertificateController {
     @GetMapping
     public ListResponse<CertificateModel> list(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "20") Integer size
+            @RequestParam(value = "size", defaultValue = "20") Integer size,
+            @RequestParam(value = "search", required = false) String search
     ) {
-        return certificateService.list(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));
+        return certificateService.list(search, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));
     }
 
 }

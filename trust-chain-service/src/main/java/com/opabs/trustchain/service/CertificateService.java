@@ -6,6 +6,7 @@ import com.opabs.trustchain.controller.command.CreateCertificateCommand;
 import com.opabs.trustchain.controller.model.CertificateModel;
 import com.opabs.trustchain.controller.responses.CreateCertificateResponse;
 import com.opabs.trustchain.domain.Certificate;
+import com.opabs.trustchain.domain.specifications.CertificateSpecifications;
 import com.opabs.trustchain.exception.InternalServerErrorException;
 import com.opabs.trustchain.exception.KeyTypeAndUsageMismatch;
 import com.opabs.trustchain.exception.NotFoundException;
@@ -29,9 +30,11 @@ import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.opabs.trustchain.domain.specifications.CertificateSpecifications.searchSpecification;
 import static com.opabs.trustchain.utils.CertificateUtils.*;
 import static com.opabs.trustchain.utils.CompressionUtils.compress;
 import static com.opabs.trustchain.utils.CompressionUtils.uncompress;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Slf4j
 @Service
@@ -87,7 +90,7 @@ public class CertificateService {
         newCertificate.setContent(compress(fromPemCertificate(certificateResponse.getCertificate())));
         newCertificate.setTrustChain(parentCertificate.getTrustChain());
         newCertificate.setWrappedPrivateKey(compress(Base64.getDecoder().decode(csrResponse.getWrappedKey())));
-
+        newCertificate.setSubjectDistinguishedName(command.getSubjectDistinguishedName());
         CertificateInfo certificateInfo = CertificateUtils.getCertificateInfo(certificateResponse.getCertificate());
         newCertificate.setCertificateFingerprint(certificateInfo.getCertificateFingerprint());
         newCertificate.setPublicKeyFingerprint(certificateInfo.getPublicKeyFingerprint());
@@ -146,8 +149,13 @@ public class CertificateService {
         }
     }
 
-    public ListResponse<CertificateModel> list(Pageable pageRequest) {
-        Page<Certificate> certificates = certificateRepository.findAll(pageRequest);
+    public ListResponse<CertificateModel> list(String search, Pageable pageRequest) {
+        Page<Certificate> certificates;
+        if (isNotEmpty(search)) {
+            certificates = certificateRepository.findAll(searchSpecification(search), pageRequest);
+        } else {
+         certificates = certificateRepository.findAll(pageRequest);
+        }
         ListResponse<CertificateModel> listResponse = new ListResponse<>();
         listResponse.setContent(certificates.getContent().stream().map(TransformationUtils::fromCertificate).collect(Collectors.toList()));
         listResponse.setTotalElements(certificates.getTotalElements());

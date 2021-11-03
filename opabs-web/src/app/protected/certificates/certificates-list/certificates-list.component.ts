@@ -57,18 +57,24 @@ export class CertificatesListComponent implements OnInit {
   downloadCert(): void {
     this.certificateService.downloadCertificate(this.selectedCertificate.id)
       .subscribe(data => {
-        saveAs(data, 'certificate.crt');
+        saveAs(data, 'certificate-' + this.selectedCertificate.id + '.crt');
       });
   }
 
   searchTextChanged(value: string): void {
     console.log(value);
+    this.currentPageIndex = 0;
+    this.certificateListResponse$ = this.certificateService.list({
+      size: this.pageSize,
+      page: this.currentPageIndex,
+      search: value
+    });
   }
 
   downloadCertChain(): void {
     this.certificateService.downloadCertificateChain(this.selectedCertificate.id)
       .subscribe(data => {
-        saveAs(data, 'certificate-chain.p7b');
+        saveAs(data, 'certificate-chain-' + this.selectedCertificate.id + '.p7b');
       });
   }
 
@@ -79,11 +85,13 @@ export class CertificatesListComponent implements OnInit {
   }
 
   setSelected(certificate: Certificate): void {
-    this.selectedCertificate = certificate;
-    this.trustChainService.show(this.selectedCertificate.trustChainId)
-      .subscribe(data => {
-        this.trustChain = data;
-      });
+    if (this.selectedCertificate?.id !== certificate.id) {
+      this.selectedCertificate = certificate;
+      this.trustChainService.show(this.selectedCertificate.trustChainId)
+        .subscribe(data => {
+          this.trustChain = data;
+        });
+    }
   }
 
   isSelected(certificate: Certificate): boolean {

@@ -43,4 +43,7 @@
       <span>{{trustChain.dateUpdated | date: 'short'}}</span>
     </blockquote>
   </div>
+  <div fxFlex="70%" *ngIf="!selectedCertificate" fxLayout="row" fxLayoutAlign="center center">
+    <h3>Please select a certificate to view.</h3>
+  </div>
 </div>

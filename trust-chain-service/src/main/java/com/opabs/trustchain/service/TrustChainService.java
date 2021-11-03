@@ -79,6 +79,7 @@ public class TrustChainService {
         certificate.setWrappedPrivateKey(compress(wrappedKey));
         certificate.setTrustChain(trustChain);
         certificate.setKeyType(command.getKeyType());
+        certificate.setSubjectDistinguishedName(command.getSubjectDistinguishedName());
 
         CertificateInfo certInfo = CertificateUtils.getCertificateInfo(signingResponse.getCertificate());
         certificate.setPublicKeyFingerprint(certInfo.getPublicKeyFingerprint());
