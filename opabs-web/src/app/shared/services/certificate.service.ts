@@ -34,10 +34,13 @@ export class CertificateService {
       return this.http.get('/api/trust-chain-service/certificate/download/p7b/' + id, { responseType: 'blob'});
   }
 
-  list(param: { size: number; page: number, search?: string }): Observable<ListResponse<Certificate>> {
+  list(param: { size: number; page: number, search?: string, parentCertificateId?: string }): Observable<ListResponse<Certificate>> {
     let params = new HttpParams().set('page', param.page.toString()).set('size', param.size.toString());
     if (param.search) {
       params = params.set('search', param.search);
+    }
+    if (param.parentCertificateId) {
+      params = params.set('parentCertificateId', param.parentCertificateId);
     }
     return this.http.get<ListResponse<Certificate>>('/api/trust-chain-service/certificate', { params });
   }

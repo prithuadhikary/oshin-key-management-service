@@ -6,3 +6,13 @@
   background-size: cover;
   display: inline-block;
 }
+.chip {
+  border-radius: 30px;
+  background: #516ee5;
+  color: #ffffff;
+  padding: 5px 10px;
+
+  fa-icon {
+    cursor: pointer;
+  }
+}

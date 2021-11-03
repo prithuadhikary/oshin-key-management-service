@@ -18,7 +18,7 @@
     <h1 fxLayout="row" fxLayoutAlign="space-between center">
       <span><fa-icon class="fa-1x" [icon]="faCertificate"></fa-icon>
         {{selectedTrustChain.name}}</span>
-      <button mat-stroked-button color="primary">View Certificates</button>
+      <button mat-stroked-button color="primary" (click)="viewChildCertificates()">View Certificates</button>
     </h1>
     <span>{{selectedTrustChain.description}}</span>
     <h2 fxLayout="row" fxLayoutAlign="space-between center">

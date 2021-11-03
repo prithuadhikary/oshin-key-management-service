@@ -149,10 +149,10 @@ public class CertificateService {
         }
     }
 
-    public ListResponse<CertificateModel> list(String search, Pageable pageRequest) {
+    public ListResponse<CertificateModel> list(String search, UUID parentCertificateId, Pageable pageRequest) {
         Page<Certificate> certificates;
-        if (isNotEmpty(search)) {
-            certificates = certificateRepository.findAll(searchSpecification(search), pageRequest);
+        if (isNotEmpty(search) || parentCertificateId != null) {
+            certificates = certificateRepository.findAll(searchSpecification(search, parentCertificateId), pageRequest);
         } else {
          certificates = certificateRepository.findAll(pageRequest);
         }

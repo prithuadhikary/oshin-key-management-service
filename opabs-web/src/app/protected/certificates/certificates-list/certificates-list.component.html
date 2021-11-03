@@ -1,5 +1,8 @@
 <div class="page-header border-bottom" fxLayout="row" fxLayoutAlign="space-between center">
-  <h1>Certificates</h1>
+  <h1>
+    Certificates
+  </h1>
+  <span class="chip" *ngIf="parentCertificate">Under parent {{parentCertificate.subjectDistinguishedName}} <fa-icon (click)="clearParentCertificateId()" [icon]="faTimesCircle"></fa-icon> </span>
   <app-search (searchTextChange)="searchTextChanged($event)"></app-search>
 </div>
 <div class="wrapper" fxLayout="row" fxLayoutAlign="start start">
@@ -33,8 +36,8 @@
       </span>
     </h2>
     <app-certificate-info [certificate]="selectedCertificate"></app-certificate-info>
-    <h2>Owning Trust Chain</h2>
-    <blockquote>
+    <h2 *ngIf="trustChain">Owning Trust Chain</h2>
+    <blockquote *ngIf="trustChain">
       <h3>Trust Chain Name</h3>
       <span>{{trustChain.name}}</span>
       <h3 *ngIf="trustChain.dateCreated">Creation Date</h3>

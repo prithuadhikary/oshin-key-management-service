@@ -12,7 +12,7 @@ import * as c3 from 'c3';
 import {CertificateReportResponseByHierarchy} from '../../../shared/model/CertificateReportResponseByHierarchy';
 import {AddTrustChainComponent} from '../add-trust-chain/add-trust-chain.component';
 import { saveAs } from 'file-saver';
-import {KeyUsage} from '../../../shared/model/KeyUsage';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-trust-chain-list',
@@ -24,7 +24,8 @@ export class TrustChainListComponent implements OnInit {
   constructor(
     private trustChainService: TrustChainService,
     private certificateService: CertificateService,
-    public dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router
   ) {
   }
 
@@ -152,6 +153,10 @@ export class TrustChainListComponent implements OnInit {
         });
       }
     });
+  }
+
+  viewChildCertificates(): void {
+    this.router.navigate(['protected', 'certificates'], { state: { parentCertificate: this.selectedTrustChain.rootCertificate }});
   }
 
   changePage(event: { pageIndex: number, pageSize: number }): void {

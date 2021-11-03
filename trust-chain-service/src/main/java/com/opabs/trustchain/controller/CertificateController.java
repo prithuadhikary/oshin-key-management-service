@@ -40,9 +40,10 @@ public class CertificateController {
     public ListResponse<CertificateModel> list(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size,
-            @RequestParam(value = "search", required = false) String search
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "parentCertificateId", required = false) UUID parentCertificateId
     ) {
-        return certificateService.list(search, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));
+        return certificateService.list(search, parentCertificateId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));
     }
 
 }

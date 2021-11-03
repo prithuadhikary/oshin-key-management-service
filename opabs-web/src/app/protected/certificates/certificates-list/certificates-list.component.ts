@@ -4,12 +4,13 @@ import {Observable} from 'rxjs';
 import {ListResponse} from '../../../shared/model/ListResponse';
 import {Certificate} from '../../../shared/model/Certificate';
 import {tap} from 'rxjs/operators';
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
-import { saveAs } from 'file-saver';
+import {faDownload, faTimesCircle} from '@fortawesome/free-solid-svg-icons';
+import {saveAs} from 'file-saver';
 import {MatDialog} from '@angular/material/dialog';
 import {AddCertificateComponent} from '../add-certificate/add-certificate.component';
 import {TrustChainService} from '../../../shared/services/trust-chain.service';
 import {TrustChain} from '../../../shared/model/TrustChain';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-certificates-list',
@@ -24,6 +25,8 @@ export class CertificatesListComponent implements OnInit {
 
   trustChain: TrustChain;
 
+  parentCertificate: Certificate;
+
   // Page params
   paginatorLength;
   pageSize = 10;
@@ -31,21 +34,26 @@ export class CertificatesListComponent implements OnInit {
   pageSizeOptions: number[] = [5, 10, 25, 100];
 
   faDownload = faDownload;
+  faTimesCircle = faTimesCircle;
 
   constructor(
     private certificateService: CertificateService,
     private trustChainService: TrustChainService,
-    private dialog: MatDialog
-  ) { }
-
-  ngOnInit(): void {
-    this.loadList(0, 20);
+    private dialog: MatDialog,
+    private router: Router
+  ) {
+    this.parentCertificate = this.router.getCurrentNavigation()?.extras?.state?.parentCertificate;
   }
 
-  loadList(page: number, pageSize: number): void {
+  ngOnInit(): void {
+      this.loadList(0, 20, this.parentCertificate?.id);
+  }
+
+  loadList(page: number, pageSize: number, parentCertificateId: string): void {
     this.certificateListResponse$ = this.certificateService.list({
       page,
-      size: pageSize
+      size: pageSize,
+      parentCertificateId
     }).pipe(
       tap((data: ListResponse<Certificate>) => {
         this.paginatorLength = data.totalElements;
@@ -62,13 +70,18 @@ export class CertificatesListComponent implements OnInit {
   }
 
   searchTextChanged(value: string): void {
-    console.log(value);
     this.currentPageIndex = 0;
     this.certificateListResponse$ = this.certificateService.list({
       size: this.pageSize,
       page: this.currentPageIndex,
-      search: value
+      search: value,
+      parentCertificateId: this.parentCertificate?.id
     });
+  }
+
+  clearParentCertificateId(): void {
+    this.parentCertificate = null;
+    this.loadList(this.currentPageIndex, this.pageSize, null);
   }
 
   downloadCertChain(): void {
@@ -110,7 +123,7 @@ export class CertificatesListComponent implements OnInit {
           result.parentCertificateId = this.selectedCertificate.id;
           this.certificateService.create(result).subscribe(() => {
             this.currentPageIndex = 0;
-            this.loadList(0, this.pageSize);
+            this.loadList(0, this.pageSize, this.parentCertificate?.id);
           });
         }
     });
