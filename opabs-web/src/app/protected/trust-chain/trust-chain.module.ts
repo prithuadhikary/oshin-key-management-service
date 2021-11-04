@@ -16,6 +16,7 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatSelectModule} from '@angular/material/select';
 import {MatTreeModule} from '@angular/material/tree';
 import {MatIconModule} from '@angular/material/icon';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 const routes: Routes = [
   { path: '', component: TrustChainListComponent }
@@ -23,22 +24,23 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [TrustChainListComponent, AddTrustChainComponent],
-  imports: [
-    CommonModule,
-    RouterModule.forChild(routes),
-    FlexModule,
-    MatButtonModule,
-    FontAwesomeModule,
-    MatPaginatorModule,
-    SharedModule,
-    MatDialogModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatSelectModule,
-    MatTreeModule,
-    MatIconModule
-  ]
+    imports: [
+        CommonModule,
+        RouterModule.forChild(routes),
+        FlexModule,
+        MatButtonModule,
+        FontAwesomeModule,
+        MatPaginatorModule,
+        SharedModule,
+        MatDialogModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatDatepickerModule,
+        MatSelectModule,
+        MatTreeModule,
+        MatIconModule,
+        MatCheckboxModule
+    ]
 })
 export class TrustChainModule { }
