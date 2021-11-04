@@ -138,6 +138,9 @@ public class TrustChainService {
         signingRequest.setValidityInYears(command.getValidityInYears());
         signingRequest.setWrappedIssuerPrivateKey(csr.getWrappedKey());
 
+        // The path length constraint determines how many sub CAs are allowed beneath this root CA certificate.
+        // Every time a non root intermediate CA certificate is generated. the basic constraint will be decremented
+        // by 1.
         signingRequest.setPathLengthConstraint(command.getPathLengthConstraint());
 
         return signingRequest;

@@ -3,10 +3,7 @@ package com.opabs.cryptoservice.service.certificate;
 import com.opabs.common.enums.KeyUsages;
 import com.opabs.common.model.*;
 import com.opabs.cryptoservice.config.MockConfig;
-import com.opabs.cryptoservice.exception.CSRSignatureInvalidException;
-import com.opabs.cryptoservice.exception.InternalServerErrorException;
-import com.opabs.cryptoservice.exception.KeyPairGenerationFailureException;
-import com.opabs.cryptoservice.exception.SigningAlgorithmAndSigningKeyMismatchException;
+import com.opabs.cryptoservice.exception.*;
 import com.opabs.cryptoservice.kpg.KeyPairStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +50,8 @@ import java.util.*;
 public class MockCertificateService implements CertificateService {
 
     public static final String PROVIDER_NAME = "BC";
+    public static final String RSA = "RSA";
+    public static final String EC = "EC";
 
     private final MockConfig mockConfig;
 
@@ -113,10 +112,13 @@ public class MockCertificateService implements CertificateService {
                 //3. Read issuer certificate and fetch out the issuer distinguished name.
                 issuerCertificate = readIssuerCertificate(request.getIssuerCertificate());
                 issuerDN = issuerCertificate.getIssuerDN().getName();
-                if ("RSA".equals(issuerCertificate.getPublicKey().getAlgorithm())) {
+                String pubKeyAlgo = issuerCertificate.getPublicKey().getAlgorithm();
+                if (RSA.equals(pubKeyAlgo)) {
                     issuerKeyType = Optional.of(KeyType.RSA);
-                } else {
+                } else if (EC.equals(pubKeyAlgo)) {
                     issuerKeyType = Optional.of(KeyType.ELLIPTIC_CURVE);
+                } else {
+                    throw new UnsupportedIssuerKeyTypeException(pubKeyAlgo);
                 }
             }
 
@@ -215,7 +217,8 @@ public class MockCertificateService implements CertificateService {
         // If the keyusages contain keyCertSign and CRL sign, then it is a CA certificate for a trust chain.
         // And should include the BasicConstraints for cA and the path length constraint.
         if (keyUsage.isPresent() && keyUsages.contains(KeyUsages.KEY_CERT_SIGN) && keyUsages.contains(KeyUsages.CRL_SIGN)) {
-            setCABasicConstraints(request, certificateGenerator);
+            // CA Certificate
+            setCABasicConstraints(request, certificateGenerator, issuerCertificate);
         } else {
             // Adding extension specifying cA flag to be false.
             certificateGenerator.addExtension(Extension.basicConstraints, true,
@@ -223,13 +226,35 @@ public class MockCertificateService implements CertificateService {
         }
     }
 
-    private void setCABasicConstraints(CertificateSigningRequest request, X509v3CertificateBuilder certificateGenerator) throws CertIOException {
-        if (request.getPathLengthConstraint() != null) {
-            certificateGenerator.addExtension(Extension.basicConstraints, true,
-                    new BasicConstraints(request.getPathLengthConstraint()));
+    private void setCABasicConstraints(CertificateSigningRequest request, X509v3CertificateBuilder certificateGenerator, X509Certificate issuerCertificate) throws CertIOException {
+        // 1. If CA certificate and not root, and if path length constraint present in issuer certificate,
+        //    Fetch out the issuer path length and decrement it by 1 and set in the current certificate.
+        // 2. If a self signed root CA, set basic constraints based on what has been passed in the request,
+        if (request.isSelfSigned()) {
+            if (request.getPathLengthConstraint() != null) {
+                certificateGenerator.addExtension(Extension.basicConstraints, true,
+                        new BasicConstraints(request.getPathLengthConstraint()));
+            } else {
+                certificateGenerator.addExtension(Extension.basicConstraints, true,
+                        new BasicConstraints(true));
+            }
         } else {
-            certificateGenerator.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+            int issuerBasicConstraint = issuerCertificate.getBasicConstraints();
+            // If path length constraint is zero, no new certificate can be issued with a lesser path length constraint.
+            // Hence throwing BasicConstraintViolationException.
+            if (issuerBasicConstraint == 0) {
+                throw new BasicConstraintViolationException();
+            }
+            // If issuer basic constraint is int max, the path length is unlimited.
+            if (issuerBasicConstraint == Integer.MAX_VALUE) {
+                certificateGenerator.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+            } else {
+                // Decrementing path length constraint obtained from the issuer certificate by 1, zero is the min value.
+                // If zero, then it must be the last intermediate CA certificate in the trust chain that can be issued.
+                certificateGenerator.addExtension(Extension.basicConstraints, true, new BasicConstraints(issuerBasicConstraint - 1));
+            }
         }
+
     }
 
     private Optional<KeyUsage> getKeyUsages(List<KeyUsages> keyUsages) {

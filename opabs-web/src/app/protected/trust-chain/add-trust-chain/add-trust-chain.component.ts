@@ -44,6 +44,7 @@ export class AddTrustChainComponent implements OnInit {
   showNamedCurveInput = false;
   showKeyLengthInput = false;
   showSignatureAlgorithms = false;
+  enforcePathLengthConstraints = false;
 
   signatureAlgorithms = [SignatureAlgorithms.SHA256withECDSA, SignatureAlgorithms.SHA256withRSA, SignatureAlgorithms.SHA1withRSA];
 
@@ -66,7 +67,8 @@ export class AddTrustChainComponent implements OnInit {
       namedCurve: [null],
       validityInYears: ['1', [Validators.required, Validators.min(1)]],
       signatureAlgorithm: [null, Validators.required],
-      tenantExtId: [null, Validators.required]
+      tenantExtId: [null, Validators.required],
+      pathLengthConstraint: [null]
     });
     this.tenantService.list({ page: 0, size: 1000 })
       .subscribe(data => {
@@ -117,6 +119,10 @@ export class AddTrustChainComponent implements OnInit {
     }
   }
 
+  togglePathLengthConstraintInput(checked: boolean): void {
+    this.enforcePathLengthConstraints = checked;
+  }
+
   get name(): AbstractControl {
     return this.formGroup.get('name');
   }
@@ -155,6 +161,10 @@ export class AddTrustChainComponent implements OnInit {
 
   get tenantExtId(): AbstractControl {
     return this.formGroup.get('tenantExtId');
+  }
+
+  get pathLengthConstraint(): AbstractControl {
+    return this.formGroup.get('pathLengthConstraint');
   }
 
 }

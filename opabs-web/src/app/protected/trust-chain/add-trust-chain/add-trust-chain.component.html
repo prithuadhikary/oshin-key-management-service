@@ -75,6 +75,13 @@
       </mat-select>
       <mat-error *ngIf="tenantExtId.hasError('required')">Tenant is required.</mat-error>
     </mat-form-field>
+
+    <mat-checkbox class="example-margin" (change)="togglePathLengthConstraintInput($event.checked)">Enforce Path Length Constraint</mat-checkbox>
+
+    <mat-form-field *ngIf="enforcePathLengthConstraints" appearance="fill">
+      <mat-label>Path Length Constraint</mat-label>
+      <input type="number" matInput formControlName="pathLengthConstraint">
+    </mat-form-field>
   </div>
 
   <button mat-flat-button color="primary" [disabled]="formGroup.invalid">Create</button>
