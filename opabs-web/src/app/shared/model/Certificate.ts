@@ -19,4 +19,5 @@ export interface Certificate {
   keyUsages: Array<string>;
   keyLength: number;
   namedCurve: string;
+  pathLengthConstraint: number;
 }

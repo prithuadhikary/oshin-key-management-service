@@ -112,12 +112,12 @@ export class CertificatesListComponent implements OnInit {
   }
 
   canCreateChildCertificates(): boolean {
-    return this.selectedCertificate.keyUsages.includes('KEY_CERT_SIGN');
+    return this.selectedCertificate.keyUsages.includes('KEY_CERT_SIGN') && this.selectedCertificate.keyUsages.includes('CRL_SIGN');
   }
 
   openAddCertificate(): void {
     this.dialog.open(AddCertificateComponent, {
-      data: { parentKeyType: this.selectedCertificate.keyType }
+      data: { parentKeyType: this.selectedCertificate.keyType, pathLengthConstraint: this.selectedCertificate.pathLengthConstraint }
     }).afterClosed().subscribe(result => {
         if (typeof result === 'object') {
           result.parentCertificateId = this.selectedCertificate.id;

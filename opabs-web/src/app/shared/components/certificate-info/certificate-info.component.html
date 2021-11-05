@@ -28,5 +28,7 @@
     <span>{{certificate.publicKeyFingerprint}}</span>
     <h3>Is A Root Certificate</h3>
     <span>{{certificate.anchor ? 'Yes': 'No'}}</span>
+    <h3 *ngIf="certificate.pathLengthConstraint != null">Path Length Constraint</h3>
+    <span *ngIf="certificate.pathLengthConstraint != null">{{certificate.pathLengthConstraint}}</span>
   </div>
 </blockquote>

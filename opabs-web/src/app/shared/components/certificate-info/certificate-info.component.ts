@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Certificate} from '../../model/Certificate';
 import {KeyUsage} from '../../model/KeyUsage';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-certificate-info',
@@ -8,6 +9,8 @@ import {KeyUsage} from '../../model/KeyUsage';
   styleUrls: ['./certificate-info.component.scss']
 })
 export class CertificateInfoComponent {
+
+  faInfoCircle = faInfoCircle;
 
   @Input() certificate: Certificate;
 

@@ -56,7 +56,7 @@ export class AddCertificateComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddCertificateComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { parentKeyType: KeyType }
+    @Inject(MAT_DIALOG_DATA) public data: { parentKeyType: KeyType, pathLengthConstraint: number }
   ) {
     this.setSignatureAlgoBasedOnParentKeyType(data.parentKeyType);
   }
@@ -99,8 +99,6 @@ export class AddCertificateComponent implements OnInit {
         this.showKeyLengthInput = true;
         this.showKeyUsageInput = true;
         this.keyUsageValues = [
-          {displayName: KeyUsage.KEY_CERT_SIGN, value: 'KEY_CERT_SIGN'},
-          {displayName: KeyUsage.CRL_SIGN, value: 'CRL_SIGN'},
           {displayName: KeyUsage.KEY_ENCIPHERMENT, value: 'KEY_ENCIPHERMENT'},
           {displayName: KeyUsage.DATA_ENCIPHERMENT, value: 'DATA_ENCIPHERMENT'},
           {displayName: KeyUsage.DIGITAL_SIGNATURE, value: 'DIGITAL_SIGNATURE'},
@@ -108,6 +106,10 @@ export class AddCertificateComponent implements OnInit {
           {displayName: KeyUsage.DECIPHER_ONLY, value: 'DECIPHER_ONLY'},
           {displayName: KeyUsage.NON_REPUDIATION, value: 'NON_REPUDIATION'}
         ];
+        if (this.data.pathLengthConstraint > 0) {
+          this.keyUsageValues.push({displayName: KeyUsage.KEY_CERT_SIGN, value: 'KEY_CERT_SIGN'},
+            {displayName: KeyUsage.CRL_SIGN, value: 'CRL_SIGN'});
+        }
         this.toggleEcInputValidators();
         break;
       case 'ELLIPTIC_CURVE':
@@ -117,10 +119,12 @@ export class AddCertificateComponent implements OnInit {
         this.keyUsageValues = [
           {displayName: KeyUsage.KEY_AGREEMENT, value: 'KEY_AGREEMENT'},
           {displayName: KeyUsage.NON_REPUDIATION, value: 'NON_REPUDIATION'},
-          {displayName: KeyUsage.DIGITAL_SIGNATURE, value: 'DIGITAL_SIGNATURE'},
-          {displayName: KeyUsage.KEY_CERT_SIGN, value: 'KEY_CERT_SIGN'},
-          {displayName: KeyUsage.CRL_SIGN, value: 'CRL_SIGN'}
+          {displayName: KeyUsage.DIGITAL_SIGNATURE, value: 'DIGITAL_SIGNATURE'}
         ];
+        if (this.data.pathLengthConstraint > 0) {
+          this.keyUsageValues.push({displayName: KeyUsage.KEY_CERT_SIGN, value: 'KEY_CERT_SIGN'},
+            {displayName: KeyUsage.CRL_SIGN, value: 'CRL_SIGN'});
+        }
         this.toggleEcInputValidators();
         break;
       default:

@@ -47,4 +47,6 @@ public class CertificateModel {
 
     private String namedCurve;
 
+    private Integer pathLengthConstraint;
+
 }

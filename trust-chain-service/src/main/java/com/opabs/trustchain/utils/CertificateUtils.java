@@ -90,7 +90,13 @@ public class CertificateUtils {
         PublicKeyInfo keyInfo = getKeyLength(certificateObject.getPublicKey());
         certificateInfo.setKeyLength(keyInfo.getKeyLength());
         certificateInfo.setNamedCurve(keyInfo.getNamedCurve());
-        certificateInfo.setKeyUsages(getKeyUsages(certificateObject));
+        List<KeyUsages> keyUsages = getKeyUsages(certificateObject);
+        certificateInfo.setKeyUsages(keyUsages);
+
+        if (keyUsages.contains(KeyUsages.KEY_CERT_SIGN) && keyUsages.contains(KeyUsages.CRL_SIGN)) {
+            certificateInfo.setPathLengthConstraint(certificateObject.getBasicConstraints());
+        }
+
         populateValidity(certificateObject, certificateInfo);
         return certificateInfo;
     }

@@ -30,4 +30,6 @@ public class CertificateInfo {
     private Integer keyLength;
 
     private String namedCurve;
+
+    private Integer pathLengthConstraint;
 }

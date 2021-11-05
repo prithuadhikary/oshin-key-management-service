@@ -121,6 +121,7 @@ export class AddTrustChainComponent implements OnInit {
 
   togglePathLengthConstraintInput(checked: boolean): void {
     this.enforcePathLengthConstraints = checked;
+    this.pathLengthConstraint.setValue('3');
   }
 
   get name(): AbstractControl {

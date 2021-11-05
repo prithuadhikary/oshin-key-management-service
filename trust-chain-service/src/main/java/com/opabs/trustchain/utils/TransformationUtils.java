@@ -54,6 +54,7 @@ public class TransformationUtils {
             certificateModel.setKeyUsages(certificateInfo.getKeyUsages());
             certificateModel.setKeyLength(certificateInfo.getKeyLength());
             certificateModel.setNamedCurve(certificateInfo.getNamedCurve());
+            certificateModel.setPathLengthConstraint(certificateInfo.getPathLengthConstraint());
         } catch (Exception ex) {
             log.error("Error occurred while parsing certificate.", ex);
             throw new InternalServerErrorException();
