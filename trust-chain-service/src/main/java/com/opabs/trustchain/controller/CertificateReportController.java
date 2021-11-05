@@ -1,7 +1,6 @@
 package com.opabs.trustchain.controller;
 
 import com.opabs.trustchain.controller.model.CertificateCountByHierarchy;
-import com.opabs.trustchain.controller.model.CertificateCountByLevel;
 import com.opabs.trustchain.controller.model.CertificateReportByKeyType;
 import com.opabs.trustchain.service.CertificateReportService;
 import lombok.RequiredArgsConstructor;

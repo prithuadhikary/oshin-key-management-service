@@ -6,7 +6,6 @@ import com.opabs.trustchain.controller.command.CreateCertificateCommand;
 import com.opabs.trustchain.controller.model.CertificateModel;
 import com.opabs.trustchain.controller.responses.CreateCertificateResponse;
 import com.opabs.trustchain.domain.Certificate;
-import com.opabs.trustchain.domain.specifications.CertificateSpecifications;
 import com.opabs.trustchain.exception.InternalServerErrorException;
 import com.opabs.trustchain.exception.KeyTypeAndUsageMismatch;
 import com.opabs.trustchain.exception.NotFoundException;
