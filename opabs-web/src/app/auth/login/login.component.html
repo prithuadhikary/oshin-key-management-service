@@ -1,25 +1,9 @@
 <section>
     <form class="login-form-outer" (ngSubmit)="login()" [formGroup]="formGroup">
         <div class="login-form-inner">
-            <mat-card class="login-form-card" fxLayout="column">
-                <h2>Login</h2>
-                <mat-form-field class="form-field">
-                    <mat-label>Username</mat-label>
-                    <input matInput placeholder="Username" formControlName="username">
-                    <mat-error *ngIf="username?.hasError('required')">Username can't be blank.</mat-error>
-                    <mat-error *ngIf="username?.hasError('email')">Username must be a valid email.</mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label>Password</mat-label>
-                    <input type="password" matInput placeholder="Password" formControlName="password">
-                    <mat-error>Password can't be blank.</mat-error>
-                </mat-form-field>
-                <button mat-raised-button color="primary">Login</button>
-            </mat-card>
             <div fxLayout="column" fxLayoutAlign="space-around center">
-                <div class="label-or">- OR -</div>
                 <button type="button" (click)="login()" mat-raised-button color="primary">Login Using Okta</button>
             </div>
         </div>
     </form>
-</section>    
+</section>

@@ -14,6 +14,7 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import {MatCardModule} from '@angular/material/card';
 import {LoaderInterceptorService} from './shared/interceptors/loader-interceptor.service';
+import {AccessTokenInterceptorService} from './shared/interceptors/access-token-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import {LoaderInterceptorService} from './shared/interceptors/loader-interceptor
     FontAwesomeModule
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptorService, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptorService, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: AccessTokenInterceptorService, multi: true }
   ],
   bootstrap: [AppComponent]
 })

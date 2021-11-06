@@ -13,6 +13,8 @@ public class EndpointConfiguration {
 
     private String tenantManagementService;
 
+    private String authService;
+
     public String getCryptoService() {
         return cryptoService;
     }
@@ -35,5 +37,13 @@ public class EndpointConfiguration {
 
     public void setTenantManagementService(String tenantManagementService) {
         this.tenantManagementService = tenantManagementService;
+    }
+
+    public String getAuthService() {
+        return authService;
+    }
+
+    public void setAuthService(String authService) {
+        this.authService = authService;
     }
 }

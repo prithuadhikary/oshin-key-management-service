@@ -21,6 +21,10 @@
       <fa-icon class="action-btn" [icon]="faEdit" (click)="openEditDialog()"></fa-icon>
       <fa-icon class="action-btn" [icon]="faTrash" (click)="openDeleteDialog()"></fa-icon>
     </h1>
+    <h2>Tenant Identifier</h2>
+    <blockquote>
+      <span>{{selectedTenant.id}}</span><br>
+    </blockquote>
     <h2>Contact Info</h2>
     <blockquote>
       <span *ngIf="selectedTenant.contactInfo.phone" >Phone: {{selectedTenant.contactInfo.phone}}</span><br>

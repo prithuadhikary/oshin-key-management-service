@@ -3,7 +3,17 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  okta: {
+    issuerUrl: 'https://dev-52177607.okta.com/oauth2/default',
+    redirectUri: 'http://localhost:4200/protected/dashboard/',
+    tokenEndpoint: 'https://dev-52177607.okta.com/oauth2/default/v1/token',
+    clientId: '0oa238u6a1iZLeox75d7',
+    scopes: 'openid profile email'
+  },
+  interceptorExclusions: [
+    'https://dev-52177607.okta.com/'
+  ]
 };
 
 /*

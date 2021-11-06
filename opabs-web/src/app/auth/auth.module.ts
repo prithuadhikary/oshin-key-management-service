@@ -14,7 +14,7 @@ import { AuthEffects } from './ngrx/auth.effects';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', component: LoginComponent }
-]
+];
 
 @NgModule({
   imports: [

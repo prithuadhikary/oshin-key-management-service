@@ -24,16 +24,10 @@ public class RoutingConfiguration {
                 .route(r ->
                         r.path("/api/tenant-management-service/**")
                                 .uri(endpointConfiguration.getTenantManagementService()))
+                .route(r ->
+                        r.path("/api/auth-service/**")
+                                .uri(endpointConfiguration.getAuthService()))
                 .build();
     }
 
-    /**
-     * Appends the uriPrefix.
-     *
-     * @param uri the uri to prefix with uriPrefix.
-     * @return uri to configure with the routeLocator.
-     */
-    private String withUriPrefix(String uri) {
-        return "http://" + uri;
-    }
 }

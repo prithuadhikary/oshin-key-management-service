@@ -2,10 +2,7 @@
     <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
       <span>OPABS KMS</span>
       <div>
-        <button mat-button [routerLink]="['/protected', 'dashboard']" routerLinkActive="active">Dashboard</button>
-        <button mat-button [routerLink]="['/protected', 'tenants']" routerLinkActive="active">Tenants</button>
-        <button mat-button [routerLink]="['/protected', 'trust-chain']" routerLinkActive="active">Trust Chains</button>
-        <button mat-button [routerLink]="['/protected', 'certificates']" routerLinkActive="active">Certificates</button>
+        <button *ngFor="let menuItem of menuItems" mat-button [routerLink]="menuItem.link" routerLinkActive="active">{{menuItem.displayName}}</button>
         <button mat-button (click)="logout()">Logout</button>
       </div>
     </mat-toolbar-row>
