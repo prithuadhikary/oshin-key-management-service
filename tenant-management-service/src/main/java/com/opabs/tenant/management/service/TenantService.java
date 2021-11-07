@@ -1,7 +1,9 @@
 package com.opabs.tenant.management.service;
 
 import com.opabs.common.model.ListResponse;
-import com.opabs.tenant.management.util.TransformationUtils;
+import com.opabs.common.security.AccessToken;
+import com.opabs.common.security.GroupPermissions;
+import com.opabs.common.security.JWTAuthToken;
 import com.opabs.tenant.management.controller.command.CreateTenantCommand;
 import com.opabs.tenant.management.controller.command.UpdateTenantCommand;
 import com.opabs.tenant.management.controller.response.CreateTenantResponse;
@@ -10,11 +12,13 @@ import com.opabs.tenant.management.domain.Tenant;
 import com.opabs.tenant.management.repository.AddressRepository;
 import com.opabs.tenant.management.repository.ContactInfoRepository;
 import com.opabs.tenant.management.repository.TenantRepository;
+import com.opabs.tenant.management.util.TransformationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -52,8 +56,18 @@ public class TenantService {
         return response;
     }
 
-    public ListResponse<Tenant> findAll(PageRequest pageRequest) {
-        Page<Tenant> tenants = tenantRepository.findAllByDeleted(false, pageRequest);
+    public ListResponse<Tenant> findAll(Principal userPrincipal, PageRequest pageRequest) {
+        Page<Tenant> tenants = null;
+        if (userPrincipal instanceof JWTAuthToken) {
+            JWTAuthToken authToken = (JWTAuthToken) userPrincipal;
+            AccessToken accessToken = authToken.getAccessToken();
+            if (authToken.getGroup() == GroupPermissions.TENANT_ADMIN) {
+                UUID tenantIdentifier = accessToken.getTenantIdentifier();
+                tenants = tenantRepository.findAllByDeletedAndId(false, tenantIdentifier, pageRequest);
+            } else if (authToken.getGroup() == GroupPermissions.OPABS_ADMIN){
+                tenants = tenantRepository.findAllByDeleted(false, pageRequest);
+            }
+        }
         //TODO: Get certificate info data from the trust chain service and populate tenantlistreposne.
         ListResponse<Tenant> response = new ListResponse<>();
         response.setContent(tenants.getContent());
@@ -65,11 +79,26 @@ public class TenantService {
         return response;
     }
 
-    public Optional<Tenant> findById(UUID id) {
-        return tenantRepository.findByIdAndDeleted(id, false);
+    public Optional<Tenant> findById(Principal principal, UUID id) {
+        if (principal instanceof JWTAuthToken) {
+            JWTAuthToken token = (JWTAuthToken) principal;
+            UUID tenantIdentifier = token.getAccessToken().getTenantIdentifier();
+            if (token.getGroup() == GroupPermissions.TENANT_ADMIN && (tenantIdentifier == null || tenantIdentifier != id)) {
+                return Optional.empty();
+            }
+            return tenantRepository.findByIdAndDeleted(id, false);
+        } else {
+            return Optional.empty();
+        }
     }
 
-    public Optional<Tenant> update(UUID id, UpdateTenantCommand command) {
+    public Optional<Tenant> update(Principal userPrincipal, UUID id, UpdateTenantCommand command) {
+        if (userPrincipal instanceof JWTAuthToken) {
+            JWTAuthToken token = (JWTAuthToken) userPrincipal;
+            if (token.getGroup() == GroupPermissions.TENANT_ADMIN && token.getAccessToken().getTenantIdentifier() != id) {
+                return Optional.empty();
+            }
+        }
         Optional<Tenant> existing = tenantRepository.findById(id);
         return existing.map(tenant -> {
             tenant.setName(command.getName());

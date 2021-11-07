@@ -16,6 +16,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,20 +36,29 @@ public class TenantController {
 
     @GetMapping
     @Secured(Permissions.TENANT_VIEW)
-    public ListResponse<Tenant> list(@RequestParam(value = "page", defaultValue = "0") Integer page, @RequestParam(value = "size", defaultValue = "20") Integer size) {
-        return tenantService.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateUpdated")));
+    public ListResponse<Tenant> list(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "20") Integer size,
+            Principal userPrincipal
+    ) {
+        return tenantService.findAll(userPrincipal, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateUpdated")));
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Tenant> show(@PathVariable("id") UUID id) {
-        Optional<Tenant> tenant = tenantService.findById(id);
+    @Secured(Permissions.TENANT_VIEW)
+    public ResponseEntity<Tenant> show(Principal principal, @PathVariable("id") UUID id) {
+        Optional<Tenant> tenant = tenantService.findById(principal, id);
         return tenant.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("{id}")
     @Secured(Permissions.TENANT_EDIT)
-    public ResponseEntity<Tenant> update(@PathVariable("id") UUID id, @RequestBody @Validated UpdateTenantCommand command) {
-        return tenantService.update(id, command).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Tenant> update(
+            @PathVariable("id") UUID id,
+            @RequestBody @Validated UpdateTenantCommand command,
+            Principal userPrincipal
+    ) {
+        return tenantService.update(userPrincipal, id, command).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("{id}")

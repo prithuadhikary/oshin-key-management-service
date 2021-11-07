@@ -21,6 +21,7 @@ public enum GroupPermissions {
     TENANT_ADMIN(
             List.of(
                     Permissions.TENANT_VIEW,
+                    Permissions.TENANT_EDIT,
                     Permissions.TRUST_CHAIN_CREATE,
                     Permissions.TRUST_CHAIN_EDIT,
                     Permissions.TRUST_CHAIN_VIEW,

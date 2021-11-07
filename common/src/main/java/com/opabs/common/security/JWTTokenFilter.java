@@ -2,6 +2,7 @@ package com.opabs.common.security;
 
 import com.google.gson.Gson;
 import com.opabs.common.exceptions.AccessTokenInvalidException;
+import com.opabs.common.exceptions.GroupInvalidException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,9 +40,15 @@ public class JWTTokenFilter extends OncePerRequestFilter {
             String accessToken = matcher.group(1);
             AccessToken token = parse(accessToken);
 
+            GroupPermissions groupName = GroupPermissions.getByGroupName(token.getGroups());
+            if (groupName == null) {
+                throw new GroupInvalidException(token.getGroups());
+            }
+
             JWTAuthToken authToken = new JWTAuthToken(
                     token,
-                    GroupPermissions.getByGroupName(token.getGroups()).getAuthorities()
+                    groupName,
+                    groupName.getAuthorities()
             );
 
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
