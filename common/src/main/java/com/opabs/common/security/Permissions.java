@@ -22,5 +22,7 @@ public class Permissions {
 
     public static final String CERTIFICATE_VIEW = "ROLE_CERTIFICATE_VIEW";
 
+    public static final String CERTIFICATE_REPORT_VIEW = "ROLE_CERTIFICATE_REPORT_VIEW";
+
     private Permissions() { }
 }

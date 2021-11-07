@@ -17,7 +17,8 @@ public enum GroupPermissions {
                     Permissions.TRUST_CHAIN_VIEW,
                     Permissions.TRUST_CHAIN_DELETE,
                     Permissions.CERTIFICATE_CREATE,
-                    Permissions.CERTIFICATE_VIEW
+                    Permissions.CERTIFICATE_VIEW,
+                    Permissions.CERTIFICATE_REPORT_VIEW
             ), "opabs-admin"),
     TENANT_ADMIN(
             List.of(
@@ -28,7 +29,8 @@ public enum GroupPermissions {
                     Permissions.TRUST_CHAIN_VIEW,
                     Permissions.TRUST_CHAIN_DELETE,
                     Permissions.CERTIFICATE_CREATE,
-                    Permissions.CERTIFICATE_VIEW
+                    Permissions.CERTIFICATE_VIEW,
+                    Permissions.CERTIFICATE_REPORT_VIEW
             ), "tenant-admin"
     );
 
