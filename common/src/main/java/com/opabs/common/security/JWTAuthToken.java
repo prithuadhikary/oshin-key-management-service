@@ -1,26 +1,30 @@
 package com.opabs.common.security;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 
 import java.util.Collection;
 
-public class JWTAuthToken extends UsernamePasswordAuthenticationToken {
+public class JWTAuthToken extends AbstractAuthenticationToken {
 
     private final AccessToken accessToken;
 
     private final GroupPermissions group;
 
     public JWTAuthToken(AccessToken accessToken, GroupPermissions group, Collection<? extends GrantedAuthority> authorities) {
-        super(
-                new User(accessToken.getSub(), "", authorities),
-                "",
-                authorities
-        );
+        super(authorities);
         this.accessToken = accessToken;
         this.group = group;
+    }
+
+    @Override
+    public Object getCredentials() {
+        return "";
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return accessToken;
     }
 
     public AccessToken getAccessToken() {

@@ -16,6 +16,8 @@ public class Permissions {
 
     public static final String TRUST_CHAIN_VIEW = "ROLE_TRUST_CHAIN_VIEW";
 
+    public static final String TRUST_CHAIN_DELETE = "ROLE_TRUST_CHAIN_DELETE";
+
     public static final String CERTIFICATE_CREATE = "ROLE_CERTIFICATE_CREATE";
 
     public static final String CERTIFICATE_VIEW = "ROLE_CERTIFICATE_VIEW";

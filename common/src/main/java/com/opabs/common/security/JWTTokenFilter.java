@@ -5,11 +5,14 @@ import com.opabs.common.exceptions.AccessTokenInvalidException;
 import com.opabs.common.exceptions.GroupInvalidException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,18 +25,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
-@Component
-public class JWTTokenFilter extends OncePerRequestFilter {
+public class JWTTokenFilter extends AbstractAuthenticationProcessingFilter {
 
     private static final Pattern BEARER_TOKEN_PATTERN
             = Pattern.compile("^Bearer *([^ ]+) *$", Pattern.CASE_INSENSITIVE);
 
+    protected JWTTokenFilter(AuthenticationManager authenticationManager) {
+        super("/**", authenticationManager);
+    }
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.isEmpty(header) || !header.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
+        if (StringUtils.isEmpty(header)) {
+            return null;
         }
         Matcher matcher = BEARER_TOKEN_PATTERN.matcher(header);
         if (matcher.matches()) {
@@ -51,11 +56,13 @@ public class JWTTokenFilter extends OncePerRequestFilter {
                     groupName.getAuthorities()
             );
 
+            authToken.setAuthenticated(true);
+
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             log.info("Token: {}", token);
             SecurityContextHolder.getContext().setAuthentication(authToken);
-            filterChain.doFilter(request, response);
+            return authToken;
         } else {
             throw new AccessTokenInvalidException();
         }
@@ -66,5 +73,14 @@ public class JWTTokenFilter extends OncePerRequestFilter {
         String claims = split[1];
         Gson gson = new Gson();
         return gson.fromJson(new String(Base64.getDecoder().decode(claims), StandardCharsets.UTF_8), AccessToken.class);
+    }
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+                                            Authentication authResult) throws IOException, ServletException {
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authResult);
+        SecurityContextHolder.setContext(context);
+        chain.doFilter(request, response);
     }
 }

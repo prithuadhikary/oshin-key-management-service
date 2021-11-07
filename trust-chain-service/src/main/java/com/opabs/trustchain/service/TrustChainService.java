@@ -2,11 +2,14 @@ package com.opabs.trustchain.service;
 
 import com.opabs.common.enums.KeyUsages;
 import com.opabs.common.model.*;
+import com.opabs.common.security.GroupPermissions;
+import com.opabs.common.security.JWTAuthToken;
 import com.opabs.trustchain.controller.command.CreateTrustChainCommand;
 import com.opabs.trustchain.controller.command.UpdateTrustChainCommand;
 import com.opabs.trustchain.controller.model.TrustChainModel;
 import com.opabs.trustchain.domain.Certificate;
 import com.opabs.trustchain.domain.TrustChain;
+import com.opabs.trustchain.exception.InvalidTenantIdException;
 import com.opabs.trustchain.exception.NotFoundException;
 import com.opabs.trustchain.feign.CryptoService;
 import com.opabs.trustchain.feign.TenantManagementService;
@@ -23,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,13 +50,15 @@ public class TrustChainService {
 
     private final CertificateRepository certificateRepository;
 
-    public TrustChainModel create(CreateTrustChainCommand command) {
-
+    public TrustChainModel create(Principal userPrincipal, CreateTrustChainCommand command) {
         //1. Validate tenantExtId with tenant management service.
         //2. Create a root certificate using crypto service with key usages keyCertSign and crlSign.
         //3. Create TrustChain entity.
         //4. Save certificate and wrappedPrivateKey.
         //5. Return fully populated TrustChainModel back to the client.
+        JWTAuthToken token = (JWTAuthToken) userPrincipal;
+        UUID tenantExtId = getTenantId(command.getTenantExtId(), token);
+
         validateTenantExtId(command);
 
         GenerateCSRRequest request = createCSRRequest(command);
@@ -65,7 +71,7 @@ public class TrustChainService {
         CertificateSigningResponse signingResponse = cryptoService.signCSR(signingRequest);
 
         TrustChain trustChain = new TrustChain();
-        trustChain.setTenantExtId(command.getTenantExtId());
+        trustChain.setTenantExtId(tenantExtId);
         trustChain.setName(command.getName());
         trustChain.setDescription(command.getDescription());
 
@@ -92,10 +98,25 @@ public class TrustChainService {
         return fromTrustChain(trustChain);
     }
 
+    private UUID getTenantId(UUID commandTokenExtId, JWTAuthToken token) {
+        UUID tenantExtId = null;
+        // If it is a tenant admin,
+        if (token.getGroup() == GroupPermissions.TENANT_ADMIN) {
+            if (!token.getAccessToken().getTenantIdentifier().equals(commandTokenExtId)) {
+                throw new InvalidTenantIdException();
+            } else {
+                tenantExtId = token.getAccessToken().getTenantIdentifier();
+            }
+        } else if (token.getGroup() == GroupPermissions.OPABS_ADMIN) {
+            tenantExtId = commandTokenExtId;
+        }
+        return tenantExtId;
+    }
+
     private void validateTenantExtId(CreateTrustChainCommand command) {
         try {
             TenantInfo tenantInfo = tenantManagementService.getTenantInfo(command.getTenantExtId());
-            if (!tenantInfo.getId().equals(command.getTenantExtId())) {
+            if (tenantInfo != null && !tenantInfo.getId().equals(command.getTenantExtId())) {
                 throw new NotFoundException("tenant", command.getTenantExtId());
             }
         } catch (Exception ex) {
@@ -104,10 +125,19 @@ public class TrustChainService {
         }
     }
 
-    public TrustChainModel show(UUID id) {
+    public TrustChainModel show(Principal userPrincipal, UUID id) {
+        UUID tenantId = getTenantExtId(userPrincipal);
+        TrustChain trustChain;
+
+        if (tenantId != null) {
+            trustChain = trustChainRepository.findByIdAndTenantExtIdAndDeleted(id, tenantId, false)
+                    .orElseThrow(() -> new NotFoundException("trust chain", id));
+        } else {
+            trustChain = trustChainRepository.findByIdAndDeleted(id, false)
+                    .orElseThrow(() -> new NotFoundException("trust chain", id));
+        }
+
         TrustChainModel responseModel = new TrustChainModel();
-        TrustChain trustChain = trustChainRepository.findByIdAndDeleted(id, false)
-                .orElseThrow(() -> new NotFoundException("trust chain", id));
         responseModel.setTenantExtId(trustChain.getTenantExtId());
         responseModel.setId(trustChain.getId());
         responseModel.setName(trustChain.getName());
@@ -117,6 +147,17 @@ public class TrustChainService {
         responseModel.setDateCreated(trustChain.getDateCreated());
         responseModel.setDateUpdated(trustChain.getDateUpdated());
         return responseModel;
+    }
+
+    private UUID getTenantExtId(Principal userPrincipal) {
+        UUID tenantId = null;
+        if (userPrincipal instanceof JWTAuthToken) {
+            JWTAuthToken token = (JWTAuthToken) userPrincipal;
+            if (token.getGroup() == GroupPermissions.TENANT_ADMIN) {
+                tenantId = token.getAccessToken().getTenantIdentifier();
+            }
+        }
+        return tenantId;
     }
 
     public Optional<TrustChain> findById(UUID id) {
@@ -146,8 +187,15 @@ public class TrustChainService {
         return signingRequest;
     }
 
-    public ListResponse<TrustChainModel> findAll(PageRequest pageRequest) {
-        Page<TrustChain> chains = trustChainRepository.findAllByDeleted(false, pageRequest);
+    public ListResponse<TrustChainModel> findAll(Principal userPrincipal, PageRequest pageRequest) {
+        UUID tenantExtId = getTenantExtId(userPrincipal);
+
+        Page<TrustChain> chains;
+        if (tenantExtId != null) {
+            chains = trustChainRepository.findAllByTenantExtIdAndDeleted(tenantExtId, false, pageRequest);
+        } else {
+            chains = trustChainRepository.findAllByDeleted(false, pageRequest);
+        }
         ListResponse<TrustChainModel> response = new ListResponse<>();
         List<TrustChainModel> transformedModel = chains.getContent().stream().map(TransformationUtils::fromTrustChain).collect(Collectors.toList());
         response.setContent(transformedModel);
@@ -158,8 +206,14 @@ public class TrustChainService {
         return response;
     }
 
-    public Optional<TrustChain> update(UUID id, UpdateTrustChainCommand trustChain) {
-        Optional<TrustChain> existing = trustChainRepository.findByIdAndDeleted(id, false);
+    public Optional<TrustChain> update(Principal userPrincipal, UUID id, UpdateTrustChainCommand trustChain) {
+        UUID tenantExtId = getTenantExtId(userPrincipal);
+        Optional<TrustChain> existing;
+        if (tenantExtId != null) {
+            existing = trustChainRepository.findByIdAndTenantExtIdAndDeleted(id, tenantExtId, false);
+        } else {
+            existing = trustChainRepository.findByIdAndDeleted(id, false);
+        }
         if (existing.isPresent()) {
             TrustChain existingTrustChain = existing.get();
             existingTrustChain.setDescription(trustChain.getDescription());
@@ -170,8 +224,14 @@ public class TrustChainService {
         }
     }
 
-    public Optional<TrustChain> delete(UUID id) {
-        Optional<TrustChain> existing = trustChainRepository.findByIdAndDeleted(id, false);
+    public Optional<TrustChain> delete(Principal userPrincipal, UUID id) {
+        UUID tenantExtId = getTenantExtId(userPrincipal);
+        Optional<TrustChain> existing;
+        if (tenantExtId != null) {
+            existing = trustChainRepository.findByIdAndTenantExtIdAndDeleted(id, tenantExtId, false);
+        } else {
+            existing = trustChainRepository.findByIdAndDeleted(id, false);
+        }
         if (existing.isPresent()) {
             TrustChain trustChain = existing.get();
             trustChain.setDeleted(true);

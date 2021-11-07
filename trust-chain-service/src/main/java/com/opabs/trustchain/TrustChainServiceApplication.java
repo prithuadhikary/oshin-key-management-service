@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableFeignClients
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = { "com.opabs.trustchain", "com.opabs.common.security" })
 public class TrustChainServiceApplication {
 
     public static void main(String[] args) {

@@ -14,5 +14,9 @@ public interface TrustChainRepository extends PagingAndSortingRepository<TrustCh
 
     Page<TrustChain> findAllByDeleted(boolean b, Pageable pageRequest);
 
+    Page<TrustChain> findAllByTenantExtIdAndDeleted(UUID tenantExtId, boolean b, Pageable pageRequest);
+
     Optional<TrustChain> findByIdAndDeleted(UUID id, boolean b);
+
+    Optional<TrustChain> findByIdAndTenantExtIdAndDeleted(UUID id, UUID tenantExtId, boolean b);
 }

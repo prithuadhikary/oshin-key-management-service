@@ -15,6 +15,7 @@ public enum GroupPermissions {
                     Permissions.TRUST_CHAIN_CREATE,
                     Permissions.TRUST_CHAIN_EDIT,
                     Permissions.TRUST_CHAIN_VIEW,
+                    Permissions.TRUST_CHAIN_DELETE,
                     Permissions.CERTIFICATE_CREATE,
                     Permissions.CERTIFICATE_VIEW
             ), "opabs-admin"),
@@ -25,6 +26,7 @@ public enum GroupPermissions {
                     Permissions.TRUST_CHAIN_CREATE,
                     Permissions.TRUST_CHAIN_EDIT,
                     Permissions.TRUST_CHAIN_VIEW,
+                    Permissions.TRUST_CHAIN_DELETE,
                     Permissions.CERTIFICATE_CREATE,
                     Permissions.CERTIFICATE_VIEW
             ), "tenant-admin"
