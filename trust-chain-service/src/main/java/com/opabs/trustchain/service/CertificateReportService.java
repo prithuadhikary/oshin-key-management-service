@@ -71,7 +71,7 @@ public class CertificateReportService {
         certificateCountsByParentCert.forEach(countByParentCert -> {
             Optional<Certificate> parentCertificateOpt = Optional.empty();
             if (countByParentCert.getParentCertificateId() != null) {
-                parentCertificateOpt = certificateRepository.findById(getUUIDFromBytes(countByParentCert.getParentCertificateId()));
+                parentCertificateOpt = certificateRepository.findById(countByParentCert.getParentCertificateId());
             }
             CertificateCountByLevel countByLevel = new CertificateCountByLevel();
             countByLevel.setCount(countByParentCert.getCount());
@@ -107,14 +107,6 @@ public class CertificateReportService {
             info.setTotalCertificateCount(info.getTotalCertificateCount() + countByKeyType.getCount());
         });
         return info;
-    }
-
-    public UUID getUUIDFromBytes(byte[] bytes) {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-        long high = byteBuffer.getLong();
-        long low = byteBuffer.getLong();
-
-        return new UUID(high, low);
     }
 
     private void validateTenantId(UUID tenantId) {

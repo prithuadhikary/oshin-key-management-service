@@ -6,11 +6,12 @@ spring:
       discovery:
         enabled: false
       enabled: false
+  profiles:
+    include: postgres-local
 
 server:
   port: 8084
   servlet:
     context-path: /api/trust-chain-service
-
 
 

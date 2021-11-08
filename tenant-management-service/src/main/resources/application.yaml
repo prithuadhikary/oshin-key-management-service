@@ -1,3 +1,4 @@
+
 server:
   port: 8085
   servlet:
@@ -10,3 +11,6 @@ spring:
   security:
     filter:
       order: 10   # this makes space for 10 custom spring security filters.
+
+  profiles:
+    include: postgres-local

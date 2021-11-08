@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import * as c3 from 'c3';
+import {Chart, registerables} from 'chart.js';
 
 @Component({
   selector: 'app-certificate-expiry-density',
@@ -11,15 +11,28 @@ export class CertificateExpiryDensityComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    const chart = c3.generate({
-      bindto: '#expiry-density-chart',
-      data: {
-        columns: [
-          ['data1', 30, 200, 100, 400, 150, 250],
-        ],
-        type: 'spline'
-      }
-    });
+      Chart.register(...registerables);
+      const canvas: any = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+      const mychart = new Chart(context, {
+        type: 'bar',
+        data: {
+          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+            'August', 'September', 'October', 'November', 'December'],
+          datasets: [{
+            label: 'DS',
+            data: [80, 90, 100, 30, 40, 50, 45, 12, 34, 56, 67, 89],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 206, 86, 0.2)',
+              'rgba(75, 192, 192, 0.2)',
+              'rgba(153, 102, 255, 0.2)',
+              'rgba(255, 159, 64, 0.2)'
+            ]
+          }]
+        }
+      });
   }
 
 

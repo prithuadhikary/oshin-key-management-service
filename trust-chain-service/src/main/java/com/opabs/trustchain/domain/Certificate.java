@@ -13,6 +13,7 @@ import java.util.UUID;
 
 @Data
 @Entity
+@Table(schema = "trust_chain")
 public class Certificate {
 
     @Id

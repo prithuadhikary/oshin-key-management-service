@@ -5,15 +5,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
 @Entity
+@Table(schema = "tenant")
 public class Tenant {
 
     @Id

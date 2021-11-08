@@ -12,6 +12,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(exclude = "tenant")
 @Entity
+@Table(schema = "tenant")
 public class ContactInfo {
 
     @Id
