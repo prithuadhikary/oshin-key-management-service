@@ -5,6 +5,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {FlexModule} from '@angular/flex-layout';
 import {MatCardModule} from '@angular/material/card';
 import {AccessTokenResolverService} from '../protected-view/resolver/access-token-resolver.service';
+import { CertificateExpiryDensityComponent } from './charts/certificate-expiry-density/certificate-expiry-density.component';
 
 const routes: Routes = [
   {
@@ -16,7 +17,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [DashboardComponent],
+  declarations: [DashboardComponent, CertificateExpiryDensityComponent],
     imports: [
         CommonModule,
         RouterModule.forChild(routes),

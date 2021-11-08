@@ -14,11 +14,13 @@ export class DashboardComponent implements OnInit {
 
   totalCertificateCount: number;
   totalTrustChainCount: number;
+  totalTenantCount: number;
 
   ngOnInit(): void {
     this.route.data.subscribe(data => {
       this.totalCertificateCount = data.accessTokenResolver.totalCertificates.total;
       this.totalTrustChainCount = data.accessTokenResolver.totalTrustChains.total;
+      this.totalTenantCount = data.accessTokenResolver.totalTenants.total;
     });
   }
 }

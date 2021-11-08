@@ -6,7 +6,7 @@ import com.opabs.common.security.GroupPermissions;
 import com.opabs.common.security.JWTAuthToken;
 import com.opabs.trustchain.controller.command.CreateTrustChainCommand;
 import com.opabs.trustchain.controller.command.UpdateTrustChainCommand;
-import com.opabs.trustchain.controller.model.TrustChainCount;
+import com.opabs.trustchain.controller.responses.TrustChainCountResponse;
 import com.opabs.trustchain.controller.model.TrustChainModel;
 import com.opabs.trustchain.domain.Certificate;
 import com.opabs.trustchain.domain.TrustChain;
@@ -244,10 +244,10 @@ public class TrustChainService {
         }
     }
 
-    public TrustChainCount count(Principal userPrincipal) {
+    public TrustChainCountResponse count(Principal userPrincipal) {
         if (userPrincipal instanceof JWTAuthToken) {
             JWTAuthToken token = (JWTAuthToken) userPrincipal;
-            TrustChainCount count = new TrustChainCount();
+            TrustChainCountResponse count = new TrustChainCountResponse();
             switch (token.getGroup()) {
                 case OPABS_ADMIN:
                     count.setTotal(trustChainRepository.count());

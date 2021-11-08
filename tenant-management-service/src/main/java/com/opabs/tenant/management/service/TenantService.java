@@ -7,6 +7,7 @@ import com.opabs.common.security.JWTAuthToken;
 import com.opabs.tenant.management.controller.command.CreateTenantCommand;
 import com.opabs.tenant.management.controller.command.UpdateTenantCommand;
 import com.opabs.tenant.management.controller.response.CreateTenantResponse;
+import com.opabs.tenant.management.controller.response.TenantCountResponse;
 import com.opabs.tenant.management.domain.ContactInfo;
 import com.opabs.tenant.management.domain.Tenant;
 import com.opabs.tenant.management.repository.AddressRepository;
@@ -64,7 +65,7 @@ public class TenantService {
             if (authToken.getGroup() == GroupPermissions.TENANT_ADMIN) {
                 UUID tenantIdentifier = accessToken.getTenantIdentifier();
                 tenants = tenantRepository.findAllByDeletedAndId(false, tenantIdentifier, pageRequest);
-            } else if (authToken.getGroup() == GroupPermissions.OPABS_ADMIN){
+            } else if (authToken.getGroup() == GroupPermissions.OPABS_ADMIN) {
                 tenants = tenantRepository.findAllByDeleted(false, pageRequest);
             }
         }
@@ -122,5 +123,11 @@ public class TenantService {
             tenantRepository.save(entity);
             return existing;
         }
+    }
+
+    public TenantCountResponse count() {
+        TenantCountResponse response = new TenantCountResponse();
+        response.setTotal(tenantRepository.count());
+        return response;
     }
 }
