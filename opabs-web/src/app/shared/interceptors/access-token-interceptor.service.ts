@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {from, Observable} from 'rxjs';
 import {AuthenticationService} from '../services/authentication.service';
-import {switchMap} from 'rxjs/operators';
+import {delay, switchMap} from 'rxjs/operators';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {environment} from '../../../environments/environment';
 
@@ -21,8 +21,9 @@ export class AccessTokenInterceptorService implements HttpInterceptor {
     if (matches.length > 0) {
       return next.handle(req);
     } else {
-      return fromPromise(this.authenticationService.fetchTokens(null))
-        .pipe(switchMap(token => {
+      return this.authenticationService.fetchTokens(null)
+        .pipe(
+          switchMap(token => {
           const headers = req.headers
             .set('Authorization', 'Bearer ' + token.accessToken)
             .append('Content-Type', 'application/json');

@@ -125,6 +125,8 @@ public class MockCertificateService implements CertificateService {
             //4. Read CA private key.
             IssuerPrivateKeyInfo caPrivateKeyInfo = readIssuerPrivateKey(request.getWrappedIssuerPrivateKey(), issuerKeyType);
 
+            //5. TODO: Validate if wrapped private key matches the issuer certificate's public key.
+
             validateSignatureAlgorithm(caPrivateKeyInfo, request.getSignatureAlgorithm());
 
             AsymmetricKeyParameter issuerPrivateKey = PrivateKeyFactory.createKey(caPrivateKeyInfo.getPrivateKey().getEncoded());

@@ -44,4 +44,8 @@ export class TenantService {
       '/api/tenant-management-service/tenant/' + id
     );
   }
+
+  fetchTenantCount(): Observable<{ total: number }> {
+    return this.http.get<{ total: number }>('/api/tenant-management-service/tenant-report/total');
+  }
 }

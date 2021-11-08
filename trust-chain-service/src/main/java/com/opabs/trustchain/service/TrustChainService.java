@@ -6,9 +6,11 @@ import com.opabs.common.security.GroupPermissions;
 import com.opabs.common.security.JWTAuthToken;
 import com.opabs.trustchain.controller.command.CreateTrustChainCommand;
 import com.opabs.trustchain.controller.command.UpdateTrustChainCommand;
+import com.opabs.trustchain.controller.model.TrustChainCount;
 import com.opabs.trustchain.controller.model.TrustChainModel;
 import com.opabs.trustchain.domain.Certificate;
 import com.opabs.trustchain.domain.TrustChain;
+import com.opabs.trustchain.exception.InternalServerErrorException;
 import com.opabs.trustchain.exception.InvalidTenantIdException;
 import com.opabs.trustchain.exception.NotFoundException;
 import com.opabs.trustchain.feign.CryptoService;
@@ -242,4 +244,24 @@ public class TrustChainService {
         }
     }
 
+    public TrustChainCount count(Principal userPrincipal) {
+        if (userPrincipal instanceof JWTAuthToken) {
+            JWTAuthToken token = (JWTAuthToken) userPrincipal;
+            TrustChainCount count = new TrustChainCount();
+            switch (token.getGroup()) {
+                case OPABS_ADMIN:
+                    count.setTotal(trustChainRepository.count());
+                    break;
+                case TENANT_ADMIN:
+                    UUID tenantExtId = token.getAccessToken().getTenantIdentifier();
+                    count.setTotal(trustChainRepository.countByTenantExtId(tenantExtId));
+                    break;
+                default:
+                    throw new IllegalArgumentException();
+            }
+            return count;
+        } else {
+            throw new InternalServerErrorException();
+        }
+    }
 }

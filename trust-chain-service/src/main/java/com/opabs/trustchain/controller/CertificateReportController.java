@@ -1,6 +1,7 @@
 package com.opabs.trustchain.controller;
 
 import com.opabs.common.security.Permissions;
+import com.opabs.trustchain.controller.model.CertificateCount;
 import com.opabs.trustchain.controller.model.CertificateCountByHierarchy;
 import com.opabs.trustchain.controller.model.CertificateReportByKeyType;
 import com.opabs.trustchain.service.CertificateReportService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.UUID;
 
 @RestController
@@ -36,6 +38,12 @@ public class CertificateReportController {
     @RequestMapping("by-hierarchy/{trustChainId}")
     public ResponseEntity<CertificateCountByHierarchy> certificateReportByHierarchy(@PathVariable("trustChainId") UUID trustChainId) {
         return ResponseEntity.ok(certificateReportService.certificateReportByHierarchy(trustChainId));
+    }
+
+    @Secured(Permissions.CERTIFICATE_REPORT_VIEW)
+    @RequestMapping("total")
+    public ResponseEntity<CertificateCount> total(Principal userPrincipal) {
+        return ResponseEntity.ok(certificateReportService.certificateCount(userPrincipal));
     }
 
 }

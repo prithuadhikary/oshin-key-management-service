@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../../environments/environment';
 import {OAuthService} from 'angular-oauth2-oidc';
+import {fromPromise} from 'rxjs/internal-compatibility';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +15,9 @@ export class AuthenticationService {
   constructor(private oAuthService: OAuthService) {
   }
 
-  public fetchTokens(authorizationCode: string): Promise<{ accessToken: any, idToken: any }> {
-    return new Promise(resolve => {
-      if (!sessionStorage.getItem(this.idTokenKey)) {
+  public fetchTokens(authorizationCode: string): Observable<{ accessToken: any, idToken: any }> {
+    return fromPromise(new Promise(resolve => {
+      if (authorizationCode != null && !sessionStorage.getItem(this.idTokenKey)) {
         const parameters = {
           grant_type: 'authorization_code',
           client_id: environment.okta.clientId,
@@ -27,7 +29,7 @@ export class AuthenticationService {
         this.oAuthService.fetchTokenUsingGrant('authorization_code', parameters).then(result => {
           sessionStorage.setItem(this.idTokenKey, result.id_token);
           sessionStorage.setItem(this.accessTokenKey, result.access_token);
-          setTimeout(() => this.fetchTokens(authorizationCode), (result.expires_in - 5000) * 1000);
+          // setTimeout(() => this.fetchTokens(authorizationCode), (0.7 * result.expires_in) * 1000);
           resolve({idToken: result.id_token, accessToken: result.access_token});
         });
       } else {
@@ -36,6 +38,6 @@ export class AuthenticationService {
           accessToken: sessionStorage.getItem(this.accessTokenKey)
         });
       }
-    });
+    }));
   }
 }

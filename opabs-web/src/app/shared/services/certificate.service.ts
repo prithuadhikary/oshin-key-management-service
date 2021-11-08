@@ -48,4 +48,8 @@ export class CertificateService {
   create(request: any): Observable<Certificate> {
     return this.http.post<Certificate>('/api/trust-chain-service/certificate', request);
   }
+
+  fetchCertificateCount(): Observable<{ total: number }> {
+    return this.http.get<{ total: number}>('/api/trust-chain-service/certificate-report/total');
+  }
 }

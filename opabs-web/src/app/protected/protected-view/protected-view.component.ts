@@ -25,15 +25,7 @@ export class ProtectedViewComponent implements OnInit {
     ) { }
 
   ngOnInit(): void {
-    if (!sessionStorage.getItem(this.accessTokenKey)) {
-      this.route.queryParams.subscribe(params => {
-        this.authenticationService.fetchTokens(params.code).then(() => {
-          this.menuItems = this.menuItemService.menuItems;
-        });
-      });
-    } else {
-      this.menuItems = this.menuItemService.menuItems;
-    }
+    this.menuItems = this.menuItemService.menuItems;
   }
 
   logout(): void {

@@ -32,4 +32,8 @@ export class TrustChainService {
   show(trustChainId: string): Observable<TrustChain> {
     return this.http.get<TrustChain>('/api/trust-chain-service/trust-chain/' + trustChainId);
   }
+
+  fetchTrustChainCount(): Observable<{ total: number }> {
+    return this.http.get<{ total: number }>('/api/trust-chain-service/trust-chain-report/total');
+  }
 }

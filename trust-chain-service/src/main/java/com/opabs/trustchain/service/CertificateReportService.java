@@ -1,11 +1,14 @@
 package com.opabs.trustchain.service;
 
 import com.opabs.common.model.CertificateCountInfo;
+import com.opabs.common.security.JWTAuthToken;
+import com.opabs.trustchain.controller.model.CertificateCount;
 import com.opabs.trustchain.controller.model.CertificateCountByHierarchy;
 import com.opabs.trustchain.controller.model.CertificateCountByLevel;
 import com.opabs.trustchain.controller.model.CertificateReportByKeyType;
 import com.opabs.trustchain.domain.Certificate;
 import com.opabs.trustchain.domain.TrustChain;
+import com.opabs.trustchain.exception.InternalServerErrorException;
 import com.opabs.trustchain.exception.NotFoundException;
 import com.opabs.trustchain.feign.TenantManagementService;
 import com.opabs.trustchain.repository.CertificateRepository;
@@ -16,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.nio.ByteBuffer;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +43,7 @@ public class CertificateReportService {
 
         validateTenantId(tenantId);
 
-        List<CountByKeyType> certCountsByKeyType = certificateRepository.countByTenantExtId(tenantId);
+        List<CountByKeyType> certCountsByKeyType = certificateRepository.countByTenantExtIdGroupByKeyType(tenantId);
 
         return getCertificateReportInfo(certCountsByKeyType);
     }
@@ -122,4 +126,21 @@ public class CertificateReportService {
         }
     }
 
+    public CertificateCount certificateCount(Principal userPrincipal) {
+        if (userPrincipal instanceof JWTAuthToken) {
+            JWTAuthToken user = (JWTAuthToken) userPrincipal;
+            CertificateCount count = new CertificateCount();
+            switch (user.getGroup()) {
+                case OPABS_ADMIN:
+                    count.setTotal(certificateRepository.count());
+                    break;
+                case TENANT_ADMIN:
+                    count.setTotal(certificateRepository.countByTenantExtId(user.getAccessToken().getTenantIdentifier()));
+                    break;
+            }
+            return count;
+        } else {
+            throw new InternalServerErrorException();
+        }
+    }
 }
