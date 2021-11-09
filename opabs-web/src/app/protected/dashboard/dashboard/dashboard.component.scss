@@ -8,10 +8,18 @@
   .detail {
     text-align: center;
     padding: 15px 10px 10px;
-    color: #131313;
-    width: 20%;
+    color: #777;
+    width: 25%;
     border: 1px dashed #CCCCCC;
-    border-radius: 50px;
+    cursor: pointer;
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#f6f8f9+0,e5ebee+50,d7dee3+51,f5f7f9+100;White+Gloss */
+    background: #f6f8f9; /* Old browsers */
+    background: -moz-linear-gradient(top,  #f6f8f9 0%, #e5ebee 50%, #d7dee3 51%, #f5f7f9 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f8f9', endColorstr='#f5f7f9',GradientType=0 ); /* IE6-9 */
+
+    box-shadow: inset 0 0 10px #CCC;
 
     h1, h2, h3 {
       margin-bottom: 0;
@@ -23,8 +31,11 @@
   padding: 20px;
   width: 100%;
 
-  .chart h2 {
-    text-align: center;
+  .chart {
+    padding: 10px;
+    h2 {
+      text-align: center;
+    }
   }
 }
 

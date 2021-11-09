@@ -15,11 +15,11 @@ export class ChartUtilService {
         datasets: [{
           data: chartData,
           backgroundColor: [
-            'rgb(255, 99, 132)',
-            'rgb(54, 162, 235)',
+            '#6e8bed',
+            'rgb(140,99,208)',
             'rgb(255, 206, 86)',
             'rgb(75, 192, 192)',
-            'rgb(153, 102, 255)',
+            'rgb(182,7,236)',
             'rgb(255, 159, 64)',
             'rgb(133,204,88)',
             'rgb(3,98,185)',

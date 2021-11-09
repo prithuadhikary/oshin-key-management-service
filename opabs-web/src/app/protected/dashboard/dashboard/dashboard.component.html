@@ -5,27 +5,27 @@
 </div>
 <div class="wrapper" fxLayout="column" fxLayoutAlign="start start">
   <div fxLayout="row" fxLayoutAlign="space-around start" class="dashboard-card">
-      <div class="detail">
+      <div [routerLink]="['/protected', 'tenants']" class="detail">
         <h3>Total Tenants</h3>
         <h1>{{totalTenantCount}}</h1>
       </div>
-      <div class="detail">
+      <div [routerLink]="['/protected', 'trust-chain']" class="detail">
         <h3>Trust Chains</h3>
         <h1>{{totalTrustChainCount}}</h1>
       </div>
-      <div class="detail">
+      <div [routerLink]="['/protected', 'certificates']" class="detail">
         <h3>Certificates</h3>
         <h2>{{totalCertificateCount}}</h2>
       </div>
   </div>
   <div fxLayout.gt-md="row" fxLayout.md="column" fxLayout.lt-md="column" class="chart-container" fxLayoutAlign="space-around center">
     <div class="chart" fxFlex.lg="100%" fxFlex.lt-lg="100%" fxFlex.gt-lg="45%">
-      <h2>Certificates Issued</h2>
-      <app-certificate-issue-density></app-certificate-issue-density>
-    </div>
-    <div class="chart" fxFlex.lg="100%" fxFlex.lt-lg="100%" fxFlex.gt-lg="45%">
       <h2>Certificates Issued By Key Type</h2>
       <app-certificates-by-keytype></app-certificates-by-keytype>
+    </div>
+    <div class="chart" fxFlex.lg="100%" fxFlex.lt-lg="100%" fxFlex.gt-lg="45%">
+      <h2>Certificates Issued</h2>
+      <app-certificate-issue-density></app-certificate-issue-density>
     </div>
   </div>
 </div>
