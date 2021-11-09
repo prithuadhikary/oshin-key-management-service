@@ -60,7 +60,7 @@ public class JWTTokenFilter extends AbstractAuthenticationProcessingFilter {
 
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            log.info("Token: {}", token);
+            log.debug("Token: {}", token);
             SecurityContextHolder.getContext().setAuthentication(authToken);
             return authToken;
         } else {
