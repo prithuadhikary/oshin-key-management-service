@@ -6,13 +6,20 @@
   .detail {
     width: 30%;
     text-align: center;
-    border: 1px solid #CCC;
+    border: 1px dashed #CCC;
+    border-radius: 50px;
     padding: 15px 0 0;
-    color: #707070;
-    box-shadow: inset 0 0 5px #CCC;
+    color: #343434;
 
     h1 {
       margin-bottom: 0;
     }
   }
 }
+
+.chart-container {
+  padding: 20px;
+  width: 100%;
+  border: 1px solid #CCCCCC;
+}
+

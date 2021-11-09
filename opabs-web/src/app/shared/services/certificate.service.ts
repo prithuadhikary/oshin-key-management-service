@@ -52,4 +52,9 @@ export class CertificateService {
   fetchCertificateCount(): Observable<{ total: number }> {
     return this.http.get<{ total: number}>('/api/trust-chain-service/certificate-report/total');
   }
+
+  fetchIssuedCountByDate(startDate: any, endDate: any): Observable<Array<{ month: string, count: number }>> {
+    const params = new HttpParams().set('startDate', startDate).set('endDate', endDate);
+    return this.http.get<Array<{ month: string, count: number }>>('/api/trust-chain-service/certificate-report/count-by-month', { params });
+  }
 }

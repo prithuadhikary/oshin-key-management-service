@@ -93,7 +93,8 @@ public class CertificateService {
         CertificateInfo certificateInfo = CertificateUtils.getCertificateInfo(certificateResponse.getCertificate());
         newCertificate.setCertificateFingerprint(certificateInfo.getCertificateFingerprint());
         newCertificate.setPublicKeyFingerprint(certificateInfo.getPublicKeyFingerprint());
-
+        newCertificate.setDateIssued(certificateInfo.getDateIssued());
+        newCertificate.setExpiryDate(certificateInfo.getExpiryDate());
         certificateRepository.save(newCertificate);
 
         CreateCertificateResponse response = new CreateCertificateResponse();

@@ -4,15 +4,20 @@ import com.opabs.common.security.Permissions;
 import com.opabs.trustchain.controller.model.CertificateCount;
 import com.opabs.trustchain.controller.model.CertificateCountByHierarchy;
 import com.opabs.trustchain.controller.model.CertificateReportByKeyType;
+import com.opabs.trustchain.controller.responses.CountByMonthResponse;
 import com.opabs.trustchain.service.CertificateReportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -44,6 +49,14 @@ public class CertificateReportController {
     @RequestMapping("total")
     public ResponseEntity<CertificateCount> total(Principal userPrincipal) {
         return ResponseEntity.ok(certificateReportService.certificateCount(userPrincipal));
+    }
+
+    @RequestMapping("count-by-month")
+    public ResponseEntity<List<CountByMonthResponse>> countByMonthBetween(Principal userPrincipal,
+                                                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+                                                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate
+    ) {
+        return ResponseEntity.ok(certificateReportService.countByMonth(userPrincipal, startDate, endDate));
     }
 
 }

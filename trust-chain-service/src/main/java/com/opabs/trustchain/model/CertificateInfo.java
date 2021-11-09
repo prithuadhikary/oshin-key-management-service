@@ -32,4 +32,8 @@ public class CertificateInfo {
     private String namedCurve;
 
     private Integer pathLengthConstraint;
+
+    private Date dateIssued;
+
+    private Date expiryDate;
 }

@@ -11,5 +11,6 @@ public enum ErrorCode {
     /**
      * This is thrown when a tenant admin tries to create a trust chain with tenant id other than that of his own.
      */
-    TENANT_ID_MISMATCH
+    TENANT_ID_MISMATCH,
+    FORBIDDEN
 }

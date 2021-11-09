@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -53,5 +54,9 @@ public class Certificate {
 
     @UpdateTimestamp
     private OffsetDateTime dateUpdated;
+
+    private Date dateIssued;
+
+    private Date expiryDate;
 
 }

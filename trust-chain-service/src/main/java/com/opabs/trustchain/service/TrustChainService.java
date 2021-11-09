@@ -92,7 +92,8 @@ public class TrustChainService {
         CertificateInfo certInfo = CertificateUtils.getCertificateInfo(signingResponse.getCertificate());
         certificate.setPublicKeyFingerprint(certInfo.getPublicKeyFingerprint());
         certificate.setCertificateFingerprint(certInfo.getCertificateFingerprint());
-
+        certificate.setDateIssued(certInfo.getDateIssued());
+        certificate.setExpiryDate(certInfo.getExpiryDate());
         certificateRepository.save(certificate);
         trustChain.setRootCertificate(certificate);
         trustChainRepository.save(trustChain);

@@ -196,3 +196,25 @@ $hoverColor: #ffc578;
   }
 }
 
+.search-box {
+  font-size: 14px;
+  border: 1px solid #CCC;
+  padding: 10px 10px 10px 35px;
+  border-radius: 20px;
+  width: 62px;
+
+  background-image: url("./assets/magnifying-glass.png");
+  background-position: 12px 11px;
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+
+  -webkit-transition: width 0.7s ease 0s;
+  -moz-transition: width 0.7s ease 0s;
+  -o-transition: width 0.7s ease 0s;
+  transition: width 0.7s ease 0s;
+
+  &:hover, &:focus, &.expanded {
+    width: 200px;
+  }
+}
+

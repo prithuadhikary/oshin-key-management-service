@@ -1,6 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {CertificateService} from '../../../shared/services/certificate.service';
-import {TrustChainService} from '../../../shared/services/trust-chain.service';
 import {ActivatedRoute} from '@angular/router';
 
 @Component({

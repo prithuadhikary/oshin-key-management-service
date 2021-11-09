@@ -1,29 +1,30 @@
 package com.opabs.trustchain.service;
 
 import com.opabs.common.model.CertificateCountInfo;
+import com.opabs.common.security.GroupPermissions;
 import com.opabs.common.security.JWTAuthToken;
 import com.opabs.trustchain.controller.model.CertificateCount;
 import com.opabs.trustchain.controller.model.CertificateCountByHierarchy;
 import com.opabs.trustchain.controller.model.CertificateCountByLevel;
 import com.opabs.trustchain.controller.model.CertificateReportByKeyType;
+import com.opabs.trustchain.controller.responses.CountByMonthResponse;
 import com.opabs.trustchain.domain.Certificate;
 import com.opabs.trustchain.domain.TrustChain;
+import com.opabs.trustchain.exception.ForbiddenException;
 import com.opabs.trustchain.exception.InternalServerErrorException;
 import com.opabs.trustchain.exception.NotFoundException;
 import com.opabs.trustchain.feign.TenantManagementService;
 import com.opabs.trustchain.repository.CertificateRepository;
 import com.opabs.trustchain.repository.CountByCertificateForLevel;
 import com.opabs.trustchain.repository.CountByKeyType;
+import com.opabs.trustchain.repository.CountByMonth;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.nio.ByteBuffer;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -132,7 +133,30 @@ public class CertificateReportService {
             }
             return count;
         } else {
-            throw new InternalServerErrorException();
+            throw new ForbiddenException();
+        }
+    }
+
+    public List<CountByMonthResponse> countByMonth(Principal userPrincipal, Date startDate, Date endDate) {
+        if (userPrincipal instanceof JWTAuthToken) {
+            GroupPermissions group = ((JWTAuthToken) userPrincipal).getGroup();
+            List<CountByMonth> countsByMonth;
+            if (group == GroupPermissions.OPABS_ADMIN) {
+                countsByMonth = certificateRepository.issuedCountByMonthBetween(startDate, endDate);
+            } else if (group == GroupPermissions.TENANT_ADMIN) {
+                UUID tenantIdentifier = ((JWTAuthToken) userPrincipal).getAccessToken().getTenantIdentifier();
+                countsByMonth = certificateRepository.issuedCountByMonthBetweenWithTenantId(tenantIdentifier, startDate, endDate);
+            } else {
+                throw new InternalServerErrorException();
+            }
+            return countsByMonth.stream().map(countByMonth -> {
+                CountByMonthResponse countByMonthResponse = new CountByMonthResponse();
+                countByMonthResponse.setCount(countByMonth.getCount());
+                countByMonthResponse.setMonth(countByMonth.getDate_Issued());
+                return countByMonthResponse;
+            }).collect(Collectors.toList());
+        } else {
+            throw new ForbiddenException();
         }
     }
 }
