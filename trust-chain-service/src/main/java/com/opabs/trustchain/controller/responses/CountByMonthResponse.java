@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 public class CountByMonthResponse {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MMMM-yy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MMMM-yy", timezone = "UTC")
     private Date month;
 
     private Long count;
