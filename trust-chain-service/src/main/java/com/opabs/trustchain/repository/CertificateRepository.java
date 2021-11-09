@@ -14,6 +14,9 @@ import java.util.UUID;
 @Repository
 public interface CertificateRepository extends PagingAndSortingRepository<Certificate, UUID>, JpaSpecificationExecutor<Certificate> {
 
+    @Query("SELECT c.keyType as keyType, count(c) as count from Certificate c group by c.keyType")
+    List<CountByKeyType> countGroupByKeyType();
+
     @Query("SELECT c.keyType as keyType, count(c) as count from Certificate c WHERE c.trustChain.tenantExtId = ?1 group by c.keyType")
     List<CountByKeyType> countByTenantExtIdGroupByKeyType(UUID tenantId);
 

@@ -145,6 +145,7 @@ public class CertificateReportService {
                 countsByMonth = certificateRepository.issuedCountByMonthBetween(startDate, endDate);
             } else if (group == GroupPermissions.TENANT_ADMIN) {
                 UUID tenantIdentifier = ((JWTAuthToken) userPrincipal).getAccessToken().getTenantIdentifier();
+                validateTenantId(tenantIdentifier);
                 countsByMonth = certificateRepository.issuedCountByMonthBetweenWithTenantId(tenantIdentifier, startDate, endDate);
             } else {
                 throw new InternalServerErrorException();
@@ -155,6 +156,28 @@ public class CertificateReportService {
                 countByMonthResponse.setMonth(countByMonth.getDate_Issued());
                 return countByMonthResponse;
             }).collect(Collectors.toList());
+        } else {
+            throw new ForbiddenException();
+        }
+    }
+
+    public CertificateReportByKeyType certificateReportByKeyType(Principal userPrincipal) {
+        if (userPrincipal instanceof JWTAuthToken) {
+            GroupPermissions group = ((JWTAuthToken) userPrincipal).getGroup();
+            CertificateReportByKeyType reportByKeyType = new CertificateReportByKeyType();
+            List<CountByKeyType> countByKeyTypes = null;
+            if (group == GroupPermissions.OPABS_ADMIN) {
+                countByKeyTypes = certificateRepository.countGroupByKeyType();
+            } else if (group == GroupPermissions.TENANT_ADMIN){
+                UUID tenantId = ((JWTAuthToken) userPrincipal).getAccessToken().getTenantIdentifier();
+                countByKeyTypes = certificateRepository.countByTenantExtIdGroupByKeyType(tenantId);
+            } else {
+                throw new InternalServerErrorException();
+            }
+            reportByKeyType.setCertificateCountInfos(countByKeyTypes.stream()
+                    .map(countByKeyType -> new CertificateCountInfo(countByKeyType.getKeyType(), countByKeyType.getCount()))
+                    .collect(Collectors.toList()));
+            return reportByKeyType;
         } else {
             throw new ForbiddenException();
         }

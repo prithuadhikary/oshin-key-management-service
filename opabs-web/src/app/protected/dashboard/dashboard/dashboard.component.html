@@ -4,21 +4,28 @@
   </h1>
 </div>
 <div class="wrapper" fxLayout="column" fxLayoutAlign="start start">
-  <div fxLayout="row" fxLayoutAlign="space-between start" class="dashboard-card">
+  <div fxLayout="row" fxLayoutAlign="space-around start" class="dashboard-card">
       <div class="detail">
+        <h3>Total Tenants</h3>
         <h1>{{totalTenantCount}}</h1>
-        <h2>Total Tenants</h2>
       </div>
       <div class="detail">
+        <h3>Trust Chains</h3>
         <h1>{{totalTrustChainCount}}</h1>
-        <h2>Trust Chains</h2>
       </div>
       <div class="detail">
-        <h1>{{totalCertificateCount}}</h1>
-        <h2>Certificates</h2>
+        <h3>Certificates</h3>
+        <h2>{{totalCertificateCount}}</h2>
       </div>
   </div>
-  <div fxLayout="row" class="chart-container" fxLayoutAlign="center center">
-    <app-certificate-issue-density></app-certificate-issue-density>
+  <div fxLayout.gt-md="row" fxLayout.md="column" fxLayout.lt-md="column" class="chart-container" fxLayoutAlign="space-around center">
+    <div class="chart" fxFlex.lg="100%" fxFlex.lt-lg="100%" fxFlex.gt-lg="45%">
+      <h2>Certificates Issued</h2>
+      <app-certificate-issue-density></app-certificate-issue-density>
+    </div>
+    <div class="chart" fxFlex.lg="100%" fxFlex.lt-lg="100%" fxFlex.gt-lg="45%">
+      <h2>Certificates Issued By Key Type</h2>
+      <app-certificates-by-keytype></app-certificates-by-keytype>
+    </div>
   </div>
 </div>

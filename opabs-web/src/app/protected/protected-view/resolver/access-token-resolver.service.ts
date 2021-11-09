@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import {ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot} from '@angular/router';
 import {AuthenticationService} from '../../../shared/services/authentication.service';
-import {flatMap} from 'rxjs/operators';
-import {forkJoin, Observable, of} from 'rxjs';
+import {catchError, flatMap} from 'rxjs/operators';
+import {empty, forkJoin, Observable, of} from 'rxjs';
 import {CertificateService} from '../../../shared/services/certificate.service';
 import {TrustChainService} from '../../../shared/services/trust-chain.service';
 import {TenantService} from '../../../shared/services/tenant.service';
@@ -17,7 +17,8 @@ export class AccessTokenResolverService implements
     private authenticationService: AuthenticationService,
     private certificateService: CertificateService,
     private trustChainService: TrustChainService,
-    private tenantService: TenantService
+    private tenantService: TenantService,
+    private router: Router
   ) { }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot)
@@ -25,6 +26,11 @@ export class AccessTokenResolverService implements
     totalCertificates: { total: number }, totalTrustChains: { total: number }, totalTenants: { total: number } }> {
     return this.authenticationService.fetchTokens(route.queryParams.code)
       .pipe(
+        catchError((): Observable<any> => {
+          sessionStorage.clear();
+          this.router.navigate(['login']);
+          return empty();
+        }),
         flatMap(value =>
           forkJoin({
             token: of(value),

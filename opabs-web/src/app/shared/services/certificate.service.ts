@@ -14,6 +14,10 @@ export class CertificateService {
   constructor(private http: HttpClient) {
   }
 
+  fetchCertificateCountByKeyType(): Observable<CertificateReportResponseByKeyType> {
+    return this.http.get<CertificateReportResponseByKeyType>('/api/trust-chain-service/certificate-report/by-key-type');
+  }
+
   fetchCertificateCountByTenantId(tenantId: string): Observable<CertificateReportResponseByKeyType> {
     return this.http.get<CertificateReportResponseByKeyType>('/api/trust-chain-service/certificate-report/by-tenant/' + tenantId);
   }

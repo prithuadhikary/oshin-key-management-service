@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.Date;
@@ -28,30 +25,37 @@ public class CertificateReportController {
     private final CertificateReportService certificateReportService;
 
     @Secured(Permissions.CERTIFICATE_REPORT_VIEW)
-    @RequestMapping("by-tenant/{tenantId}")
-    public ResponseEntity<CertificateReportByKeyType> certificateReportByTenant(@PathVariable("tenantId") UUID tenantId) {
+    @GetMapping("by-key-type")
+    public ResponseEntity<CertificateReportByKeyType> certificateReportByKeyType(Principal userPrincipal) {
+        return ResponseEntity.ok(certificateReportService.certificateReportByKeyType(userPrincipal));
+    }
+
+    @Secured(Permissions.CERTIFICATE_REPORT_VIEW)
+    @GetMapping("by-tenant/{tenantId}")
+    public ResponseEntity<CertificateReportByKeyType> certificateReportByKeyTypeForTenant(@PathVariable("tenantId") UUID tenantId) {
         return ResponseEntity.ok(certificateReportService.certificateReportByTenantId(tenantId));
     }
 
     @Secured(Permissions.CERTIFICATE_REPORT_VIEW)
-    @RequestMapping("by-trust-chain/{trustChainId}")
-    public ResponseEntity<CertificateReportByKeyType> certificateReportByTrustChain(@PathVariable("trustChainId") UUID trustChainId) {
+    @GetMapping("by-trust-chain/{trustChainId}")
+    public ResponseEntity<CertificateReportByKeyType> certificateReportByTrustChainForTrustChain(@PathVariable("trustChainId") UUID trustChainId) {
         return ResponseEntity.ok(certificateReportService.certificateReportByTrustChain(trustChainId));
     }
 
     @Secured(Permissions.CERTIFICATE_REPORT_VIEW)
-    @RequestMapping("by-hierarchy/{trustChainId}")
+    @GetMapping("by-hierarchy/{trustChainId}")
     public ResponseEntity<CertificateCountByHierarchy> certificateReportByHierarchy(@PathVariable("trustChainId") UUID trustChainId) {
         return ResponseEntity.ok(certificateReportService.certificateReportByHierarchy(trustChainId));
     }
 
     @Secured(Permissions.CERTIFICATE_REPORT_VIEW)
-    @RequestMapping("total")
+    @GetMapping("total")
     public ResponseEntity<CertificateCount> total(Principal userPrincipal) {
         return ResponseEntity.ok(certificateReportService.certificateCount(userPrincipal));
     }
 
-    @RequestMapping("count-by-month")
+    @Secured(Permissions.CERTIFICATE_REPORT_VIEW)
+    @GetMapping("count-by-month")
     public ResponseEntity<List<CountByMonthResponse>> countByMonthBetween(Principal userPrincipal,
                                                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
                                                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate

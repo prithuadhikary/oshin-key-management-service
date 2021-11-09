@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Chart, registerables} from 'chart.js';
 import {CertificateService} from '../../../../shared/services/certificate.service';
 import * as moment from 'moment';
+import {ChartUtilService} from '../../../../shared/services/chart-util.service';
 
 @Component({
   selector: 'app-certificate-issue-density',
@@ -11,7 +12,8 @@ import * as moment from 'moment';
 export class CertificateIssueDensityComponent implements OnInit {
 
   constructor(
-    private certificateService: CertificateService
+    private certificateService: CertificateService,
+    private chartUtilService: ChartUtilService
   ) { }
 
   ngOnInit(): void {
@@ -39,50 +41,10 @@ export class CertificateIssueDensityComponent implements OnInit {
             chartData.push(0);
           }
         }
-        this.plotChart(context, labels, chartData, maxValue);
+        this.chartUtilService.plotBarChart(context, labels, chartData, maxValue);
       });
   }
 
-  plotChart(context: any, labels: Array<string>, chartData: Array<number>, maxValue: number): void {
-    const myChart = new Chart(context, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Certificate Issued - Summary',
-          data: chartData,
-          backgroundColor: [
-            'rgb(255, 99, 132)',
-            'rgb(54, 162, 235)',
-            'rgb(255, 206, 86)',
-            'rgb(75, 192, 192)',
-            'rgb(153, 102, 255)',
-            'rgb(255, 159, 64)',
-            'rgb(133,204,88)',
-            'rgb(3,98,185)',
-            'rgb(232,99,57)',
-            'rgb(2,192,176)',
-            'rgb(141,41,210)',
-            'rgb(9,190,148)'
-          ]
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            title: {
-              display: true,
-              text: 'No. Of Certificates'
-            },
-            suggestedMax: Math.ceil(maxValue * 1.5),
-            ticks: {
-              stepSize: 1
-            }
-          }
-        }
-      }
-    });
-  }
+
 
 }
