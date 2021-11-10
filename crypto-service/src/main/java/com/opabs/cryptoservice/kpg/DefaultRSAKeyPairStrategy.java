@@ -35,7 +35,7 @@ public class DefaultRSAKeyPairStrategy implements KeyPairStrategy {
             KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("rsa", AWS_HSM_JCE_PROVIDER_NAME);
             int keySize = (int) params.get(KEY_SIZE);
             String keyLabel = (String) params.get(KEY_LABEL);
-            CaviumRSAKeyGenParameterSpec spec = new CaviumRSAKeyGenParameterSpec(keySize, new BigInteger("65537"), keyLabel + ":public", keyLabel + ":private", true, true);
+            CaviumRSAKeyGenParameterSpec spec = new CaviumRSAKeyGenParameterSpec(keySize, new BigInteger("65537"), keyLabel + ":public", keyLabel + ":private", true, false);
             keyPairGen.initialize(spec);
             return keyPairGen.generateKeyPair();
         } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
