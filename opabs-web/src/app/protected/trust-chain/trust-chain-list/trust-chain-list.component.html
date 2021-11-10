@@ -5,7 +5,7 @@
 <div class="wrapper" fxLayout="row" fxLayoutAlign="start start">
   <div class="item-list" fxFlex="30%" fxLayout="column" fxFlexFill>
     <div fxLayout="row" fxLayoutAlign="start center" [ngClass]="{ item: true, selected: isSelected(trustChain) }" *ngFor="let trustChain of (trustChainResponse$ | async)?.content" (click)="setSelected(trustChain)">
-      <h3><fa-icon [icon]="faCertificate"></fa-icon> {{trustChain.name}}</h3>
+      <h3><fa-icon [icon]="faLink"></fa-icon> {{trustChain.name}}</h3>
     </div>
     <mat-paginator [length]="paginatorLength"
                    [pageSize]="pageSize"
@@ -16,7 +16,7 @@
   </div>
   <div class="item-details" fxLayout="column" fxFlex="70%" *ngIf="selectedTrustChain">
     <h1 fxLayout="row" fxLayoutAlign="space-between center">
-      <span><fa-icon class="fa-1x" [icon]="faCertificate"></fa-icon>
+      <span><fa-icon class="fa-1x" [icon]="faLink"></fa-icon>
         {{selectedTrustChain.name}}</span>
       <button mat-stroked-button color="primary" (click)="viewChildCertificates()">View Certificates</button>
     </h1>

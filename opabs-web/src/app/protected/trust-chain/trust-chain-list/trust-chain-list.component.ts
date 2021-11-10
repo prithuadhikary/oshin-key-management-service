@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {TrustChainService} from '../../../shared/services/trust-chain.service';
-import {faCertificate, faDownload} from '@fortawesome/free-solid-svg-icons';
+import {faLink, faDownload} from '@fortawesome/free-solid-svg-icons';
 import {MatDialog} from '@angular/material/dialog';
 import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
@@ -29,7 +29,7 @@ export class TrustChainListComponent implements OnInit {
   ) {
   }
 
-  faCertificate = faCertificate;
+  faLink = faLink;
   faDownload = faDownload;
 
   selectedTrustChain: TrustChain;
