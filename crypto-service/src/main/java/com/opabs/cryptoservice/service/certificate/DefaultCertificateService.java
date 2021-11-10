@@ -69,7 +69,8 @@ public class DefaultCertificateService implements CertificateService {
             try {
                 X500Name subjectDN = new X500Name(request.getSubjectDN());
                 KeyPair keyPair = generateKeyPair(request.getKeyType(), request.getKeyGenParams());
-                ContentSigner contentSigner = new JcaContentSignerBuilder(request.getKeyType().getCertificateSignatureAlgo()).build(keyPair.getPrivate());
+                ContentSigner contentSigner = new JcaContentSignerBuilder(request.getKeyType().getCertificateSignatureAlgo())
+                        .setProvider("Cavium").build(keyPair.getPrivate());
                 final PKCS10CertificationRequestBuilder builder = new JcaPKCS10CertificationRequestBuilder(
                         subjectDN, keyPair.getPublic());
                 PKCS10CertificationRequest csr = builder.build(contentSigner);
