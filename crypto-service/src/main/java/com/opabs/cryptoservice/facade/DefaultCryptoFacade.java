@@ -2,10 +2,10 @@ package com.opabs.cryptoservice.facade;
 
 import com.opabs.common.model.*;
 import com.opabs.cryptoservice.service.aes.MockAesService;
-import com.opabs.cryptoservice.service.certificate.MockCertificateService;
+import com.opabs.cryptoservice.service.certificate.CertificateService;
+import com.opabs.cryptoservice.service.certificate.DefaultCertificateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class DefaultCryptoFacade implements CryptoFacade {
 
-    private final MockCertificateService certificateService;
+    private final CertificateService certificateService;
 
     private final MockAesService aesService;
 

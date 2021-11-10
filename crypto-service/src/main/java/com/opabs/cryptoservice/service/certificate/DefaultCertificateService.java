@@ -47,7 +47,7 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MockCertificateService implements CertificateService {
+public class DefaultCertificateService implements CertificateService {
 
     public static final String PROVIDER_NAME = "BC";
     public static final String RSA = "RSA";
@@ -129,7 +129,7 @@ public class MockCertificateService implements CertificateService {
 
             validateSignatureAlgorithm(caPrivateKeyInfo, request.getSignatureAlgorithm());
 
-            AsymmetricKeyParameter issuerPrivateKey = PrivateKeyFactory.createKey(caPrivateKeyInfo.getPrivateKey().getEncoded());
+//            AsymmetricKeyParameter issuerPrivateKey = PrivateKeyFactory.createKey(caPrivateKeyInfo.getPrivateKey().getEncoded());
 
             //6. Create certificate builder.
             X509v3CertificateBuilder certificateGenerator = new X509v3CertificateBuilder(
@@ -141,13 +141,7 @@ public class MockCertificateService implements CertificateService {
             //7. Add extensions.
             populateExtensions(request, pkcs10req, issuerCertificate, certificateGenerator);
 
-            ContentSigner sigGen = null;
-
-            if (caPrivateKeyInfo.getKeyType() == KeyType.RSA) {
-                sigGen = new BcRSAContentSignerBuilder(sigAlgId, digAlgId).build(issuerPrivateKey);
-            } else if (caPrivateKeyInfo.getKeyType() == KeyType.ELLIPTIC_CURVE) {
-                sigGen = new BcECContentSignerBuilder(sigAlgId, digAlgId).build(issuerPrivateKey);
-            }
+            ContentSigner sigGen = new JcaContentSignerBuilder(request.getSignatureAlgorithm().name()).setProvider("BC").build(caPrivateKeyInfo.getPrivateKey());
 
             X509CertificateHolder holder = certificateGenerator.build(sigGen);
 
