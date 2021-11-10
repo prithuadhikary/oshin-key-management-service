@@ -16,6 +16,7 @@
     <properties>
         <java.version>11</java.version>
         <spring-cloud.version>2020.0.4</spring-cloud.version>
+        <aws.cloudhsm.version>3.4.0</aws.cloudhsm.version>
     </properties>
     <dependencies>
         <dependency>
@@ -86,6 +87,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.aws.local</groupId>
+            <artifactId>cloudhsm</artifactId>
+            <version>${aws.cloudhsm.version}</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -121,6 +127,25 @@
                     <source>14</source>
                     <target>14</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>customlib/cloudhsm-3.4.0.jar</file>
+                            <groupId>com.aws.local</groupId>
+                            <artifactId>cloudhsm</artifactId>
+                            <version>${aws.cloudhsm.version}</version>
+                            <packaging>jar</packaging>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

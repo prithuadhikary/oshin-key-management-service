@@ -4,6 +4,7 @@ import com.opabs.common.model.KeyType;
 import com.opabs.cryptoservice.exception.CurveNotSpecifiedException;
 import com.opabs.cryptoservice.exception.KeyPairGenerationFailureException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.security.KeyFactory;
@@ -16,7 +17,8 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class EllipticCurveKeyPairStrategy implements KeyPairStrategy {
+@Profile("local")
+public class MockEllipticCurveKeyPairStrategy implements KeyPairStrategy {
 
     public static final String PARAM_CURVE = "namedCurve";
 

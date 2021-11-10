@@ -96,12 +96,6 @@ public class DefaultCertificateService implements CertificateService {
             // Validate CSR signature.
             validateCSRSignature(pkcs10req);
 
-            //2. Find the signature and digest algorithm id.
-            AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder()
-                    .find(request.getSignatureAlgorithm().name());
-            AlgorithmIdentifier digAlgId = new DefaultDigestAlgorithmIdentifierFinder()
-                    .find(sigAlgId);
-
             String issuerDN;
             X509Certificate issuerCertificate = null;
             Optional<KeyType> issuerKeyType = Optional.empty();
@@ -129,8 +123,6 @@ public class DefaultCertificateService implements CertificateService {
 
             validateSignatureAlgorithm(caPrivateKeyInfo, request.getSignatureAlgorithm());
 
-//            AsymmetricKeyParameter issuerPrivateKey = PrivateKeyFactory.createKey(caPrivateKeyInfo.getPrivateKey().getEncoded());
-
             //6. Create certificate builder.
             X509v3CertificateBuilder certificateGenerator = new X509v3CertificateBuilder(
                     new X500Name(issuerDN), new BigInteger("1"),
@@ -141,7 +133,8 @@ public class DefaultCertificateService implements CertificateService {
             //7. Add extensions.
             populateExtensions(request, pkcs10req, issuerCertificate, certificateGenerator);
 
-            ContentSigner sigGen = new JcaContentSignerBuilder(request.getSignatureAlgorithm().name()).setProvider("BC").build(caPrivateKeyInfo.getPrivateKey());
+            ContentSigner sigGen = new JcaContentSignerBuilder(request.getSignatureAlgorithm().name())
+                    .setProvider("Cavium").build(caPrivateKeyInfo.getPrivateKey());
 
             X509CertificateHolder holder = certificateGenerator.build(sigGen);
 
