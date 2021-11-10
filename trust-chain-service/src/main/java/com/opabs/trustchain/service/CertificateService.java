@@ -2,6 +2,8 @@ package com.opabs.trustchain.service;
 
 import com.opabs.common.enums.KeyUsages;
 import com.opabs.common.model.*;
+import com.opabs.common.security.GroupPermissions;
+import com.opabs.common.security.JWTAuthToken;
 import com.opabs.trustchain.controller.command.CreateCertificateCommand;
 import com.opabs.trustchain.controller.model.CertificateModel;
 import com.opabs.trustchain.controller.responses.CreateCertificateResponse;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.security.Principal;
 import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -149,13 +152,15 @@ public class CertificateService {
         }
     }
 
-    public ListResponse<CertificateModel> list(String search, UUID parentCertificateId, Pageable pageRequest) {
+    public ListResponse<CertificateModel> list(Principal userPrincipal, String search, UUID parentCertificateId, Pageable pageRequest) {
         Page<Certificate> certificates;
-        if (isNotEmpty(search) || parentCertificateId != null) {
-            certificates = certificateRepository.findAll(searchSpecification(search, parentCertificateId), pageRequest);
-        } else {
-         certificates = certificateRepository.findAll(pageRequest);
+        UUID tenantId = null;
+        if (userPrincipal instanceof JWTAuthToken && ((JWTAuthToken) userPrincipal).getGroup() == GroupPermissions.TENANT_ADMIN) {
+            tenantId = ((JWTAuthToken) userPrincipal).getAccessToken().getTenantIdentifier();
         }
+
+        certificates = certificateRepository.findAll(searchSpecification(search, parentCertificateId, tenantId), pageRequest);
+
         ListResponse<CertificateModel> listResponse = new ListResponse<>();
         listResponse.setContent(certificates.getContent().stream().map(TransformationUtils::fromCertificate).collect(Collectors.toList()));
         listResponse.setTotalElements(certificates.getTotalElements());

@@ -7,12 +7,15 @@ import {CertificateService} from '../../../shared/services/certificate.service';
 import {TrustChainService} from '../../../shared/services/trust-chain.service';
 import {TenantService} from '../../../shared/services/tenant.service';
 
+type ResolvedValues = { token: Observable<{ accessToken: string, idToken: string }>,
+  totalCertificates: Observable<{ total: number }>,
+  totalTrustChains: Observable<{ total: number }>, totalTenants?: Observable<{ total: number }>  };
+
 @Injectable({
   providedIn: 'root'
 })
 export class AccessTokenResolverService implements
-  Resolve<{ token: { accessToken: string, idToken: string },
-    totalCertificates: { total: number }, totalTrustChains: { total: number }, totalTenants: { total: number }  }>{
+  Resolve<ResolvedValues>{
   constructor(
     private authenticationService: AuthenticationService,
     private certificateService: CertificateService,
@@ -22,22 +25,23 @@ export class AccessTokenResolverService implements
   ) { }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot)
-    : Observable<{ token: { accessToken: string, idToken: string },
-    totalCertificates: { total: number }, totalTrustChains: { total: number }, totalTenants: { total: number } }> {
+    : Observable<ResolvedValues> {
     return this.authenticationService.fetchTokens(route.queryParams.code)
       .pipe(
         catchError((): Observable<any> => {
           sessionStorage.clear();
-          this.router.navigate(['login']);
+          this.router.navigate(['/login']);
           return empty();
         }),
-        flatMap(value =>
-          forkJoin({
+        flatMap((value: { accessToken: string, idToken: string }) => {
+          const sourcesObject: ResolvedValues = {
             token: of(value),
-            totalTenants: this.tenantService.fetchTenantCount(),
             totalCertificates: this.certificateService.fetchCertificateCount(),
             totalTrustChains: this.trustChainService.fetchTrustChainCount()
-          })
+          };
+          sourcesObject.totalTenants = this.tenantService.fetchTenantCount();
+          return forkJoin(sourcesObject);
+          }
         )
       );
   }

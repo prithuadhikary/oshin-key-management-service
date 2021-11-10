@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+import { faBuilding, faLink, faFileContract } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-dashboard',
@@ -7,6 +8,10 @@ import {ActivatedRoute} from '@angular/router';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
+
+  faBuilding = faBuilding;
+  faLink = faLink;
+  faFileContract = faFileContract;
 
   constructor(private route: ActivatedRoute) { }
 

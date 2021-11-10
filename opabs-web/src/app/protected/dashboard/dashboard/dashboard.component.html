@@ -5,17 +5,26 @@
 </div>
 <div class="wrapper" fxLayout="column" fxLayoutAlign="start start">
   <div fxLayout="row" fxLayoutAlign="space-around start" class="dashboard-card">
-      <div [routerLink]="['/protected', 'tenants']" class="detail">
-        <h3>Total Tenants</h3>
-        <h1>{{totalTenantCount}}</h1>
+      <div [routerLink]="['/protected', 'tenants']" fxLayout="row" fxLayoutAlign="space-between center" class="detail">
+        <fa-icon class="detail-icon" [icon]="faBuilding"></fa-icon>
+        <div>
+          <h1>{{totalTenantCount}}</h1>
+          <h3>Tenants</h3>
+        </div>
       </div>
-      <div [routerLink]="['/protected', 'trust-chain']" class="detail">
-        <h3>Trust Chains</h3>
-        <h1>{{totalTrustChainCount}}</h1>
+      <div [routerLink]="['/protected', 'trust-chain']" fxLayout="row" fxLayoutAlign="space-between center" class="detail">
+        <fa-icon class="detail-icon" [icon]="faLink"></fa-icon>
+        <div>
+          <h1>{{totalTrustChainCount}}</h1>
+          <h3>Trust Chains</h3>
+        </div>
       </div>
-      <div [routerLink]="['/protected', 'certificates']" class="detail">
-        <h3>Certificates</h3>
-        <h2>{{totalCertificateCount}}</h2>
+      <div [routerLink]="['/protected', 'certificates']" fxLayout="row" fxLayoutAlign="space-between center" class="detail">
+        <fa-icon class="detail-icon" [icon]="faFileContract"></fa-icon>
+        <div>
+          <h2>{{totalCertificateCount}}</h2>
+          <h3>Certificates</h3>
+        </div>
       </div>
   </div>
   <div fxLayout.gt-md="row" fxLayout.md="column" fxLayout.lt-md="column" class="chart-container" fxLayoutAlign="space-around center">

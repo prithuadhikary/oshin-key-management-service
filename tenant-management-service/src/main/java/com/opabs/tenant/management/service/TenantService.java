@@ -84,7 +84,7 @@ public class TenantService {
         if (principal instanceof JWTAuthToken) {
             JWTAuthToken token = (JWTAuthToken) principal;
             UUID tenantIdentifier = token.getAccessToken().getTenantIdentifier();
-            if (token.getGroup() == GroupPermissions.TENANT_ADMIN && (tenantIdentifier == null || tenantIdentifier != id)) {
+            if (token.getGroup() == GroupPermissions.TENANT_ADMIN && (tenantIdentifier == null || !tenantIdentifier.equals(id))) {
                 return Optional.empty();
             }
             return tenantRepository.findByIdAndDeleted(id, false);

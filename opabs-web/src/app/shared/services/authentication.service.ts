@@ -19,7 +19,7 @@ export class AuthenticationService {
 
   public fetchTokens(authorizationCode: string): Observable<{ accessToken: any, idToken: any }> {
     return fromPromise(new Promise((resolve, reject) => {
-      if (authorizationCode != null) {
+      if (authorizationCode != null && !sessionStorage.getItem(this.idTokenKey)) {
         const parameters = {
           grant_type: 'authorization_code',
           client_id: environment.okta.clientId,
@@ -31,7 +31,6 @@ export class AuthenticationService {
         this.oAuthService.fetchTokenUsingGrant('authorization_code', parameters).then(result => {
           sessionStorage.setItem(this.idTokenKey, result.id_token);
           sessionStorage.setItem(this.accessTokenKey, result.access_token);
-          // setTimeout(() => this.fetchTokens(authorizationCode), (0.7 * result.expires_in) * 1000);
           resolve({idToken: result.id_token, accessToken: result.access_token});
         }, error => {
             reject(error);

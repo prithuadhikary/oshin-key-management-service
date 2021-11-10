@@ -14,6 +14,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.UUID;
 
 @RestController
@@ -44,12 +45,13 @@ public class CertificateController {
     @GetMapping
     @Secured(Permissions.CERTIFICATE_VIEW)
     public ListResponse<CertificateModel> list(
+            Principal userPrincipal,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size,
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "parentCertificateId", required = false) UUID parentCertificateId
     ) {
-        return certificateService.list(search, parentCertificateId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));
+        return certificateService.list(userPrincipal, search, parentCertificateId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));
     }
 
 }

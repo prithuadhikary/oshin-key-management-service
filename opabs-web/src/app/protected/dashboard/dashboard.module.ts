@@ -7,6 +7,7 @@ import {MatCardModule} from '@angular/material/card';
 import {AccessTokenResolverService} from '../protected-view/resolver/access-token-resolver.service';
 import { CertificateIssueDensityComponent } from './charts/certificate-issue-density/certificate-issue-density.component';
 import { CertificatesByKeytypeComponent } from './charts/certificates-by-keytype/certificates-by-keytype.component';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 const routes: Routes = [
   {
@@ -23,7 +24,8 @@ const routes: Routes = [
         CommonModule,
         RouterModule.forChild(routes),
         FlexModule,
-        MatCardModule
+        MatCardModule,
+        FontAwesomeModule
     ]
 })
 export class DashboardModule { }
