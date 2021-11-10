@@ -19,7 +19,7 @@ export class AuthenticationService {
 
   public fetchTokens(authorizationCode: string): Observable<{ accessToken: any, idToken: any }> {
     return fromPromise(new Promise((resolve, reject) => {
-      if (authorizationCode != null && !sessionStorage.getItem(this.idTokenKey)) {
+      if (authorizationCode != null) {
         const parameters = {
           grant_type: 'authorization_code',
           client_id: environment.okta.clientId,

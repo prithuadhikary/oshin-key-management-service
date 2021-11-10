@@ -16,6 +16,7 @@ type ResolvedValues = { token: Observable<{ accessToken: string, idToken: string
 })
 export class AccessTokenResolverService implements
   Resolve<ResolvedValues>{
+
   constructor(
     private authenticationService: AuthenticationService,
     private certificateService: CertificateService,
@@ -28,11 +29,6 @@ export class AccessTokenResolverService implements
     : Observable<ResolvedValues> {
     return this.authenticationService.fetchTokens(route.queryParams.code)
       .pipe(
-        catchError((): Observable<any> => {
-          sessionStorage.clear();
-          this.router.navigate(['/login']);
-          return empty();
-        }),
         flatMap((value: { accessToken: string, idToken: string }) => {
           const sourcesObject: ResolvedValues = {
             token: of(value),
