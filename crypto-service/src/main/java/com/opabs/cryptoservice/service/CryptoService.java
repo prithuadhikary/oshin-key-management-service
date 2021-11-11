@@ -27,4 +27,8 @@ public class CryptoService {
     public Mono<CertificateSigningResponse> signCSR(CertificateSigningRequest request) {
         return cryptoFacade.sign(request);
     }
+
+    public Mono<AesCreateKeyResponse> createKey(AesCreateKeyRequest request) {
+        return cryptoFacade.createKey(request);
+    }
 }

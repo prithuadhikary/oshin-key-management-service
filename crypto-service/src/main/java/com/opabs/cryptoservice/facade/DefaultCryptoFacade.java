@@ -1,9 +1,8 @@
 package com.opabs.cryptoservice.facade;
 
 import com.opabs.common.model.*;
-import com.opabs.cryptoservice.service.aes.MockAesService;
+import com.opabs.cryptoservice.service.aes.AesService;
 import com.opabs.cryptoservice.service.certificate.CertificateService;
-import com.opabs.cryptoservice.service.certificate.DefaultCertificateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,7 +15,7 @@ public class DefaultCryptoFacade implements CryptoFacade {
 
     private final CertificateService certificateService;
 
-    private final MockAesService aesService;
+    private final AesService aesService;
 
     @Override
     public Mono<AesEncryptResponse> encrypt(AesEncryptRequest request) {
@@ -36,6 +35,11 @@ public class DefaultCryptoFacade implements CryptoFacade {
     @Override
     public Mono<CertificateSigningResponse> sign(CertificateSigningRequest request) {
         return certificateService.sign(request);
+    }
+
+    @Override
+    public Mono<AesCreateKeyResponse> createKey(AesCreateKeyRequest request) {
+        return aesService.createKey(request.getKeySize(), request.getLabel());
     }
 
 }

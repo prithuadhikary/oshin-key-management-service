@@ -1,9 +1,6 @@
 package com.opabs.cryptoservice.controller;
 
-import com.opabs.common.model.AesDecryptRequest;
-import com.opabs.common.model.AesDecryptResponse;
-import com.opabs.common.model.AesEncryptRequest;
-import com.opabs.common.model.AesEncryptResponse;
+import com.opabs.common.model.*;
 import com.opabs.cryptoservice.service.CryptoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +25,11 @@ public class AesController {
     @PostMapping("decrypt")
     public Mono<AesDecryptResponse> aesDecrypt(@RequestBody @Validated AesDecryptRequest decryptRequest) {
         return cryptoService.decrypt(decryptRequest);
+    }
+
+    @PostMapping("generate")
+    public Mono<AesCreateKeyResponse> createKey(@RequestBody @Validated AesCreateKeyRequest request) {
+        return cryptoService.createKey(request);
     }
 
 }

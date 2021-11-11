@@ -5,23 +5,22 @@ import com.opabs.common.model.AesDecryptRequest;
 import com.opabs.common.model.AesDecryptResponse;
 import com.opabs.common.model.AesEncryptRequest;
 import com.opabs.common.model.AesEncryptResponse;
-import com.opabs.cryptoservice.config.MockConfig;
+import com.opabs.cryptoservice.constants.Constants;
 import com.opabs.cryptoservice.exception.BadTagException;
+import com.opabs.cryptoservice.crypto.kg.KeyDetails;
+import com.opabs.cryptoservice.crypto.kg.KeyGeneratorStrategy;
 import com.opabs.common.model.AesCreateKeyResponse;
 import com.opabs.cryptoservice.service.model.AesDecryptCommand;
 import com.opabs.cryptoservice.service.model.AesEncryptCommand;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
 import javax.crypto.AEADBadTagException;
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Base64;
 import java.util.Optional;
@@ -29,39 +28,24 @@ import java.util.Optional;
 import static com.opabs.cryptoservice.util.CryptoUtils.*;
 import static com.opabs.cryptoservice.util.TransformationUtils.toCommand;
 
-@Slf4j
-@Service
-@Profile("local")
+@Component
+@Profile("cloud")
 @RequiredArgsConstructor
-public class MockAesService implements AesService {
+public class DefaultAesService implements AesService {
 
-    private final MockConfig mockConfig;
+    private final KeyGeneratorStrategy keyGeneratorStrategy;
 
-    private SecretKey aesKey;
-
-    @PostConstruct
-    public void setup() {
-        this.aesKey = new SecretKeySpec(Base64.getDecoder().decode(mockConfig.getAesKey()), "AES");
-    }
-
+    @Override
     public Mono<AesEncryptResponse> encrypt(AesEncryptRequest request) {
         return Mono.fromCallable(() -> {
-
             AesEncryptCommand command = toCommand(request);
-
             ModeOfOperation modeOfOperation = getModeOfOperation(command);
+            Key key = getKeyForAlias(request.getKeyAlias());
 
-            AlgorithmParameterSpec parameterSpec = getAlgorithmParameterSpec(command.getTagLength(), modeOfOperation, command.getIv());
+            Cipher cipher = Cipher.getInstance(modeOfOperation.modeOfOperation(), Constants.AWS_HSM_JCE_PROVIDER_NAME);
+            cipher.init(Cipher.ENCRYPT_MODE, key);
 
-            Cipher cipher = Cipher.getInstance(modeOfOperation.modeOfOperation());
-
-            cipher.init(Cipher.ENCRYPT_MODE, this.aesKey, parameterSpec);
-
-            boolean isGcmMode = ModeOfOperation.GCM.equals(command.getModeOfOperation());
-
-            if (isGcmMode && ArrayUtils.isNotEmpty(command.getAdditionalAuthData())) {
-                cipher.updateAAD(command.getAdditionalAuthData());
-            }
+            boolean isGcmMode = updateAAD(command, cipher);
 
             byte[] cipherText = cipher.doFinal(command.getMessage());
 
@@ -79,10 +63,12 @@ public class MockAesService implements AesService {
             } else {
                 response.setCipher(encoder.encodeToString(cipherText));
             }
+
             return response;
-        }).onErrorResume(AEADBadTagException.class, throwable -> Mono.error(new BadTagException()));
+        });
     }
 
+    @Override
     public Mono<AesDecryptResponse> decrypt(AesDecryptRequest request) {
         return Mono.fromCallable(() -> {
             AesDecryptCommand command = toCommand(request);
@@ -94,10 +80,10 @@ public class MockAesService implements AesService {
             AlgorithmParameterSpec parameterSpec = getAlgorithmParameterSpec(
                     tagLength, modeOfOperation, command.getIv()
             );
-
+            Key key = getKeyForAlias(request.getKeyAlias());
             Cipher cipher = Cipher.getInstance(modeOfOperation.modeOfOperation());
 
-            cipher.init(Cipher.DECRYPT_MODE, this.aesKey, parameterSpec);
+            cipher.init(Cipher.DECRYPT_MODE, key, parameterSpec);
 
             boolean isGcmMode = ModeOfOperation.GCM.equals(command.getModeOfOperation());
 
@@ -117,7 +103,12 @@ public class MockAesService implements AesService {
 
     @Override
     public Mono<AesCreateKeyResponse> createKey(int keyLength, String label) {
-        return null;
+        return Mono.fromCallable(() -> {
+            KeyDetails keyDetails = keyGeneratorStrategy.generate(keyLength, label);
+            AesCreateKeyResponse response = new AesCreateKeyResponse();
+            response.setHandle(keyDetails.getKeyHandle());
+            response.setLabel(label);
+            return response;
+        });
     }
-
 }

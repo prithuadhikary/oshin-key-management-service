@@ -1,4 +1,4 @@
-package com.opabs.cryptoservice.kpg;
+package com.opabs.cryptoservice.crypto.kpg;
 
 import com.opabs.common.model.KeyType;
 import com.opabs.cryptoservice.exception.CurveNotSpecifiedException;
@@ -15,12 +15,12 @@ import java.security.spec.ECGenParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Map;
 
+import static com.opabs.cryptoservice.constants.Constants.PARAM_CURVE;
+
 @Slf4j
 @Component
 @Profile("local")
 public class MockEllipticCurveKeyPairStrategy implements KeyPairStrategy {
-
-    public static final String PARAM_CURVE = "namedCurve";
 
     public static final String EC_ALGORITHM_NAME = "EC";
 

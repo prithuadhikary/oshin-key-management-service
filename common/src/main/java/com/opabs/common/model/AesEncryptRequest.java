@@ -21,12 +21,6 @@ public class AesEncryptRequest extends AesRequestBase {
     @NotNull
     private String message;
 
-    /**
-     * Key alias identifying the key to encrypt the message with.
-     */
-    @NotNull
-    private String keyAlias;
-
 
     /**
      * Optional field for AES GCM. Determines the length of tag(in bytes) generated during GCM based encryption.

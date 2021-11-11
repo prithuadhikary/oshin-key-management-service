@@ -2,25 +2,25 @@ package com.opabs.cryptoservice.service.certificate;
 
 import com.opabs.common.enums.KeyUsages;
 import com.opabs.common.model.*;
-import com.opabs.cryptoservice.config.MockConfig;
+import com.opabs.cryptoservice.crypto.keywrap.KeyWrapUnwrapStrategy;
+import com.opabs.cryptoservice.crypto.kpg.KeyPairStrategy;
 import com.opabs.cryptoservice.exception.*;
-import com.opabs.cryptoservice.kpg.KeyPairStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.operator.*;
-import org.bouncycastle.operator.bc.BcECContentSignerBuilder;
-import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -31,9 +31,6 @@ import org.bouncycastle.util.io.pem.PemObject;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
-import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -49,20 +46,13 @@ import java.util.*;
 @RequiredArgsConstructor
 public class DefaultCertificateService implements CertificateService {
 
-    public static final String PROVIDER_NAME = "BC";
+    public static final String AWS_HSM_PROVIDER_NAME = "Cavium";
     public static final String RSA = "RSA";
     public static final String EC = "EC";
 
-    private final MockConfig mockConfig;
-
     private final Set<KeyPairStrategy> keyPairStrategies;
 
-    private SecretKey aesKey;
-
-    @PostConstruct
-    public void setup() {
-        this.aesKey = new SecretKeySpec(Base64.getDecoder().decode(mockConfig.getAesKey()), "AES");
-    }
+    private final KeyWrapUnwrapStrategy keyWrapUnwrapStrategy;
 
     public Mono<GenerateCSRResponse> generateCertificateSigningRequest(GenerateCSRRequest request) {
         return Mono.fromCallable(() -> {
@@ -75,7 +65,7 @@ public class DefaultCertificateService implements CertificateService {
                         subjectDN, keyPair.getPublic());
                 PKCS10CertificationRequest csr = builder.build(contentSigner);
                 String csrPem = writeCSRAsPem(csr);
-                String wrappedKey = wrapKey(keyPair.getPrivate());
+                String wrappedKey = wrapKey(keyPair.getPrivate(), request.getWrappingKeyAlias());
                 GenerateCSRResponse response = new GenerateCSRResponse();
                 response.setPkcs10CSR(csrPem);
                 response.setWrappedKey(wrappedKey);
@@ -118,7 +108,7 @@ public class DefaultCertificateService implements CertificateService {
             }
 
             //4. Read CA private key.
-            IssuerPrivateKeyInfo caPrivateKeyInfo = readIssuerPrivateKey(request.getWrappedIssuerPrivateKey(), issuerKeyType);
+            IssuerPrivateKeyInfo caPrivateKeyInfo = readIssuerPrivateKey(request.getWrappedIssuerPrivateKey(), request.getUnwrappingKeyAlias(), issuerKeyType);
 
             //5. TODO: Validate if wrapped private key matches the issuer certificate's public key.
 
@@ -161,10 +151,11 @@ public class DefaultCertificateService implements CertificateService {
     private void validateCSRSignature(PKCS10CertificationRequest pkcs10req) {
         boolean isSignatureValid = false;
         try {
-            ContentVerifierProvider contentVerifierProvider = new JcaContentVerifierProviderBuilder().setProvider(PROVIDER_NAME).build(pkcs10req.getSubjectPublicKeyInfo());
+            ContentVerifierProvider contentVerifierProvider = new JcaContentVerifierProviderBuilder()
+                    .build(pkcs10req.getSubjectPublicKeyInfo());
             isSignatureValid = pkcs10req.isSignatureValid(contentVerifierProvider);
         } catch (OperatorCreationException | PKCSException exception) {
-            log.error("Error occurred while validating the signature ok the certificate signing request.", exception);
+            log.error("Error occurred while validating the signature of the certificate signing request.", exception);
         }
         if (!isSignatureValid) {
             throw new CSRSignatureInvalidException();
@@ -268,21 +259,21 @@ public class DefaultCertificateService implements CertificateService {
         }
     }
 
-    private IssuerPrivateKeyInfo readIssuerPrivateKey(String wrappedPrivateKey, Optional<KeyType> issuerKeyType) throws Exception {
-        byte[] unwrappedKey = unwrapKey(wrappedPrivateKey);
+    private IssuerPrivateKeyInfo readIssuerPrivateKey(String wrappedPrivateKey, String unwrappingKeyAlias, Optional<KeyType> issuerKeyType) throws Exception {
+        Key unwrappedKey = unwrapKey(wrappedPrivateKey, unwrappingKeyAlias);
         IssuerPrivateKeyInfo info = new IssuerPrivateKeyInfo();
         if (issuerKeyType.isPresent()) {
             Optional<KeyPairStrategy> keyPairStrategy = keyPairStrategies.stream().filter(kps -> kps.supportedKeyType() == issuerKeyType.get()).findFirst();
             if (keyPairStrategy.isEmpty()) {
                 throw new InternalServerErrorException();
             }
-            info.setPrivateKey(keyPairStrategy.get().loadPrivateKey(unwrappedKey));
+            info.setPrivateKey(keyPairStrategy.get().loadPrivateKey(unwrappedKey.getEncoded()));
             info.setKeyType(keyPairStrategy.get().supportedKeyType());
         } else {
             PrivateKey privateKey;
             for (KeyPairStrategy strategy : keyPairStrategies) {
                 try {
-                    privateKey = strategy.loadPrivateKey(unwrappedKey);
+                    privateKey = strategy.loadPrivateKey(unwrappedKey.getEncoded());
                     info.setPrivateKey(privateKey);
                     info.setKeyType(strategy.supportedKeyType());
                     break;
@@ -312,17 +303,11 @@ public class DefaultCertificateService implements CertificateService {
         return stringWriter.toString();
     }
 
-    private String wrapKey(PrivateKey keyToWrap) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, this.aesKey);
-        byte[] wrappedKey = cipher.doFinal(keyToWrap.getEncoded());
-        return Base64.getEncoder().encodeToString(wrappedKey);
+    private String wrapKey(PrivateKey keyToWrap, String wrappingKeyAlias) {
+        return keyWrapUnwrapStrategy.wrapKey(keyToWrap, wrappingKeyAlias);
     }
 
-    private byte[] unwrapKey(String wrappedKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        byte[] wrappedKeyDecoded = Base64.getDecoder().decode(wrappedKey);
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, this.aesKey);
-        return cipher.doFinal(wrappedKeyDecoded);
+    private Key unwrapKey(String wrappedKey, String unwrappingKeyAlias) {
+        return keyWrapUnwrapStrategy.unwrapKey(wrappedKey, unwrappingKeyAlias);
     }
 }

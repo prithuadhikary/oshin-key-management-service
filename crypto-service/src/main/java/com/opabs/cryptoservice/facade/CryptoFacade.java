@@ -39,4 +39,10 @@ public interface CryptoFacade {
      */
     Mono<CertificateSigningResponse> sign(CertificateSigningRequest request);
 
+    /**
+     * Will generate an AES key and store in the hsm.
+     * @param request The request containing the key length and label to associate with the key.
+     * @return An {@link AesCreateKeyResponse} instance containing the specifics of the key.
+     */
+    Mono<AesCreateKeyResponse> createKey(AesCreateKeyRequest request);
 }

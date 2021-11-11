@@ -1,4 +1,4 @@
-package com.opabs.cryptoservice.kpg;
+package com.opabs.cryptoservice.crypto.kpg;
 
 import com.opabs.common.model.KeyType;
 import com.opabs.cryptoservice.exception.KeyPairGenerationFailureException;
