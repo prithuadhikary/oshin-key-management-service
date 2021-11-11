@@ -28,9 +28,8 @@ public class Certificate {
     @Lob
     private byte[] content;
 
-    @Lob
     @JsonIgnore
-    private byte[] wrappedPrivateKey;
+    private String privateKeyAlias;
 
     private boolean isAnchor;
 

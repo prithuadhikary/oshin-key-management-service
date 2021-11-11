@@ -68,16 +68,15 @@ public class CertificateService {
             throw new ParentKeyUsageInvalidException();
         }
 
-        GenerateCSRRequest generateCSRRequest = createCSRRequest(command);
+        GenerateCSRRequest generateCSRRequest = createCSRRequest(command, parentCertificate.getTrustChain().getTenantExtId());
         GenerateCSRResponse csrResponse = cryptoService.generateCSR(generateCSRRequest);
 
         CertificateSigningRequest csrReq = new CertificateSigningRequest();
         csrReq.setKeyUsages(command.getKeyUsages());
-        csrReq.setWrappedIssuerPrivateKey(Base64.getEncoder().encodeToString(uncompress(parentCertificate.getWrappedPrivateKey())));
+        csrReq.setIssuerPrivateKeyAlias(parentCertificate.getPrivateKeyAlias());
         csrReq.setValidityInYears(command.getValidityInYears());
         csrReq.setValidFrom(command.getValidFrom());
         //TODO: Implement tenant specific unwrapping key alias in crypto service.
-        csrReq.setUnwrappingKeyAlias("unwrappingKeyAlias");
         csrReq.setSignatureAlgorithm(command.getSignatureAlgorithm());
         csrReq.setPkcs10CSR(csrResponse.getPkcs10CSR());
         String pemCertificate = toPemCertificate(uncompress(parentCertificate.getContent()));
@@ -91,7 +90,7 @@ public class CertificateService {
         newCertificate.setParentCertificate(parentCertificate);
         newCertificate.setContent(compress(fromPemCertificate(certificateResponse.getCertificate())));
         newCertificate.setTrustChain(parentCertificate.getTrustChain());
-        newCertificate.setWrappedPrivateKey(compress(Base64.getDecoder().decode(csrResponse.getWrappedKey())));
+        newCertificate.setPrivateKeyAlias(csrResponse.getPrivateKeyAlias());
         newCertificate.setSubjectDistinguishedName(command.getSubjectDistinguishedName());
         CertificateInfo certificateInfo = CertificateUtils.getCertificateInfo(certificateResponse.getCertificate());
         newCertificate.setCertificateFingerprint(certificateInfo.getCertificateFingerprint());

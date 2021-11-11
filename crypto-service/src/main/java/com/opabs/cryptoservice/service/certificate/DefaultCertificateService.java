@@ -1,12 +1,9 @@
 package com.opabs.cryptoservice.service.certificate;
 
-import com.cavium.cfm2.CFM2Exception;
 import com.opabs.common.enums.KeyUsages;
 import com.opabs.common.model.*;
-import com.opabs.cryptoservice.constants.Constants;
-import com.opabs.cryptoservice.crypto.kpg.KeyPairStrategy;
 import com.opabs.cryptoservice.exception.*;
-import com.opabs.cryptoservice.util.CryptoUtils;
+import com.opabs.cryptoservice.service.KeyManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -39,11 +36,14 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -53,15 +53,17 @@ public class DefaultCertificateService implements CertificateService {
     public static final String RSA = "RSA";
     public static final String EC = "EC";
 
-    private final Set<KeyPairStrategy> keyPairStrategies;
+    private final KeyManagementService keyManagementService;
+
+    private final Provider activeProvider;
 
     public Mono<GenerateCSRResponse> generateCertificateSigningRequest(GenerateCSRRequest request) {
         return Mono.fromCallable(() -> {
             try {
                 X500Name subjectDN = new X500Name(request.getSubjectDN());
-                KeyPair keyPair = generateKeyPair(request.getKeyType(), request.getPrivateKeyAlias(), request.getKeyGenParams());
+                KeyPair keyPair = keyManagementService.generateKeyPair(request.getKeyType(), request.getPrivateKeyAlias(), request.getKeyGenParams());
                 ContentSigner contentSigner = new JcaContentSignerBuilder(request.getKeyType().getCertificateSignatureAlgo())
-                        .setProvider(Constants.AWS_HSM_JCE_PROVIDER_NAME).build(keyPair.getPrivate());
+                        .setProvider(activeProvider).build(keyPair.getPrivate());
                 final PKCS10CertificationRequestBuilder builder = new JcaPKCS10CertificationRequestBuilder(
                         subjectDN, keyPair.getPublic());
                 PKCS10CertificationRequest csr = builder.build(contentSigner);
@@ -117,7 +119,7 @@ public class DefaultCertificateService implements CertificateService {
             populateExtensions(request, pkcs10req, issuerCertificate, certificateGenerator);
 
             ContentSigner sigGen = new JcaContentSignerBuilder(request.getSignatureAlgorithm().name())
-                    .setProvider("Cavium").build(caPrivateKeyInfo.getPrivateKey());
+                    .setProvider(activeProvider).build(caPrivateKeyInfo.getPrivateKey());
 
             X509CertificateHolder holder = certificateGenerator.build(sigGen);
 
@@ -136,7 +138,6 @@ public class DefaultCertificateService implements CertificateService {
             }
             response.setCertificate(writer.toString());
             return response;
-
         });
     }
 
@@ -262,9 +263,9 @@ public class DefaultCertificateService implements CertificateService {
         }
     }
 
-    private IssuerPrivateKeyInfo readIssuerPrivateKey(String privateKeyAlias) throws CFM2Exception {
+    private IssuerPrivateKeyInfo readIssuerPrivateKey(String privateKeyAlias) {
         IssuerPrivateKeyInfo info = new IssuerPrivateKeyInfo();
-        PrivateKey issuerPrivateKey = CryptoUtils.getKeyForAlias(privateKeyAlias);
+        PrivateKey issuerPrivateKey = (PrivateKey) keyManagementService.getKeyForKeyAlias(privateKeyAlias);
         info.setPrivateKey(issuerPrivateKey);
         log.info("Issuer private key algorithm: {}", issuerPrivateKey.getAlgorithm());
         Optional<KeyType> keyType = getKeyType(issuerPrivateKey.getAlgorithm());
@@ -272,14 +273,6 @@ public class DefaultCertificateService implements CertificateService {
         return info;
     }
 
-    private KeyPair generateKeyPair(KeyType keyType, String privateKeyAlias, Map<String, Object> keyGenParams) {
-        Optional<KeyPairStrategy> kpgStrategy = keyPairStrategies.stream().filter(keyPairStrategy -> keyPairStrategy.supportedKeyType() == keyType).findFirst();
-        if (kpgStrategy.isEmpty()) {
-            throw new InternalServerErrorException();
-        } else {
-            return kpgStrategy.get().generate(keyGenParams, privateKeyAlias);
-        }
-    }
 
     private String writeCSRAsPem(PKCS10CertificationRequest csr) throws IOException {
         PemObject csrPemObject = new PemObject("CERTIFICATE REQUEST", csr.getEncoded());

@@ -20,6 +20,11 @@ public class GenerateCSRBase {
     private String subjectDistinguishedName;
 
     /**
+     * The alias of the RSA/EC private key generated using HSM.
+     */
+    private String privateKeyAlias;
+
+    /**
      * To be used in case of RSA key type.
      */
     private RSAKeySize keySize;

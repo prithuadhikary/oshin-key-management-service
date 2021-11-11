@@ -4,8 +4,6 @@ import com.cavium.cfm2.CFM2Exception;
 import com.cavium.cfm2.Util;
 import com.cavium.key.CaviumKey;
 import com.opabs.common.enums.ModeOfOperation;
-import com.opabs.common.model.AesEncryptRequest;
-import com.opabs.common.model.AesRequestBase;
 import com.opabs.cryptoservice.exception.BadRequestException;
 import com.opabs.cryptoservice.exception.ErrorCode;
 import com.opabs.cryptoservice.service.model.AesCommandBase;
@@ -16,7 +14,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
-import java.security.Key;
 import java.security.PrivateKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Enumeration;
@@ -53,19 +50,6 @@ public class CryptoUtils {
         } else {
             return command.getCipher();
         }
-    }
-
-
-    public static PrivateKey getKeyForAlias(String keyAlias) throws CFM2Exception {
-        CaviumKey key;
-        Enumeration<CaviumKey> keys = Util.findAllKeys(keyAlias);
-        if (keys.hasMoreElements()) {
-            key = keys.nextElement();
-        } else {
-            throw new BadRequestException("Could not find key with alias: " + keyAlias,
-                    ErrorCode.KEY_NOT_FOUND);
-        }
-        return (PrivateKey) key;
     }
 
     public static boolean updateAAD(AesEncryptCommand command, Cipher cipher) {

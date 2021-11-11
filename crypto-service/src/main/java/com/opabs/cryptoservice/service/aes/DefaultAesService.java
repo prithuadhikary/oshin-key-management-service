@@ -10,6 +10,7 @@ import com.opabs.cryptoservice.exception.BadTagException;
 import com.opabs.cryptoservice.crypto.kg.KeyDetails;
 import com.opabs.cryptoservice.crypto.kg.KeyGeneratorStrategy;
 import com.opabs.common.model.AesCreateKeyResponse;
+import com.opabs.cryptoservice.service.KeyManagementService;
 import com.opabs.cryptoservice.service.model.AesDecryptCommand;
 import com.opabs.cryptoservice.service.model.AesEncryptCommand;
 import lombok.RequiredArgsConstructor;
@@ -35,12 +36,14 @@ public class DefaultAesService implements AesService {
 
     private final KeyGeneratorStrategy keyGeneratorStrategy;
 
+    private final KeyManagementService keyManagementService;
+
     @Override
     public Mono<AesEncryptResponse> encrypt(AesEncryptRequest request) {
         return Mono.fromCallable(() -> {
             AesEncryptCommand command = toCommand(request);
             ModeOfOperation modeOfOperation = getModeOfOperation(command);
-            Key key = getKeyForAlias(request.getKeyAlias());
+            Key key = keyManagementService.getKeyForKeyAlias(request.getKeyAlias());
 
             Cipher cipher = Cipher.getInstance(modeOfOperation.modeOfOperation(), Constants.AWS_HSM_JCE_PROVIDER_NAME);
             cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -80,7 +83,7 @@ public class DefaultAesService implements AesService {
             AlgorithmParameterSpec parameterSpec = getAlgorithmParameterSpec(
                     tagLength, modeOfOperation, command.getIv()
             );
-            Key key = getKeyForAlias(request.getKeyAlias());
+            Key key = keyManagementService.getKeyForKeyAlias(request.getKeyAlias());
             Cipher cipher = Cipher.getInstance(modeOfOperation.modeOfOperation());
 
             cipher.init(Cipher.DECRYPT_MODE, key, parameterSpec);

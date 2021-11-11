@@ -21,8 +21,6 @@ public class MockRSAKeyPairStrategy implements KeyPairStrategy {
 
     public static final String KEY_SIZE = "keySize";
 
-    private final Map<String, PrivateKey> privateKeyMap = new ConcurrentHashMap<>();
-
     @Override
     public KeyPair generate(Map<String, Object> params, String privateKeyAlias) {
         if (!params.containsKey(KEY_SIZE)) {
@@ -31,9 +29,7 @@ public class MockRSAKeyPairStrategy implements KeyPairStrategy {
         try {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
             kpg.initialize((Integer) params.get(KEY_SIZE));
-            KeyPair keyPair = kpg.generateKeyPair();
-            privateKeyMap.put(privateKeyAlias, keyPair.getPrivate());
-            return keyPair;
+            return kpg.generateKeyPair();
         } catch (Exception ex) {
             log.error("Error occurred while generating RSA key.", ex);
             throw new KeyPairGenerationFailureException();

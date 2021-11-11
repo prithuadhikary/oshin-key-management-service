@@ -10,6 +10,7 @@ import com.opabs.trustchain.exception.KeySizeMissingException;
 import com.opabs.trustchain.model.CertificateInfo;
 import com.opabs.trustchain.model.PublicKeyInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
@@ -32,10 +33,8 @@ import java.security.cert.*;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Slf4j
 public class CertificateUtils {
@@ -199,11 +198,15 @@ public class CertificateUtils {
         return signedData.getEncoded();
     }
 
-    public static <T extends GenerateCSRBase> GenerateCSRRequest createCSRRequest(T command) {
+    public static <T extends GenerateCSRBase> GenerateCSRRequest createCSRRequest(T command, UUID tenantId) {
         GenerateCSRRequest request = new GenerateCSRRequest();
         request.setKeyType(command.getKeyType());
-        //TODO: Implement symmetric key alias generation per tenant/organization.
-        request.setWrappingKeyAlias("aes-key-alias");
+        if (StringUtils.isEmpty(command.getPrivateKeyAlias())) {
+            String generatedKeyAlias = generateKeyAlias(command.getKeyType(), tenantId);
+            request.setPrivateKeyAlias(generatedKeyAlias);
+        } else {
+            request.setPrivateKeyAlias(command.getPrivateKeyAlias());
+        }
         request.setSubjectDN(command.getSubjectDistinguishedName());
         if (command.getKeyType() == KeyType.RSA) {
             if (command.getKeySize() == null) {
@@ -221,6 +224,16 @@ public class CertificateUtils {
             );
         }
         return request;
+    }
+
+    private static String generateKeyAlias(KeyType keyType, UUID tenantId) {
+        StringBuilder keyAlias = new StringBuilder();
+        keyAlias.append(keyType.name().toLowerCase());
+        keyAlias.append("-");
+        SimpleDateFormat dt = new SimpleDateFormat("yyyyMMddhhmmss");
+        keyAlias.append(dt.format(new Date()));
+        keyAlias.append(tenantId);
+        return keyAlias.toString();
     }
 
     private CertificateUtils() {

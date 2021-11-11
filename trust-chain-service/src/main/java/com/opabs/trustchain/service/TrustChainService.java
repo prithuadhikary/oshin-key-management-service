@@ -56,17 +56,16 @@ public class TrustChainService {
         //1. Validate tenantExtId with tenant management service.
         //2. Create a root certificate using crypto service with key usages keyCertSign and crlSign.
         //3. Create TrustChain entity.
-        //4. Save certificate and wrappedPrivateKey.
+        //4. Save certificate and privateKeyAlias representing the private key stored in the HSM.
         //5. Return fully populated TrustChainModel back to the client.
         JWTAuthToken token = (JWTAuthToken) userPrincipal;
         UUID tenantExtId = getTenantId(command.getTenantExtId(), token);
 
         validateTenantExtId(command);
 
-        GenerateCSRRequest request = createCSRRequest(command);
+        GenerateCSRRequest request = createCSRRequest(command, tenantExtId);
         GenerateCSRResponse csr = cryptoService.generateCSR(request);
         log.debug("CSR Response: {}", csr.getPkcs10CSR());
-        log.debug("Wrapped Key: {}", csr.getWrappedKey());
 
         CertificateSigningRequest signingRequest = createSigningRequest(command, csr);
 
@@ -83,8 +82,7 @@ public class TrustChainService {
         certificate.setAnchor(true);
         byte[] content = fromPemCertificate(signingResponse.getCertificate());
         certificate.setContent(compress(content));
-        byte[] wrappedKey = Base64.getDecoder().decode(csr.getWrappedKey());
-        certificate.setWrappedPrivateKey(compress(wrappedKey));
+        certificate.setPrivateKeyAlias(csr.getPrivateKeyAlias());
         certificate.setTrustChain(trustChain);
         certificate.setKeyType(command.getKeyType());
         certificate.setSubjectDistinguishedName(command.getSubjectDistinguishedName());
@@ -176,11 +174,9 @@ public class TrustChainService {
 
         signingRequest.setPkcs10CSR(csr.getPkcs10CSR());
         signingRequest.setSignatureAlgorithm(command.getSignatureAlgorithm());
-        //TODO: Change this to use a valid key alias after implementation of key alias based keys.
-        signingRequest.setUnwrappingKeyAlias("TENANT_SPECIFIC_KEY_ALIAS");
         signingRequest.setValidFrom(command.getValidFrom());
         signingRequest.setValidityInYears(command.getValidityInYears());
-        signingRequest.setWrappedIssuerPrivateKey(csr.getWrappedKey());
+        signingRequest.setIssuerPrivateKeyAlias(csr.getPrivateKeyAlias());
 
         // The path length constraint determines how many sub CAs are allowed beneath this root CA certificate.
         // Every time a non root intermediate CA certificate is generated. the basic constraint will be decremented

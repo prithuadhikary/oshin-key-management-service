@@ -27,8 +27,6 @@ public class MockEllipticCurveKeyPairStrategy implements KeyPairStrategy {
 
     public static final String EC_ALGORITHM_NAME = "EC";
 
-    private final Map<String, PrivateKey> privateKeyMap = new ConcurrentHashMap<>();
-
     @Override
     public KeyPair generate(Map<String, Object> params, String privateKeyAlias) {
         if (!params.containsKey(PARAM_CURVE)) {
@@ -38,9 +36,7 @@ public class MockEllipticCurveKeyPairStrategy implements KeyPairStrategy {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance(EC_ALGORITHM_NAME);
             ECGenParameterSpec spec = new ECGenParameterSpec((String) params.get(PARAM_CURVE));
             kpg.initialize(spec);
-            KeyPair keyPair = kpg.generateKeyPair();
-            privateKeyMap.put(privateKeyAlias, keyPair.getPrivate());
-            return keyPair;
+            return kpg.generateKeyPair();
         } catch (Exception ex) {
             log.error("Error occurred while generating EC key pair.", ex);
             throw new KeyPairGenerationFailureException();

@@ -1,8 +1,6 @@
 package com.opabs.cryptoservice.crypto.kpg;
 
 import com.cavium.cfm2.CFM2Exception;
-import com.cavium.cfm2.Util;
-import com.cavium.key.CaviumKey;
 import com.cavium.key.parameter.CaviumECGenParameterSpec;
 import com.opabs.common.model.KeyType;
 import com.opabs.cryptoservice.exception.CurveNotSpecifiedException;
@@ -39,10 +37,8 @@ public class DefaultECKeyPairStrategy implements KeyPairStrategy {
                             privateKeyAlias,
                             false,
                             true));
-            KeyPair keyPair = keyPairGen.generateKeyPair();
-            Util.persistKey((CaviumKey) keyPair.getPrivate());
-            return keyPair;
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException | CFM2Exception ex) {
+            return keyPairGen.generateKeyPair();
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
             log.error("Error occurred during EC keypair generation.", ex);
             throw new KeyPairGenerationFailureException();
         }

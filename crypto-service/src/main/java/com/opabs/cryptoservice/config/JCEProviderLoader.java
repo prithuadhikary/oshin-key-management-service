@@ -2,27 +2,36 @@ package com.opabs.cryptoservice.config;
 
 import com.cavium.provider.CaviumProvider;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
+import java.io.IOException;
+import java.security.Provider;
 import java.security.Security;
-import java.util.List;
 
-@Component
-public class JCEProviderLoader implements CommandLineRunner {
+@Configuration
+public class JCEProviderLoader {
 
-    @Autowired
-    private Environment environment;
-
-    @Override
-    public void run(String... args) throws Exception {
-        List<String> activeProfiles = List.of(environment.getActiveProfiles());
-        if (activeProfiles.contains("local")) {
-            Security.addProvider(new BouncyCastleProvider());
-        } else if (activeProfiles.contains("cloud")) {
-            Security.addProvider(new CaviumProvider());
-        }
+    @Bean
+    @Profile("local")
+    public Provider bouncyCastleProvider() {
+        Provider provider = new BouncyCastleProvider();
+        Security.addProvider(provider);
+        return provider;
     }
+
+    /**
+     * Loads the cavium provider required to communicate with the aws cloudHSM.
+     * @return A security provider bean.
+     * @throws IOException May be thrown.
+     */
+    @Bean
+    @Profile("cloud")
+    public Provider caviumProvider() throws IOException {
+        Provider provider = new CaviumProvider();
+        Security.addProvider(provider);
+        return provider;
+    }
+
 }
