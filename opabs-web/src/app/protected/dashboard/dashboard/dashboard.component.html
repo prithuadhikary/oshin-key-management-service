@@ -1,25 +1,28 @@
 <div class="page-header border-bottom" fxLayout="row" fxLayoutAlign="space-between center">
   <h1>
-    Dashboard
+    Welcome {{userDetails.name}}
   </h1>
 </div>
 <div class="wrapper" fxLayout="column" fxLayoutAlign="start start">
   <div fxLayout="row" fxLayoutAlign="space-around start" class="dashboard-card">
-      <div [routerLink]="['/protected', 'tenants']" fxLayout="row" fxLayoutAlign="space-between center" class="detail">
+      <div [routerLink]="['/protected', 'tenants']" fxLayout="row" fxLayoutAlign="space-between center" class="detail mat-elevation-z3">
+        <div class="icon-bg"></div>
         <fa-icon class="detail-icon" [icon]="faBuilding"></fa-icon>
         <div>
           <h1>{{totalTenantCount}}</h1>
           <h3>Tenants</h3>
         </div>
       </div>
-      <div [routerLink]="['/protected', 'trust-chain']" fxLayout="row" fxLayoutAlign="space-between center" class="detail">
+      <div [routerLink]="['/protected', 'trust-chain']" fxLayout="row" fxLayoutAlign="space-between center" class="detail mat-elevation-z3">
+        <div class="icon-bg"></div>
         <fa-icon class="detail-icon" [icon]="faLink"></fa-icon>
         <div>
           <h1>{{totalTrustChainCount}}</h1>
           <h3>Trust Chains</h3>
         </div>
       </div>
-      <div [routerLink]="['/protected', 'certificates']" fxLayout="row" fxLayoutAlign="space-between center" class="detail">
+      <div [routerLink]="['/protected', 'certificates']" fxLayout="row" fxLayoutAlign="space-between center" class="detail mat-elevation-z3">
+        <div class="icon-bg"></div>
         <fa-icon class="detail-icon" [icon]="faFileContract"></fa-icon>
         <div>
           <h2>{{totalCertificateCount}}</h2>
@@ -28,11 +31,11 @@
       </div>
   </div>
   <div fxLayout.gt-md="row" fxLayout.md="column" fxLayout.lt-md="column" class="chart-container" fxLayoutAlign="space-around center">
-    <div class="chart" fxFlex.lg="100%" fxFlex.lt-lg="100%" fxFlex.gt-lg="45%">
+    <div class="chart mat-elevation-z2" fxFlex.lg="100%" fxFlex.lt-lg="100%" fxFlex.gt-lg="45%">
       <h2>Certificates Issued By Key Type</h2>
       <app-certificates-by-keytype></app-certificates-by-keytype>
     </div>
-    <div class="chart" fxFlex.lg="100%" fxFlex.lt-lg="100%" fxFlex.gt-lg="45%">
+    <div class="chart mat-elevation-z2" fxFlex.lg="100%" fxFlex.lt-lg="100%" fxFlex.gt-lg="45%">
       <h2>Certificates Issued</h2>
       <app-certificate-issue-density></app-certificate-issue-density>
     </div>

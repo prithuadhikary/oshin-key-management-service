@@ -11,6 +11,7 @@ export class AuthenticationService {
 
   private readonly idTokenKey = 'id_token';
   private readonly accessTokenKey = 'access_token';
+  private readonly authCodeKey = 'authorization_code';
 
   constructor(
     private oAuthService: OAuthService,
@@ -19,7 +20,9 @@ export class AuthenticationService {
 
   public fetchTokens(authorizationCode: string): Observable<{ accessToken: any, idToken: any }> {
     return fromPromise(new Promise((resolve, reject) => {
-      if (authorizationCode != null) {
+      const oldCode = sessionStorage.getItem(this.authCodeKey);
+      if (authorizationCode != null && authorizationCode !== oldCode) {
+        sessionStorage.setItem(this.authCodeKey, authorizationCode);
         const parameters = {
           grant_type: 'authorization_code',
           client_id: environment.okta.clientId,
