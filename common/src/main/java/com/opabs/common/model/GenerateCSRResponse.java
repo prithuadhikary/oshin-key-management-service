@@ -1,5 +1,6 @@
 package com.opabs.common.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 /**
@@ -7,12 +8,13 @@ import lombok.Data;
  * the certificate signing request in PKCS10 format.
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GenerateCSRResponse {
 
     /**
-     * The wrapped private key.
+     * The key alias of the generated private key.
      */
-    private String wrappedKey;
+    private String privateKeyAlias;
 
     /**
      * The Certificate Signing Request in PKCS10 format.

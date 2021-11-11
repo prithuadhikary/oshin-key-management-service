@@ -1,6 +1,7 @@
-package com.opabs.cryptoservice.crypto.kpg;
+package com.opabs.cryptoservice.crypto.mock;
 
 import com.opabs.common.model.KeyType;
+import com.opabs.cryptoservice.crypto.kpg.KeyPairStrategy;
 import com.opabs.cryptoservice.exception.CurveNotSpecifiedException;
 import com.opabs.cryptoservice.exception.KeyPairGenerationFailureException;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,9 @@ import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.opabs.cryptoservice.constants.Constants.PARAM_CURVE;
 
@@ -24,8 +27,10 @@ public class MockEllipticCurveKeyPairStrategy implements KeyPairStrategy {
 
     public static final String EC_ALGORITHM_NAME = "EC";
 
+    private final Map<String, PrivateKey> privateKeyMap = new ConcurrentHashMap<>();
+
     @Override
-    public KeyPair generate(Map<String, Object> params) {
+    public KeyPair generate(Map<String, Object> params, String privateKeyAlias) {
         if (!params.containsKey(PARAM_CURVE)) {
             throw new CurveNotSpecifiedException();
         }
@@ -33,18 +38,13 @@ public class MockEllipticCurveKeyPairStrategy implements KeyPairStrategy {
             KeyPairGenerator kpg = KeyPairGenerator.getInstance(EC_ALGORITHM_NAME);
             ECGenParameterSpec spec = new ECGenParameterSpec((String) params.get(PARAM_CURVE));
             kpg.initialize(spec);
-            return kpg.generateKeyPair();
+            KeyPair keyPair = kpg.generateKeyPair();
+            privateKeyMap.put(privateKeyAlias, keyPair.getPrivate());
+            return keyPair;
         } catch (Exception ex) {
             log.error("Error occurred while generating EC key pair.", ex);
             throw new KeyPairGenerationFailureException();
         }
-    }
-
-    @Override
-    public PrivateKey loadPrivateKey(byte[] privateKeyBytes) throws Exception {
-        KeyFactory factory = KeyFactory.getInstance("EC");
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-        return factory.generatePrivate(keySpec);
     }
 
     @Override

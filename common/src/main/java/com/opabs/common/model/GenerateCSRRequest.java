@@ -35,9 +35,9 @@ public class GenerateCSRRequest {
     private Map<String, Object> keyGenParams;
 
     /**
-     * The key alias identifying the key to use to wrap the generated private key.
+     * The alias which will be associated with the generated private key stored in HSM.
      */
     @NotEmpty
-    private String wrappingKeyAlias;
+    private String privateKeyAlias;
 
 }

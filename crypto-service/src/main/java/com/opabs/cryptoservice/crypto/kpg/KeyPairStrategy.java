@@ -3,7 +3,6 @@ package com.opabs.cryptoservice.crypto.kpg;
 import com.opabs.common.model.KeyType;
 
 import java.security.KeyPair;
-import java.security.PrivateKey;
 import java.util.Map;
 
 /**
@@ -17,9 +16,7 @@ public interface KeyPairStrategy {
      * @param params key pair gen parameters.
      * @return A keypair of type {@link KeyType}.
      */
-    KeyPair generate(Map<String, Object> params);
-
-    PrivateKey loadPrivateKey(byte[] privateKeyBytes) throws Exception;
+    KeyPair generate(Map<String, Object> params, String privateKeyAlias);
 
     KeyType supportedKeyType();
 

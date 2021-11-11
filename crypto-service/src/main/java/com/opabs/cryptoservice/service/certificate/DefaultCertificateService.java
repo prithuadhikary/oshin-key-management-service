@@ -1,10 +1,13 @@
 package com.opabs.cryptoservice.service.certificate;
 
+import com.cavium.cfm2.CFM2Exception;
 import com.opabs.common.enums.KeyUsages;
 import com.opabs.common.model.*;
+import com.opabs.cryptoservice.constants.Constants;
 import com.opabs.cryptoservice.crypto.keywrap.KeyWrapUnwrapStrategy;
 import com.opabs.cryptoservice.crypto.kpg.KeyPairStrategy;
 import com.opabs.cryptoservice.exception.*;
+import com.opabs.cryptoservice.util.CryptoUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -34,7 +37,10 @@ import reactor.core.publisher.Mono;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -46,7 +52,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class DefaultCertificateService implements CertificateService {
 
-    public static final String AWS_HSM_PROVIDER_NAME = "Cavium";
     public static final String RSA = "RSA";
     public static final String EC = "EC";
 
@@ -58,19 +63,18 @@ public class DefaultCertificateService implements CertificateService {
         return Mono.fromCallable(() -> {
             try {
                 X500Name subjectDN = new X500Name(request.getSubjectDN());
-                KeyPair keyPair = generateKeyPair(request.getKeyType(), request.getKeyGenParams());
+                KeyPair keyPair = generateKeyPair(request.getKeyType(), request.getPrivateKeyAlias(), request.getKeyGenParams());
                 ContentSigner contentSigner = new JcaContentSignerBuilder(request.getKeyType().getCertificateSignatureAlgo())
-                        .setProvider("Cavium").build(keyPair.getPrivate());
+                        .setProvider(Constants.AWS_HSM_JCE_PROVIDER_NAME).build(keyPair.getPrivate());
                 final PKCS10CertificationRequestBuilder builder = new JcaPKCS10CertificationRequestBuilder(
                         subjectDN, keyPair.getPublic());
                 PKCS10CertificationRequest csr = builder.build(contentSigner);
                 String csrPem = writeCSRAsPem(csr);
-                String wrappedKey = wrapKey(keyPair.getPrivate(), request.getWrappingKeyAlias());
                 GenerateCSRResponse response = new GenerateCSRResponse();
                 response.setPkcs10CSR(csrPem);
-                response.setWrappedKey(wrappedKey);
+                response.setPrivateKeyAlias(request.getPrivateKeyAlias());
                 return response;
-            } catch (OperatorCreationException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | IOException e) {
+            } catch (OperatorCreationException | IOException e) {
                 log.error("Error occurred while generating key pair.", e);
                 throw new KeyPairGenerationFailureException();
             }
@@ -89,26 +93,18 @@ public class DefaultCertificateService implements CertificateService {
 
             String issuerDN;
             X509Certificate issuerCertificate = null;
-            Optional<KeyType> issuerKeyType = Optional.empty();
             if (request.isSelfSigned()) {
                 //3. If self signed, the issuer and the subject dn will be the same.
                 issuerDN = pkcs10req.getSubject().toString();
+                log.info("Issuer DN for self signed certificate: {}", issuerDN);
             } else {
                 //3. Read issuer certificate and fetch out the issuer distinguished name.
                 issuerCertificate = readIssuerCertificate(request.getIssuerCertificate());
                 issuerDN = issuerCertificate.getIssuerDN().getName();
-                String pubKeyAlgo = issuerCertificate.getPublicKey().getAlgorithm();
-                if (RSA.equals(pubKeyAlgo)) {
-                    issuerKeyType = Optional.of(KeyType.RSA);
-                } else if (EC.equals(pubKeyAlgo)) {
-                    issuerKeyType = Optional.of(KeyType.ELLIPTIC_CURVE);
-                } else {
-                    throw new UnsupportedIssuerKeyTypeException(pubKeyAlgo);
-                }
             }
 
             //4. Read CA private key.
-            IssuerPrivateKeyInfo caPrivateKeyInfo = readIssuerPrivateKey(request.getWrappedIssuerPrivateKey(), request.getUnwrappingKeyAlias(), issuerKeyType);
+            IssuerPrivateKeyInfo caPrivateKeyInfo = readIssuerPrivateKey(request.getIssuerPrivateKeyAlias());
 
             //5. TODO: Validate if wrapped private key matches the issuer certificate's public key.
 
@@ -146,6 +142,17 @@ public class DefaultCertificateService implements CertificateService {
             return response;
 
         });
+    }
+
+    private Optional<KeyType> getKeyType(String pubKeyAlgo) {
+        Optional<KeyType> issuerKeyType = Optional.empty();
+        log.info("Public key algo: {}", pubKeyAlgo);
+        if (RSA.equals(pubKeyAlgo)) {
+            issuerKeyType = Optional.of(KeyType.RSA);
+        } else if (EC.equals(pubKeyAlgo)) {
+            issuerKeyType = Optional.of(KeyType.ELLIPTIC_CURVE);
+        }
+        return issuerKeyType;
     }
 
     private void validateCSRSignature(PKCS10CertificationRequest pkcs10req) {
@@ -259,38 +266,22 @@ public class DefaultCertificateService implements CertificateService {
         }
     }
 
-    private IssuerPrivateKeyInfo readIssuerPrivateKey(String wrappedPrivateKey, String unwrappingKeyAlias, Optional<KeyType> issuerKeyType) throws Exception {
-        Key unwrappedKey = unwrapKey(wrappedPrivateKey, unwrappingKeyAlias);
+    private IssuerPrivateKeyInfo readIssuerPrivateKey(String privateKeyAlias) throws CFM2Exception {
         IssuerPrivateKeyInfo info = new IssuerPrivateKeyInfo();
-        if (issuerKeyType.isPresent()) {
-            Optional<KeyPairStrategy> keyPairStrategy = keyPairStrategies.stream().filter(kps -> kps.supportedKeyType() == issuerKeyType.get()).findFirst();
-            if (keyPairStrategy.isEmpty()) {
-                throw new InternalServerErrorException();
-            }
-            info.setPrivateKey(keyPairStrategy.get().loadPrivateKey(unwrappedKey.getEncoded()));
-            info.setKeyType(keyPairStrategy.get().supportedKeyType());
-        } else {
-            PrivateKey privateKey;
-            for (KeyPairStrategy strategy : keyPairStrategies) {
-                try {
-                    privateKey = strategy.loadPrivateKey(unwrappedKey.getEncoded());
-                    info.setPrivateKey(privateKey);
-                    info.setKeyType(strategy.supportedKeyType());
-                    break;
-                } catch (Exception ex) {
-                    log.debug("Strategy failed to load issuer private key.");
-                }
-            }
-        }
+        PrivateKey issuerPrivateKey = CryptoUtils.getKeyForAlias(privateKeyAlias);
+        info.setPrivateKey(issuerPrivateKey);
+        log.info("Issuer private key algorithm: {}", issuerPrivateKey.getAlgorithm());
+        Optional<KeyType> keyType = getKeyType(issuerPrivateKey.getAlgorithm());
+        info.setKeyType(keyType.orElseThrow(() -> new UnsupportedIssuerKeyTypeException(issuerPrivateKey.getAlgorithm())));
         return info;
     }
 
-    private KeyPair generateKeyPair(KeyType keyType, Map<String, Object> keyGenParams) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    private KeyPair generateKeyPair(KeyType keyType, String privateKeyAlias, Map<String, Object> keyGenParams) {
         Optional<KeyPairStrategy> kpgStrategy = keyPairStrategies.stream().filter(keyPairStrategy -> keyPairStrategy.supportedKeyType() == keyType).findFirst();
         if (kpgStrategy.isEmpty()) {
             throw new InternalServerErrorException();
         } else {
-            return kpgStrategy.get().generate(keyGenParams);
+            return kpgStrategy.get().generate(keyGenParams, privateKeyAlias);
         }
     }
 

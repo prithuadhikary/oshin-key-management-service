@@ -45,22 +45,16 @@ public class CertificateSigningRequest {
     private boolean selfSigned;
 
     /**
-     * For generation of self signed certificate,the wrapped private key must be passed to sign the sign the CSR.
-     * This is for the use cases, where we need a root CA certificate.
+     * The issuer private key alias will point to the issuer private key stored in the hsm.
+     * For self signed certificate the issuer private key alias will be same as the private key.
+     *
      */
-    @NotEmpty
-    private String wrappedIssuerPrivateKey;
+    private String issuerPrivateKeyAlias;
 
     /**
      * Issuer Certificate as PEM.
      */
     private String issuerCertificate;
-
-    /**
-     * The key alias identifying the key to use to unwrap the wrapped key.
-     */
-    @NotEmpty
-    private String unwrappingKeyAlias;
 
     /**
      * The certificate serial number.

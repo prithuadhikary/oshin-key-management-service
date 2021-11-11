@@ -17,6 +17,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.Key;
+import java.security.PrivateKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Enumeration;
 
@@ -55,7 +56,7 @@ public class CryptoUtils {
     }
 
 
-    public static Key getKeyForAlias(String keyAlias) throws CFM2Exception {
+    public static PrivateKey getKeyForAlias(String keyAlias) throws CFM2Exception {
         CaviumKey key;
         Enumeration<CaviumKey> keys = Util.findAllKeys(keyAlias);
         if (keys.hasMoreElements()) {
@@ -64,7 +65,7 @@ public class CryptoUtils {
             throw new BadRequestException("Could not find key with alias: " + keyAlias,
                     ErrorCode.KEY_NOT_FOUND);
         }
-        return key;
+        return (PrivateKey) key;
     }
 
     public static boolean updateAAD(AesEncryptCommand command, Cipher cipher) {
