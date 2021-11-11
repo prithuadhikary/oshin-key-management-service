@@ -4,7 +4,6 @@ import com.cavium.cfm2.CFM2Exception;
 import com.opabs.common.enums.KeyUsages;
 import com.opabs.common.model.*;
 import com.opabs.cryptoservice.constants.Constants;
-import com.opabs.cryptoservice.crypto.keywrap.KeyWrapUnwrapStrategy;
 import com.opabs.cryptoservice.crypto.kpg.KeyPairStrategy;
 import com.opabs.cryptoservice.exception.*;
 import com.opabs.cryptoservice.util.CryptoUtils;
@@ -37,7 +36,6 @@ import reactor.core.publisher.Mono;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -56,8 +54,6 @@ public class DefaultCertificateService implements CertificateService {
     public static final String EC = "EC";
 
     private final Set<KeyPairStrategy> keyPairStrategies;
-
-    private final KeyWrapUnwrapStrategy keyWrapUnwrapStrategy;
 
     public Mono<GenerateCSRResponse> generateCertificateSigningRequest(GenerateCSRRequest request) {
         return Mono.fromCallable(() -> {
@@ -294,11 +290,4 @@ public class DefaultCertificateService implements CertificateService {
         return stringWriter.toString();
     }
 
-    private String wrapKey(PrivateKey keyToWrap, String wrappingKeyAlias) {
-        return keyWrapUnwrapStrategy.wrapKey(keyToWrap, wrappingKeyAlias);
-    }
-
-    private Key unwrapKey(String wrappedKey, String unwrappingKeyAlias) {
-        return keyWrapUnwrapStrategy.unwrapKey(wrappedKey, unwrappingKeyAlias);
-    }
 }
