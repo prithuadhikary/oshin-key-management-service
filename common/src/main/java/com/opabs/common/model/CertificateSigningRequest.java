@@ -46,13 +46,15 @@ public class CertificateSigningRequest {
 
     /**
      * The issuer private key alias will point to the issuer private key stored in the hsm.
-     * For self signed certificate the issuer private key alias will be same as the private key.
+     * For self signed certificate the issuer private key alias will be same as the private key's alias.
      *
      */
     private String issuerPrivateKeyAlias;
 
     /**
-     * Issuer Certificate as PEM.
+     * Issuer Certificate as PEM. Only required when issuing a non root certificate.
+     * Used to retrieve the DN of the issuer. But in case of root certificate, the
+     * certificate is self signed and the issuer DN is same as the subject DN.
      */
     private String issuerCertificate;
 

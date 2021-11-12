@@ -208,6 +208,10 @@ components:
                 Required when key type is Elliptic Curve.
               type: string
               example: secp256r1
+        privateKeyAlias:
+          description: The alias to associate the key with in the HSM.
+          type: string
+          example: rsa-2048-some-uinique-identifier
     GenerateCSRResponse:
       description: >-
         The GenerateCSRResponse object contains the wrapped private key

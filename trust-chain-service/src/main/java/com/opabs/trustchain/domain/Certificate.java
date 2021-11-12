@@ -29,12 +29,14 @@ public class Certificate {
     private byte[] content;
 
     @JsonIgnore
+    @Column(unique = true)
     private String privateKeyAlias;
 
     private boolean isAnchor;
 
     private String subjectDistinguishedName;
 
+    @Column(unique = true)
     private String publicKeyFingerprint;
 
     private String certificateFingerprint;
