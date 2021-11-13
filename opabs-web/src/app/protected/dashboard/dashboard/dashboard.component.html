@@ -5,7 +5,7 @@
 </div>
 <div class="wrapper" fxLayout="column" fxLayoutAlign="start start">
   <div fxLayout="row" fxLayoutAlign="space-around start" class="dashboard-card">
-      <div [routerLink]="['/protected', 'tenants']" fxLayout="row" fxLayoutAlign="space-between center" class="detail mat-elevation-z3">
+      <div *ngIf="!isTenantAdmin" [routerLink]="['/protected', 'tenants']" fxLayout="row" fxLayoutAlign="space-between center" class="detail mat-elevation-z3">
         <div class="icon-bg"></div>
         <fa-icon class="detail-icon" [icon]="faBuilding"></fa-icon>
         <div>

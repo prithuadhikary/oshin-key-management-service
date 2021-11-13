@@ -8,6 +8,8 @@ export const environment = {
     issuerUrl: 'https://dev-52177607.okta.com/oauth2/default',
     redirectUri: 'http://localhost:4200/protected/dashboard/',
     tokenEndpoint: 'https://dev-52177607.okta.com/oauth2/default/v1/token',
+    logoutEndpoint: 'https://dev-52177607.okta.com/oauth2/default/v1/logout',
+    postLogoutRedirectUri: 'http://localhost:4200/',
     clientId: '0oa238u6a1iZLeox75d7',
     scopes: 'openid profile email'
   },

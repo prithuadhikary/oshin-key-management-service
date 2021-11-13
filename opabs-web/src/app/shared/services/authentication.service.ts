@@ -3,6 +3,8 @@ import {environment} from '../../../environments/environment';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {Observable} from 'rxjs';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +17,8 @@ export class AuthenticationService {
 
   constructor(
     private oAuthService: OAuthService,
+    private http: HttpClient,
+    private router: Router
   ) {
   }
 
@@ -36,7 +40,7 @@ export class AuthenticationService {
           sessionStorage.setItem(this.accessTokenKey, result.access_token);
           resolve({idToken: result.id_token, accessToken: result.access_token});
         }, error => {
-            reject(error);
+          reject(error);
         });
       } else {
         resolve({
@@ -45,5 +49,14 @@ export class AuthenticationService {
         });
       }
     }));
+  }
+
+  performLogout(): void {
+    const idToken = sessionStorage.getItem('id_token');
+    const params = new HttpParams().set('id_token_hint', idToken)
+      .set('post_logout_redirect_uri', environment.okta.postLogoutRedirectUri);
+    this.oAuthService.revokeTokenAndLogout();
+    this.oAuthService.logOut();
+    window.location.href = `${environment.okta.logoutEndpoint}?${params.toString()}`;
   }
 }

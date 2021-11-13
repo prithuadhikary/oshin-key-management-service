@@ -12,8 +12,6 @@ import {MenuItem} from '../../shared/model/MenuItem';
 })
 export class ProtectedViewComponent implements OnInit {
 
-  private readonly accessTokenKey = 'access_token';
-
   menuItems: Array<MenuItem> = [];
 
   constructor(
@@ -21,7 +19,7 @@ export class ProtectedViewComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private authenticationService: AuthenticationService,
-    private menuItemService: MenuItemService
+    private menuItemService: MenuItemService,
     ) { }
 
   ngOnInit(): void {
@@ -29,9 +27,7 @@ export class ProtectedViewComponent implements OnInit {
   }
 
   logout(): void {
-    this.oAuthService.revokeTokenAndLogout();
-    this.oAuthService.logOut();
-    this.router.navigate(['/login']);
+    this.authenticationService.performLogout();
   }
 
 }

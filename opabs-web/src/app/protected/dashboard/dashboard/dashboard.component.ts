@@ -32,4 +32,8 @@ export class DashboardComponent implements OnInit {
       this.userDetails = this.userService.userInfo();
     });
   }
+
+  get isTenantAdmin(): boolean {
+    return this.userService.isTenantAdmin();
+  }
 }

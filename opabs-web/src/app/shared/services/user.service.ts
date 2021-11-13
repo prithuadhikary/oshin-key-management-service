@@ -11,9 +11,23 @@ export class UserService {
   public userInfo(): { name: string, email: string } {
     const idToken = sessionStorage.getItem('id_token');
     const helper = new JwtHelperService();
-    const userIdentity = helper.decodeToken(idToken);
-    console.log(userIdentity);
-    return userIdentity;
+    return helper.decodeToken(idToken);
+  }
+
+  public groupInfo(): { groups: Array<string> } {
+    const accessToken = sessionStorage.getItem('access_token');
+    const helper = new JwtHelperService();
+    return helper.decodeToken(accessToken);
+  }
+
+  public isAdmin(): boolean {
+    const groupInfo = this.groupInfo();
+    return groupInfo.groups.includes('opabs-admin');
+  }
+
+  public isTenantAdmin(): boolean {
+    const groupInfo = this.groupInfo();
+    return groupInfo.groups.includes('tenant-admin');
   }
 
 }
