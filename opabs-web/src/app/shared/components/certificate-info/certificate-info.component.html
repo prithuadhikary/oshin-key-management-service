@@ -14,6 +14,8 @@
     <span>{{certificate.validUpto | date: 'medium'}}</span>
     <h3>Key Usages</h3>
     <span>{{getKeyUsages()}}</span>
+    <h3>Serial</h3>
+    <span>{{certificate.serial}}</span>
   </div>
   <div fxLayout="column" fxFlex="50%">
     <h3>Key Length</h3>
@@ -29,6 +31,8 @@
     <h3>Is A Root Certificate</h3>
     <span>{{certificate.anchor ? 'Yes': 'No'}}</span>
     <h3 *ngIf="certificate.pathLengthConstraint != null">Path Length Constraint</h3>
-    <span *ngIf="certificate.pathLengthConstraint != null">{{certificate.pathLengthConstraint}}</span>
+    <span *ngIf="certificate.pathLengthConstraint != null">
+      {{pathLengthConstraint}}
+    </span>
   </div>
 </blockquote>

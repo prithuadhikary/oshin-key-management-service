@@ -1,7 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Certificate} from '../../model/Certificate';
 import {KeyUsage} from '../../model/KeyUsage';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-certificate-info',
@@ -10,7 +9,7 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 })
 export class CertificateInfoComponent {
 
-  faInfoCircle = faInfoCircle;
+  private readonly maxPathLength = 2147483647;
 
   @Input() certificate: Certificate;
 
@@ -20,6 +19,14 @@ export class CertificateInfoComponent {
     return this.certificate.keyUsages.map(value => {
       return KeyUsage[value];
     });
+  }
+
+  get pathLengthConstraint(): any {
+    if (this.certificate.pathLengthConstraint === this.maxPathLength) {
+      return 'Unlimited';
+    } else {
+      return this.certificate.pathLengthConstraint;
+    }
   }
 
 }

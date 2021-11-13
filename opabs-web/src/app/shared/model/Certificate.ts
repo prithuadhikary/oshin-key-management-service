@@ -20,4 +20,5 @@ export interface Certificate {
   keyLength: number;
   namedCurve: string;
   pathLengthConstraint: number;
+  serial: number;
 }
