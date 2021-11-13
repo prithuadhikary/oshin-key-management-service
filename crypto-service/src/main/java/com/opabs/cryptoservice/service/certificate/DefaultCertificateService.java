@@ -110,7 +110,7 @@ public class DefaultCertificateService implements CertificateService {
 
             //6. Create certificate builder.
             X509v3CertificateBuilder certificateGenerator = new X509v3CertificateBuilder(
-                    new X500Name(issuerDN), new BigInteger("1"),
+                    new X500Name(issuerDN), new BigInteger(request.getSerial().toString()),
                     Date.from(request.getValidFrom().toInstant()),
                     Date.from(request.getValidFrom().plus(request.getValidityInYears(), ChronoUnit.YEARS).toInstant()),
                     pkcs10req.getSubject(), pkcs10req.getSubjectPublicKeyInfo());

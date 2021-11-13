@@ -93,6 +93,7 @@ public class CertificateUtils {
         certificateInfo.setKeyUsages(keyUsages);
         certificateInfo.setDateIssued(certificateObject.getNotBefore());
         certificateInfo.setExpiryDate(certificateObject.getNotAfter());
+        certificateInfo.setSerial(certificateObject.getSerialNumber().intValue());
         if (keyUsages.contains(KeyUsages.KEY_CERT_SIGN) && keyUsages.contains(KeyUsages.CRL_SIGN)) {
             certificateInfo.setPathLengthConstraint(certificateObject.getBasicConstraints());
         }

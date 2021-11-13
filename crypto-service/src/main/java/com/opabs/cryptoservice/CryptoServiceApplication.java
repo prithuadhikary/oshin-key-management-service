@@ -11,7 +11,7 @@ import java.util.TimeZone;
 @SpringBootApplication
 public class CryptoServiceApplication {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         SpringApplication.run(CryptoServiceApplication.class, args);
     }

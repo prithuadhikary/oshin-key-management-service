@@ -49,4 +49,6 @@ public class CertificateModel {
 
     private Integer pathLengthConstraint;
 
+    private Integer serial;
+
 }

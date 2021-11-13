@@ -36,4 +36,6 @@ public class CertificateInfo {
     private Date dateIssued;
 
     private Date expiryDate;
+
+    private Integer serial;
 }
