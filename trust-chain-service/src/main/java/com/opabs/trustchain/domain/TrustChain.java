@@ -46,4 +46,6 @@ public class TrustChain {
     @UpdateTimestamp
     private OffsetDateTime dateUpdated;
 
+    private Long lastSerialNumber;
+
 }

@@ -4,7 +4,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
   datasource:
     url: jdbc:postgresql://localhost:5432/opabs?currentSchema=trust_chain
     username: postgres

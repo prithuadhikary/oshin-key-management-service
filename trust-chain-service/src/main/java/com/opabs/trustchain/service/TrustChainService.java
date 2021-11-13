@@ -75,7 +75,7 @@ public class TrustChainService {
         trustChain.setTenantExtId(tenantExtId);
         trustChain.setName(command.getName());
         trustChain.setDescription(command.getDescription());
-
+        trustChain.setLastSerialNumber(1L);
         trustChain = trustChainRepository.save(trustChain);
 
         Certificate certificate = new Certificate();
@@ -86,7 +86,6 @@ public class TrustChainService {
         certificate.setTrustChain(trustChain);
         certificate.setKeyType(command.getKeyType());
         certificate.setSubjectDistinguishedName(command.getSubjectDistinguishedName());
-
         CertificateInfo certInfo = CertificateUtils.getCertificateInfo(signingResponse.getCertificate());
         certificate.setPublicKeyFingerprint(certInfo.getPublicKeyFingerprint());
         certificate.setCertificateFingerprint(certInfo.getCertificateFingerprint());
@@ -177,7 +176,8 @@ public class TrustChainService {
         signingRequest.setValidFrom(command.getValidFrom());
         signingRequest.setValidityInYears(command.getValidityInYears());
         signingRequest.setIssuerPrivateKeyAlias(csr.getPrivateKeyAlias());
-
+        // The serial number is one for the first certificate that is being issued by itself.
+        signingRequest.setSerial(1L);
         // The path length constraint determines how many sub CAs are allowed beneath this root CA certificate.
         // Every time a non root intermediate CA certificate is generated. the basic constraint will be decremented
         // by 1.

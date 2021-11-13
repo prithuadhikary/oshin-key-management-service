@@ -61,7 +61,7 @@ public class CertificateSigningRequest {
     /**
      * The certificate serial number.
      */
-    private Integer serial = 1;
+    private Long serial = 1L;
 
     /**
      * The certificate signing algorithm.

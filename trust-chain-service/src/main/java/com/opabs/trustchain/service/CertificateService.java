@@ -8,6 +8,7 @@ import com.opabs.trustchain.controller.command.CreateCertificateCommand;
 import com.opabs.trustchain.controller.model.CertificateModel;
 import com.opabs.trustchain.controller.responses.CreateCertificateResponse;
 import com.opabs.trustchain.domain.Certificate;
+import com.opabs.trustchain.domain.TrustChain;
 import com.opabs.trustchain.exception.InternalServerErrorException;
 import com.opabs.trustchain.exception.KeyTypeAndUsageMismatch;
 import com.opabs.trustchain.exception.NotFoundException;
@@ -15,6 +16,7 @@ import com.opabs.trustchain.exception.ParentKeyUsageInvalidException;
 import com.opabs.trustchain.feign.CryptoService;
 import com.opabs.trustchain.model.CertificateInfo;
 import com.opabs.trustchain.repository.CertificateRepository;
+import com.opabs.trustchain.repository.TrustChainRepository;
 import com.opabs.trustchain.utils.CertificateUtils;
 import com.opabs.trustchain.utils.CompressionUtils;
 import com.opabs.trustchain.utils.TransformationUtils;
@@ -29,14 +31,16 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.CertificateException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.opabs.trustchain.domain.specifications.CertificateSpecifications.searchSpecification;
 import static com.opabs.trustchain.utils.CertificateUtils.*;
 import static com.opabs.trustchain.utils.CompressionUtils.compress;
 import static com.opabs.trustchain.utils.CompressionUtils.uncompress;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Slf4j
 @Service
@@ -47,6 +51,8 @@ public class CertificateService {
     private final CryptoService cryptoService;
 
     private final CertificateRepository certificateRepository;
+
+    private final TrustChainRepository trustChainRepository;
 
     public CreateCertificateResponse createCertificate(CreateCertificateCommand command) {
         //1. Fetch the parent certificate object containing the certificate content and
@@ -68,7 +74,8 @@ public class CertificateService {
             throw new ParentKeyUsageInvalidException();
         }
 
-        GenerateCSRRequest generateCSRRequest = createCSRRequest(command, parentCertificate.getTrustChain().getTenantExtId());
+        TrustChain trustChain = parentCertificate.getTrustChain();
+        GenerateCSRRequest generateCSRRequest = createCSRRequest(command, trustChain.getTenantExtId());
         GenerateCSRResponse csrResponse = cryptoService.generateCSR(generateCSRRequest);
 
         CertificateSigningRequest csrReq = new CertificateSigningRequest();
@@ -82,6 +89,11 @@ public class CertificateService {
         String pemCertificate = toPemCertificate(uncompress(parentCertificate.getContent()));
         csrReq.setIssuerCertificate(pemCertificate);
 
+        Long lastSerialNumber = trustChain.getLastSerialNumber();
+        csrReq.setSerial(lastSerialNumber + 1);
+        trustChain.setLastSerialNumber(lastSerialNumber + 1);
+        trustChainRepository.save(trustChain);
+
         CertificateSigningResponse certificateResponse = cryptoService.signCSR(csrReq);
 
         Certificate newCertificate = new Certificate();
@@ -89,7 +101,7 @@ public class CertificateService {
         newCertificate.setKeyType(command.getKeyType());
         newCertificate.setParentCertificate(parentCertificate);
         newCertificate.setContent(compress(fromPemCertificate(certificateResponse.getCertificate())));
-        newCertificate.setTrustChain(parentCertificate.getTrustChain());
+        newCertificate.setTrustChain(trustChain);
         newCertificate.setPrivateKeyAlias(csrResponse.getPrivateKeyAlias());
         newCertificate.setSubjectDistinguishedName(command.getSubjectDistinguishedName());
         CertificateInfo certificateInfo = CertificateUtils.getCertificateInfo(certificateResponse.getCertificate());
@@ -102,7 +114,7 @@ public class CertificateService {
         CreateCertificateResponse response = new CreateCertificateResponse();
         response.setId(newCertificate.getId());
         response.setCertificate(certificateResponse.getCertificate());
-        response.setTrustChainId(parentCertificate.getTrustChain().getId());
+        response.setTrustChainId(trustChain.getId());
         response.setParentCertificateId(parentCertificate.getId());
         response.setCertificateFingerprint(certificateInfo.getCertificateFingerprint());
         response.setPublicKeyFingerprint(certificateInfo.getPublicKeyFingerprint());
