@@ -37,6 +37,11 @@
       width: 55px;
       z-index: 1;
       border-radius: 20px 0 0 20px;
+      transition: width 0.5s;
+    }
+
+    &:hover .icon-bg {
+      width: 70px
     }
 
     h1, h2, h3 {
