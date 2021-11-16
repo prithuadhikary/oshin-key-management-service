@@ -19,8 +19,8 @@ export class CertificateIssueDensityComponent implements OnInit {
   ngOnInit(): void {
       Chart.register(...registerables);
       const now = Date();
-      const startDate = moment(now).subtract(6, 'month').startOf('month');
-      const endDate = moment(now).add(6, 'month').endOf('month');
+      const startDate = moment(now).subtract(6, 'month').startOf('month').utc();
+      const endDate = moment(now).add(6, 'month').endOf('month').utc();
       this.certificateService.fetchIssuedCountByDate(startDate.toISOString(), endDate.toISOString()).subscribe(data => {
         const canvas: any = document.getElementById('canvas');
         const context = canvas.getContext('2d');
