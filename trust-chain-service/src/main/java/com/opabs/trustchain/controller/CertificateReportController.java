@@ -57,8 +57,8 @@ public class CertificateReportController {
     @Secured(Permissions.CERTIFICATE_REPORT_VIEW)
     @GetMapping("count-by-month")
     public ResponseEntity<List<CountByMonthResponse>> countByMonthBetween(Principal userPrincipal,
-                                                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
-                                                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate
+                                                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date startDate,
+                                                                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date endDate
     ) {
         return ResponseEntity.ok(certificateReportService.countByMonth(userPrincipal, startDate, endDate));
     }
