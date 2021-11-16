@@ -1,23 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: crypto-management-service
+  name: trust-chain-service
   labels:
-    app: crypto-management-service
+    app: trust-chain-service
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: crypto-management-service
+      app: trust-chain-service
   template:
     metadata:
       labels:
-        app: crypto-management-service
+        app: trust-chain-service
     spec:
       containers:
-        - name: crypto-management-service
-          image: prithuadhikary/crypto-management-service:1.0
+        - name: trust-chain-service
+          image: prithuadhikary/trust-chain-service:1.0
           imagePullPolicy: Always
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: cloud
+            - name: DB_HOST
+              value: postgres-ext-service
+            - name: DB_NAME
+              value: opabs
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: DB_USERNAME
+                  name: opabs-db-creds
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PASSWORD
+                  name: opabs-db-creds
           ports:
             - containerPort: 8084
               protocol: TCP
@@ -25,11 +42,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: crypto-management-service
+  name: trust-chain-service
 spec:
   type: ClusterIP
   selector:
-    app: crypto-management-service
+    app: trust-chain-service
   ports:
     - port: 80
       targetPort: 8084

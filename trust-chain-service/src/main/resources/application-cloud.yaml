@@ -4,3 +4,13 @@ spring:
       discovery:
         enabled: true
       enabled: true
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:5432/${DB_NAME}?currentSchema=trust_chain
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}

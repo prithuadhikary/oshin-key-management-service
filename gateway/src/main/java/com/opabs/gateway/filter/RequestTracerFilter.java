@@ -16,7 +16,7 @@ public class RequestTracerFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange serverWebExchange,
                              WebFilterChain webFilterChain) {
-        LOGGER.info("Hitting {}", serverWebExchange.getRequest().getURI());
+        LOGGER.info("Method: {}, Hitting {}", serverWebExchange.getRequest().getMethodValue(), serverWebExchange.getRequest().getURI());
         serverWebExchange.getResponse()
           .getHeaders().add("web-filter", "web-filter-test");
         return webFilterChain.filter(serverWebExchange);

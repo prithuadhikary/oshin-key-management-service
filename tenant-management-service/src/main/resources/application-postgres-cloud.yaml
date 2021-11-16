@@ -6,7 +6,6 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:postgresql://localhost:5432/opabs?currentSchema=trust_chain
-    username: postgres
-    password: password
-
+    url: jdbc:postgresql://${DB_HOST}:5432/${DB_NAME}?currentSchema=tenant
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}

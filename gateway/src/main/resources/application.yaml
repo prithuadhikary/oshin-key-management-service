@@ -11,13 +11,14 @@ spring:
           lower-case-service-id: true
     kubernetes:
       enabled: false
+      discovery:
+        enabled: false
 
 endpoint:
   configuration:
     cryptoService: http://localhost:8083
     trustChainService: http://localhost:8084
     tenantManagementService: http://localhost:8085
-    authService: http://localhost:8086
 
 management:
   endpoints:

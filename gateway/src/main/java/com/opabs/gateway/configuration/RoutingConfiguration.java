@@ -24,9 +24,6 @@ public class RoutingConfiguration {
                 .route(r ->
                         r.path("/api/tenant-management-service/**")
                                 .uri(endpointConfiguration.getTenantManagementService()))
-                .route(r ->
-                        r.path("/api/auth-service/**")
-                                .uri(endpointConfiguration.getAuthService()))
                 .build();
     }
 

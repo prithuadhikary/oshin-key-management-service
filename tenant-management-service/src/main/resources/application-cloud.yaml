@@ -1,4 +1,9 @@
 spring:
   cloud:
     kubernetes:
+      discovery:
+        enabled: true
       enabled: true
+
+server:
+  port: 80

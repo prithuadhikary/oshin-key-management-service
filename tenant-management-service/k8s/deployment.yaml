@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tenant-management-service
+spec:
+  selector:
+    matchLabels:
+      app: tenant-management-service
+  template:
+    metadata:
+      labels:
+        app: tenant-management-service
+    spec:
+      containers:
+        - name: tenant-management-service
+          image: prithuadhikary/tenant-management-service:1.0
+          imagePullPolicy: Always
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: cloud, kubernetes, postgres-cloud
+            - name: DB_HOST
+              value: postgres-ext-service
+            - name: DB_NAME
+              value: opabs
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: opabs-db-creds
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: opabs-db-creds
+                  key: DB_PASSWORD
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tenant-management-service
+spec:
+  selector:
+    app: tenant-management-service
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80

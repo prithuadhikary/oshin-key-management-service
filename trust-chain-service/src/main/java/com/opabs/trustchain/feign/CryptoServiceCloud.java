@@ -5,5 +5,5 @@ import org.springframework.context.annotation.Profile;
 
 @Profile("cloud")
 @FeignClient(value = "crypto-service")
-public interface CryptoServiceCloud {
+public interface CryptoServiceCloud extends CryptoService {
 }
