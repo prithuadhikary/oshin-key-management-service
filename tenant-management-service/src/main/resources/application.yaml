@@ -8,6 +8,9 @@ spring:
   cloud:
     kubernetes:
       enabled: false
+      discovery:
+        enabled: false
+
   security:
     filter:
       order: 10   # this makes space for 10 custom spring security filters.

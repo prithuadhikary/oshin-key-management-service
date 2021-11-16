@@ -18,4 +18,6 @@ public interface TenantRepository extends PagingAndSortingRepository<Tenant, UUI
     Page<Tenant> findAllByDeletedAndId(Boolean isDeleted, UUID id, Pageable pageable);
 
     Optional<Tenant> findByIdAndDeleted(UUID id, boolean deleted);
+
+    Long countByDeleted(Boolean isDeleted);
 }

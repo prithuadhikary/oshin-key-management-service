@@ -127,7 +127,7 @@ public class TenantService {
 
     public TenantCountResponse count() {
         TenantCountResponse response = new TenantCountResponse();
-        response.setTotal(tenantRepository.count());
+        response.setTotal(tenantRepository.countByDeleted(false));
         return response;
     }
 }

@@ -9,4 +9,3 @@ spring:
     url: jdbc:postgresql://localhost:5432/opabs?currentSchema=tenant
     username: postgres
     password: password
-

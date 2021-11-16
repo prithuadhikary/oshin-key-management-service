@@ -1,3 +1,5 @@
+
+
 spring:
   cloud:
     kubernetes:
@@ -13,4 +15,8 @@ spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST}:5432/${DB_NAME}?currentSchema=trust_chain
     username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+  password: ${DB_PASSWORD}
+
+
+server:
+  port: 80
