@@ -22,6 +22,7 @@ public class GenerateCSRBase {
     /**
      * The alias of the RSA/EC private key generated using HSM.
      */
+    @NotEmpty
     private String privateKeyAlias;
 
     /**
